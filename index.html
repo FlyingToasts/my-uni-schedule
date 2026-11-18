@@ -256,6 +256,10 @@
                         <i class="fa-solid fa-palette"></i>
                         <span><span class="sm:hidden">จัดการสี</span><span class="hidden sm:inline">จัดการสี / หมวดวิชา</span></span>
                     </button>
+                    <button onclick="openAppIconModal()" class="px-2 sm:px-3.5 py-3 sm:py-2.5 bg-teal-600/90 hover:bg-teal-500 text-white font-semibold rounded-xl text-xs sm:text-sm transition-all shadow-md active:scale-95 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 whitespace-nowrap">
+                        <i class="fa-solid fa-image"></i>
+                        <span>ไอคอนแอป</span>
+                    </button>
                 </div>
 
                 <!-- แถวล่าง: ส่งออก / นำเข้า / ล้างข้อมูล -->
@@ -3641,6 +3645,182 @@
     </script>
 
     <script>
+        // --- DYNAMIC PWA ICON & MANIFEST GENERATOR ---
+        const STORAGE_APP_ICON_KEY = 'smart_schedule_custom_icon_v1';
+        let currentManifestBlobUrl = null;
+
+        // สร้างไอคอนเริ่มต้นด้วย Canvas (ไม่ต้องมีไฟล์ icon แยก)
+        function generateDefaultIconDataUrl(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(0, 0, size, size);
+            const pad = size * 0.1;
+            const radius = size * 0.2;
+            ctx.fillStyle = '#1e293b';
+            ctx.beginPath();
+            if (typeof ctx.roundRect === 'function') {
+                ctx.roundRect(pad, pad, size - pad * 2, size - pad * 2, radius);
+            } else {
+                ctx.rect(pad, pad, size - pad * 2, size - pad * 2);
+            }
+            ctx.fill();
+            ctx.fillStyle = '#f59e0b';
+            ctx.beginPath();
+            if (typeof ctx.roundRect === 'function') {
+                ctx.roundRect(pad, pad, size - pad * 2, size * 0.24, [radius, radius, 0, 0]);
+            } else {
+                ctx.rect(pad, pad, size - pad * 2, size * 0.24);
+            }
+            ctx.fill();
+            ctx.fillStyle = '#f8fafc';
+            ctx.font = `bold ${Math.round(size * 0.32)}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('ตาราง', size / 2, size * 0.62);
+            return canvas.toDataURL('image/png');
+        }
+
+        // ครอปภาพจากจุดกึ่งกลางให้เป็นสี่เหลี่ยมจัตุรัส
+        function resizeImageFileToSquarePng(file, size) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = size;
+                        canvas.height = size;
+                        const ctx = canvas.getContext('2d');
+                        const minSide = Math.min(img.width, img.height);
+                        const sx = (img.width - minSide) / 2;
+                        const sy = (img.height - minSide) / 2;
+                        ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
+                        resolve(canvas.toDataURL('image/png'));
+                    };
+                    img.onerror = reject;
+                    img.src = ev.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function getActiveAppIcons() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(STORAGE_APP_ICON_KEY) || 'null');
+                if (saved && saved.icon192 && saved.icon512) return saved;
+            } catch (e) {
+                console.warn('Could not read saved app icon:', e);
+            }
+            return {
+                icon192: generateDefaultIconDataUrl(192),
+                icon512: generateDefaultIconDataUrl(512)
+            };
+        }
+
+        // สร้าง Web App Manifest จากไอคอนปัจจุบัน
+        function applyDynamicManifestAndIcons() {
+            const icons = getActiveAppIcons();
+            const baseUrl = new URL('./', window.location.href).href;
+            const scopePath = new URL('./', window.location.href).pathname;
+            const manifestObj = {
+                id: scopePath,
+                name: 'ตารางเรียนอัจฉริยะ (Smart Schedule)',
+                short_name: 'ตารางเรียน',
+                description: 'ตารางเรียนรายชั่วโมง วิชา Lab โน้ตรายวิชา และสรุปงานประจำสัปดาห์',
+                start_url: baseUrl,
+                scope: baseUrl,
+                display: 'standalone',
+                orientation: 'portrait',
+                background_color: '#0f172a',
+                theme_color: '#0f172a',
+                icons: [
+                    { src: icons.icon192, sizes: '192x192', type: 'image/png', purpose: 'any' },
+                    { src: icons.icon512, sizes: '512x512', type: 'image/png', purpose: 'any' },
+                    { src: icons.icon512, sizes: '512x512', type: 'image/png', purpose: 'maskable' }
+                ]
+            };
+            if (currentManifestBlobUrl) URL.revokeObjectURL(currentManifestBlobUrl);
+            const blob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+            currentManifestBlobUrl = URL.createObjectURL(blob);
+            let manifestLink = document.querySelector('link[rel="manifest"]');
+            if (!manifestLink) {
+                manifestLink = document.createElement('link');
+                manifestLink.rel = 'manifest';
+                document.head.appendChild(manifestLink);
+            }
+            manifestLink.href = currentManifestBlobUrl;
+            let appleIcon = document.querySelector('link[rel="apple-touch-icon"]');
+            if (!appleIcon) {
+                appleIcon = document.createElement('link');
+                appleIcon.rel = 'apple-touch-icon';
+                document.head.appendChild(appleIcon);
+            }
+            appleIcon.href = icons.icon192;
+            let favicon = document.querySelector('link[rel="icon"]');
+            if (!favicon) {
+                favicon = document.createElement('link');
+                favicon.rel = 'icon';
+                document.head.appendChild(favicon);
+            }
+            favicon.href = icons.icon192;
+            const previewEl = document.getElementById('app-icon-preview');
+            if (previewEl) previewEl.src = icons.icon192;
+        }
+
+        function openAppIconModal() {
+            const preview = document.getElementById('app-icon-preview');
+            if (preview) preview.src = getActiveAppIcons().icon192;
+            const modal = document.getElementById('app-icon-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeAppIconModal() {
+            const modal = document.getElementById('app-icon-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        async function handleCustomAppIconUpload(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            if (!file.type || !file.type.startsWith('image/')) {
+                showToast('กรุณาเลือกไฟล์รูปภาพเท่านั้น', 'error');
+                event.target.value = '';
+                return;
+            }
+            try {
+                const [icon192, icon512] = await Promise.all([
+                    resizeImageFileToSquarePng(file, 192),
+                    resizeImageFileToSquarePng(file, 512)
+                ]);
+                localStorage.setItem(STORAGE_APP_ICON_KEY, JSON.stringify({ icon192, icon512 }));
+                applyDynamicManifestAndIcons();
+                showToast('เปลี่ยนไอคอนแอปแล้ว! กด "ติดตั้งแอป" เพื่อเพิ่มลงหน้าจอโฮมได้เลย', 'success');
+            } catch (err) {
+                console.error('Custom app icon processing failed:', err);
+                showToast('ไม่สามารถประมวลผลรูปภาพนี้ได้ หรือพื้นที่จัดเก็บไม่เพียงพอ', 'error');
+            }
+            event.target.value = '';
+        }
+
+        function resetCustomAppIcon() {
+            localStorage.removeItem(STORAGE_APP_ICON_KEY);
+            applyDynamicManifestAndIcons();
+            showToast('รีเซ็ตกลับเป็นไอคอนเริ่มต้นเรียบร้อยแล้ว', 'info');
+        }
+
+        // อัปเดต manifest/ไอคอนทันทีเมื่อโหลดหน้าเว็บ
+        applyDynamicManifestAndIcons();
+
         // --- PWA SERVICE WORKER & INSTALL PROMPT ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -3655,19 +3835,13 @@
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
         const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
 
-        // Android / Desktop Chrome: จับ event ติดตั้งแอป
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            if (!isStandalone && installBtn) {
-                installBtn.classList.remove('hidden');
-            }
+            if (!isStandalone && installBtn) installBtn.classList.remove('hidden');
         });
 
-        // iOS Safari: แสดงปุ่มให้กดดูวิธี Add to Home Screen
-        if (isIOS && !isStandalone && installBtn) {
-            installBtn.classList.remove('hidden');
-        }
+        if (isIOS && !isStandalone && installBtn) installBtn.classList.remove('hidden');
 
         window.addEventListener('appinstalled', () => {
             deferredPrompt = null;
@@ -3679,17 +3853,52 @@
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted' && installBtn) {
-                    installBtn.classList.add('hidden');
-                }
+                if (outcome === 'accepted' && installBtn) installBtn.classList.add('hidden');
                 deferredPrompt = null;
             } else if (isIOS) {
-                showToast('บน iPhone/iPad: แตะปุ่ม "แชร์" (สี่เหลี่ยมมีลูกศรชี้ขึ้น) ด้านล่าง แล้วเลือก "เพิ่มไปยังหน้าจอโฮม"', 'info');
+                showToast('บน iPhone/iPad: แตะปุ่ม "แชร์" ด้านล่าง แล้วเลือก "เพิ่มไปยังหน้าจอโฮม"', 'info');
             } else {
                 showToast('เปิดเมนูเบราว์เซอร์ (⋮) แล้วเลือก "ติดตั้งแอป" หรือ "เพิ่มลงหน้าจอหลัก"', 'info');
             }
         }
     </script>
+
+
+    <!-- Modal: Custom App Icon -->
+    <div id="app-icon-modal" class="fixed inset-0 z-[65] hidden items-center justify-center bg-slate-950/85 backdrop-blur-sm p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+            <div class="px-5 py-4 bg-slate-800/90 border-b border-slate-700 flex items-center justify-between">
+                <h3 class="font-bold text-base text-white flex items-center gap-2">
+                    <i class="fa-solid fa-image text-teal-400"></i> ตั้งค่าไอคอนแอปบนหน้าจอโฮม
+                </h3>
+                <button onclick="closeAppIconModal()" class="text-slate-400 hover:text-white w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-700">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="p-5 space-y-4 text-xs sm:text-sm">
+                <div class="flex items-center gap-4 bg-slate-800/70 p-3.5 rounded-xl border border-slate-700">
+                    <img id="app-icon-preview" alt="App Icon Preview" class="w-16 h-16 rounded-2xl object-cover border-2 border-teal-400/60 shadow-md shrink-0 bg-slate-900">
+                    <div class="space-y-1">
+                        <div class="font-bold text-white">ตัวอย่างไอคอนแอปปัจจุบัน</div>
+                        <p class="text-[11px] text-slate-400 leading-relaxed">ระบบจะครอปตรงกลางเป็นสี่เหลี่ยมจัตุรัสและปรับขนาดเป็น 192×192 และ 512×512 ให้อัตโนมัติ</p>
+                    </div>
+                </div>
+                <div class="bg-amber-950/30 border border-amber-500/30 rounded-xl p-3 text-[11px] text-amber-200 leading-relaxed">
+                    <i class="fa-solid fa-circle-info text-amber-400 mr-1"></i>
+                    <strong>แนะนำ:</strong> เลือกรูปไอคอนที่ต้องการให้เรียบร้อย<strong>ก่อน</strong>กดปุ่ม "ติดตั้งแอป" หากติดตั้งไปแล้วอยากเปลี่ยนรูป ให้ลบแอปเดิมบนหน้าจอแล้วติดตั้งใหม่
+                </div>
+                <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+                    <label class="px-4 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs cursor-pointer shadow transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-upload"></i> เลือกรูปภาพจากเครื่อง
+                        <input type="file" accept="image/*" onchange="handleCustomAppIconUpload(event)" class="hidden">
+                    </label>
+                    <button type="button" onclick="resetCustomAppIcon()" class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-medium">
+                        ใช้ไอคอนเริ่มต้น
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>
