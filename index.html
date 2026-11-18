@@ -1504,7 +1504,7 @@
                     ? `bg-slate-900 text-amber-300 font-bold border-r border-slate-700 ${dayColWidthClass}`
                     : `bg-slate-900/95 text-slate-300 font-semibold border-r border-slate-700 ${dayColWidthClass}`;
 
-                tbodyHTML += `<tr class="${rowBg} h-20 sm:h-24">`;
+                tbodyHTML += `<tr class="${rowBg}">`;
                 tbodyHTML += `
                     <td class="p-1.5 sm:p-2.5 text-center align-middle ${dayCellClass}">
                         <div class="leading-tight">${isFit ? `<span class="sm:hidden">${dayObj.short}</span><span class="hidden sm:inline">${dayObj.name}</span>` : dayObj.name}</div>
@@ -1512,119 +1512,96 @@
                     </td>
                 `;
 
-                let hIndex = 0;
-                while (hIndex < hoursList.length) {
-                    const currentHour = hoursList[hIndex];
-                    const slotStartMins = currentHour * 60;
-                    const slotEndMins = (currentHour + 1) * 60;
+                // --- Time-proportional layout: each session is positioned by its real start/end minutes ---
+                const gridStartM = minHour * 60;
+                const gridTotalM = (maxHour - minHour) * 60;
 
-                    const matchedSessions = daySessions.filter(sess => {
-                        const cStart = timeToMinutes(sess.start);
-                        const cEnd = timeToMinutes(sess.end);
-                        return cStart < slotEndMins && cEnd > slotStartMins;
-                    });
+                // Assign lanes (rows) so truly-overlapping sessions never cover each other
+                const laneEnds = [];
+                const placed = daySessions.map(sess => {
+                    const st = timeToMinutes(sess.start), en = timeToMinutes(sess.end);
+                    let lane = laneEnds.findIndex(e => e <= st);
+                    if (lane === -1) { lane = laneEnds.length; laneEnds.push(en); } else { laneEnds[lane] = en; }
+                    return { sess, st, en, lane };
+                });
+                const laneCount = Math.max(1, laneEnds.length);
+                const rowHeightPx = laneCount * 92;
 
-                    if (matchedSessions.length > 0) {
-                        let maxEndMins = slotEndMins;
-                        matchedSessions.forEach(sess => {
-                            const cEnd = timeToMinutes(sess.end);
-                            if (cEnd > maxEndMins) maxEndMins = cEnd;
-                        });
+                const hourBgHTML = hoursList.map(h => {
+                    const clickStart = `${pad(h)}:00`;
+                    const clickEnd = `${pad(h + 1)}:00`;
+                    return `<div onclick="openCourseModal(null, ${dayObj.id}, '${clickStart}', '${clickEnd}')"
+                                 title="คลิกเพื่อเพิ่มวิชาเรียน ${dayObj.name} เวลา ${clickStart} - ${clickEnd}"
+                                 class="flex-1 border-r border-slate-800/60 hover:bg-slate-800/60 cursor-pointer transition-colors group flex items-center justify-center">
+                                <span class="opacity-0 group-hover:opacity-100 text-slate-500 text-xs transition-opacity"><i class="fa-solid fa-plus"></i></span>
+                            </div>`;
+                }).join('');
 
-                        let spanCount = Math.ceil((maxEndMins - slotStartMins) / 60);
-                        if (hIndex + spanCount > hoursList.length) {
-                            spanCount = hoursList.length - hIndex;
-                        }
-                        if (spanCount < 1) spanCount = 1;
+                const cardsHTML = placed.map(({ sess, st, en, lane }) => {
+                    const colObj = getColorObj(sess.colorId);
+                    const endSecs = en * 60;
+                    const isCurrent = isToday && currentSession && currentSession.sessionKey === sess.sessionKey;
+                    const isNext = isToday && nextSession && nextSession.sessionKey === sess.sessionKey;
+                    const isPassed = isToday && (nowTotalSecs >= endSecs);
 
-                        const coveredEndMins = (currentHour + spanCount) * 60;
-                        const allSessionsInSpan = daySessions.filter(sess => {
-                            const cStart = timeToMinutes(sess.start);
-                            const cEnd = timeToMinutes(sess.end);
-                            return cStart >= slotStartMins && cStart < coveredEndMins && cEnd > slotStartMins;
-                        });
+                    let borderStyle = `border: 1px solid ${hexToRgba(colObj.hex, 0.55)}; background-color: ${hexToRgba(colObj.hex, 0.18)};`;
+                    let extraClass = "hover:brightness-125";
+                    let miniStatus = "";
 
-                        const cellSessionsHTML = allSessionsInSpan.map(sess => {
-                            const colObj = getColorObj(sess.colorId);
-                            const endSecs = timeToMinutes(sess.end) * 60;
-                            const isCurrent = isToday && currentSession && currentSession.sessionKey === sess.sessionKey;
-                            const isNext = isToday && nextSession && nextSession.sessionKey === sess.sessionKey;
-                            const isPassed = isToday && (nowTotalSecs >= endSecs);
-
-                            let borderStyle = `border: 1px solid ${hexToRgba(colObj.hex, 0.55)}; background-color: ${hexToRgba(colObj.hex, 0.18)};`;
-                            let extraClass = "hover:brightness-125";
-                            let miniStatus = "";
-
-                            if (isCurrent) {
-                                borderStyle = `border: 2px solid #34d399; background-color: rgba(16, 185, 129, 0.25);`;
-                                extraClass = "ring-2 ring-emerald-400/30 shadow-md";
-                                miniStatus = `<span class="text-[9px] px-1 rounded bg-emerald-400 text-slate-950 font-bold">เรียนอยู่</span>`;
-                            } else if (isNext) {
-                                borderStyle = `border: 2px solid #fbbf24; background-color: rgba(245, 158, 11, 0.22);`;
-                                miniStatus = `<span class="text-[9px] px-1 rounded bg-amber-400 text-slate-950 font-bold">ถัดไป</span>`;
-                            } else if (sess.isInactive) {
-                                extraClass = "opacity-40 grayscale hover:opacity-80";
-                                miniStatus = `<span class="text-[9px] px-1 rounded bg-slate-600 text-slate-200 font-bold">${escapeHTML(sess.inactiveLabel)}</span>`;
-                            } else if (isPassed) {
-                                extraClass = "opacity-45 hover:opacity-85";
-                            }
-
-                            const labTag = sess.specialType === 'lab'
-                                ? `<span class="text-[9px] px-1 rounded bg-sky-500/30 text-sky-200 font-bold shrink-0">LAB</span>`
-                                : '';
-
-                            return `
-                                <div onclick="openCourseModal('${sess.courseId}')" 
-                                     class="cursor-pointer rounded-lg ${isFit ? 'p-1 sm:p-1.5' : 'p-2'} transition-all flex flex-col justify-between h-full overflow-hidden ${extraClass}"
-                                     style="${borderStyle} border-left: 4px solid ${colObj.hex};"
-                                     title="${escapeHTML(sess.code ? sess.code + ' ' : '')}${escapeHTML(sess.name)} (${sess.start}-${sess.end}) ห้อง: ${escapeHTML(sess.room)}">
-                                    <div>
-                                        <div class="flex items-center justify-between gap-1">
-                                            <span class="font-mono font-bold truncate" style="color: ${colObj.hex}; font-size: ${isFit ? '10px' : '11px'};">
-                                                ${escapeHTML(sess.code || sess.start)}
-                                            </span>
-                                            <div class="flex items-center gap-1 shrink-0">
-                                                ${labTag}
-                                                ${miniStatus}
-                                            </div>
-                                        </div>
-                                        <div class="font-bold text-white leading-tight mt-0.5 ${isFit ? 'line-clamp-2 text-[10px] sm:text-xs' : 'line-clamp-2 text-xs'}">
-                                            ${escapeHTML(sess.name)}
-                                        </div>
-                                    </div>
-                                    <div class="mt-1 pt-1 border-t border-white/10 flex items-center justify-between gap-1 text-[9px] sm:text-[10px] text-slate-300 font-mono">
-                                        <span class="truncate">${sess.start}-${sess.end}</span>
-                                        ${!isFit && sess.room ? `<span class="truncate text-slate-200 font-sans"><i class="fa-solid fa-location-dot text-rose-400 mr-0.5"></i>${escapeHTML(sess.room)}</span>` : ''}
-                                    </div>
-                                </div>
-                            `;
-                        }).join('');
-
-                        tbodyHTML += `
-                            <td colspan="${spanCount}" class="p-1 border-r border-slate-800/90 align-top">
-                                <div class="flex flex-col gap-1 h-full">
-                                    ${cellSessionsHTML}
-                                </div>
-                            </td>
-                        `;
-
-                        hIndex += spanCount;
-                    } else {
-                        const clickStart = `${pad(currentHour)}:00`;
-                        const clickEnd = `${pad(currentHour + 1)}:00`;
-                        tbodyHTML += `
-                            <td onclick="openCourseModal(null, ${dayObj.id}, '${clickStart}', '${clickEnd}')"
-                                title="คลิกเพื่อเพิ่มวิชาเรียน ${dayObj.name} เวลา ${clickStart} - ${clickEnd}"
-                                class="p-1 border-r border-slate-800/60 hover:bg-slate-800/60 cursor-pointer transition-colors group text-center align-middle">
-                                <span class="opacity-0 group-hover:opacity-100 text-slate-500 text-xs transition-opacity">
-                                    <i class="fa-solid fa-plus"></i>
-                                </span>
-                            </td>
-                        `;
-                        hIndex += 1;
+                    if (isCurrent) {
+                        borderStyle = `border: 2px solid #34d399; background-color: rgba(16, 185, 129, 0.25);`;
+                        extraClass = "ring-2 ring-emerald-400/30 shadow-md";
+                        miniStatus = `<span class="text-[9px] px-1 rounded bg-emerald-400 text-slate-950 font-bold">เรียนอยู่</span>`;
+                    } else if (isNext) {
+                        borderStyle = `border: 2px solid #fbbf24; background-color: rgba(245, 158, 11, 0.22);`;
+                        miniStatus = `<span class="text-[9px] px-1 rounded bg-amber-400 text-slate-950 font-bold">ถัดไป</span>`;
+                    } else if (sess.isInactive) {
+                        extraClass = "opacity-40 grayscale hover:opacity-80";
+                        miniStatus = `<span class="text-[9px] px-1 rounded bg-slate-600 text-slate-200 font-bold">${escapeHTML(sess.inactiveLabel)}</span>`;
+                    } else if (isPassed) {
+                        extraClass = "opacity-45 hover:opacity-85";
                     }
-                }
 
+                    const labTag = sess.specialType === 'lab'
+                        ? `<span class="text-[9px] px-1 rounded bg-sky-500/30 text-sky-200 font-bold shrink-0">LAB</span>`
+                        : '';
+
+                    const leftPct = ((st - gridStartM) / gridTotalM) * 100;
+                    const widthPct = ((en - st) / gridTotalM) * 100;
+                    const topPct = (lane / laneCount) * 100;
+                    const heightPct = 100 / laneCount;
+                    const posStyle = `left: calc(${leftPct}% + 2px); width: calc(${widthPct}% - 4px); top: calc(${topPct}% + 2px); height: calc(${heightPct}% - 4px);`;
+
+                    return `
+                        <div onclick="openCourseModal('${sess.courseId}')"
+                             class="absolute z-10 cursor-pointer rounded-lg ${isFit ? 'p-1 sm:p-1.5' : 'p-2'} transition-all flex flex-col justify-between overflow-hidden ${extraClass}"
+                             style="${posStyle} ${borderStyle} border-left: 4px solid ${colObj.hex};"
+                             title="${escapeHTML(sess.code ? sess.code + ' ' : '')}${escapeHTML(sess.name)} (${sess.start}-${sess.end}) ห้อง: ${escapeHTML(sess.room)}">
+                            <div class="min-h-0">
+                                <div class="flex items-center justify-between gap-1">
+                                    <span class="font-mono font-bold truncate" style="color: ${colObj.hex}; font-size: ${isFit ? '10px' : '11px'};">
+                                        ${escapeHTML(sess.code || sess.start)}
+                                    </span>
+                                    <div class="flex items-center gap-1 shrink-0">${labTag}${miniStatus}</div>
+                                </div>
+                                <div class="font-bold text-white leading-tight mt-0.5 ${isFit ? 'line-clamp-2 text-[10px] sm:text-xs' : 'line-clamp-2 text-xs'}">
+                                    ${escapeHTML(sess.name)}
+                                </div>
+                            </div>
+                            <div class="mt-1 pt-1 border-t border-white/10 flex items-center justify-between gap-1 text-[9px] sm:text-[10px] text-slate-300 font-mono">
+                                <span class="truncate">${sess.start}-${sess.end}</span>
+                                ${!isFit && sess.room ? `<span class="truncate text-slate-200 font-sans"><i class="fa-solid fa-location-dot text-rose-400 mr-0.5"></i>${escapeHTML(sess.room)}</span>` : ''}
+                            </div>
+                        </div>`;
+                }).join('');
+
+                tbodyHTML += `
+                    <td colspan="${hoursList.length}" class="p-0 border-r border-slate-800/90 align-top">
+                        <div class="relative" style="height: ${rowHeightPx}px;">
+                            <div class="absolute inset-0 flex">${hourBgHTML}</div>
+                            ${cardsHTML}
+                        </div>
+                    </td>`;
                 tbodyHTML += `</tr>`;
             });
 
