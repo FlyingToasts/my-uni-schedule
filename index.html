@@ -267,6 +267,9 @@
                     <button onclick="exportScheduleJSON()" title="ส่งออกไฟล์สำรองข้อมูล (JSON)" class="px-2 sm:px-3 py-2.5 bg-slate-900 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl text-xs font-medium transition-all flex items-center justify-center gap-1.5 whitespace-nowrap">
                         <i class="fa-solid fa-download text-sky-400"></i> <span>ส่งออก</span>
                     </button>
+                    <button onclick="exportScheduleICS()" title="ส่งออกลงแอปปฏิทินมือถือเพื่อทำ Widget" class="px-2 sm:px-3 py-2.5 bg-slate-900 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl text-xs font-medium transition-all flex items-center justify-center gap-1.5 whitespace-nowrap">
+                        <i class="fa-solid fa-calendar-plus text-amber-400"></i> <span>ลงปฏิทิน</span>
+                    </button>
                     <label title="นำเข้าข้อมูลจากไฟล์ JSON" class="px-2 sm:px-3 py-2.5 bg-slate-900 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl text-xs font-medium transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap">
                         <i class="fa-solid fa-upload text-emerald-400"></i> <span>นำเข้า</span>
                         <input type="file" id="import-json-input" accept=".json" onchange="importScheduleJSON(event)" class="hidden">
@@ -3642,6 +3645,157 @@
             }
             list.innerHTML = html;
         }
+        // --- EXPORT TO PHONE CALENDAR (.ICS) FOR NATIVE WIDGET ---
+        function exportScheduleICS() {
+            if (!Array.isArray(scheduleData) || scheduleData.length === 0) {
+                showToast('ยังไม่มีรายวิชาในตารางเรียนสำหรับส่งออก', 'error');
+                return;
+            }
+
+            const ICAL_DAYS = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+            const pad = (n) => String(n).padStart(2, '0');
+            const escICS = (value) => String(value ?? '')
+                .replace(/\\/g, '\\\\')
+                .replace(/;/g, '\\;')
+                .replace(/,/g, '\\,')
+                .replace(/\r?\n/g, '\\n');
+
+            const toICSDateTime = (isoDate, timeStr) => {
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(String(isoDate || '')) || !/^\d{2}:\d{2}$/.test(String(timeStr || ''))) return null;
+                const [y, m, d] = isoDate.split('-');
+                const [hh, mm] = timeStr.split(':');
+                return `${y}${m}${d}T${hh}${mm}00`;
+            };
+
+            const now = new Date();
+            const dtStamp = `${now.getUTCFullYear()}${pad(now.getUTCMonth() + 1)}${pad(now.getUTCDate())}T${pad(now.getUTCHours())}${pad(now.getUTCMinutes())}${pad(now.getUTCSeconds())}Z`;
+            const ctxIso = getCurrentContextTime().isoDate;
+            const lines = [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'PRODID:-//SmartClassSchedule//TH',
+                'CALSCALE:GREGORIAN',
+                'X-WR-CALNAME:ตารางเรียนอัจฉริยะ',
+                'METHOD:PUBLISH'
+            ];
+
+            const addEvent = ({ uid, summary, location, description, dtStart, dtEnd, rrule, isAllDay }) => {
+                if (!dtStart || !dtEnd) return;
+                lines.push('BEGIN:VEVENT');
+                lines.push(`UID:${escICS(uid)}@smartschedule`);
+                lines.push(`DTSTAMP:${dtStamp}`);
+                if (isAllDay) {
+                    lines.push(`DTSTART;VALUE=DATE:${dtStart}`);
+                    lines.push(`DTEND;VALUE=DATE:${dtEnd}`);
+                } else {
+                    lines.push(`DTSTART:${dtStart}`);
+                    lines.push(`DTEND:${dtEnd}`);
+                }
+                if (rrule) lines.push(`RRULE:${rrule}`);
+                lines.push(`SUMMARY:${escICS(summary)}`);
+                if (location) lines.push(`LOCATION:${escICS(location)}`);
+                if (description) lines.push(`DESCRIPTION:${escICS(description)}`);
+                lines.push('BEGIN:VALARM', 'TRIGGER:-PT15M', 'ACTION:DISPLAY', 'DESCRIPTION:Reminder', 'END:VALARM');
+                lines.push('END:VEVENT');
+            };
+
+            scheduleData.forEach((c) => {
+                const title = `${c.code ? c.code + ' ' : ''}${c.name || 'ไม่ระบุชื่อวิชา'}`;
+                const desc = c.teacher ? `ผู้สอน: ${c.teacher}` : '';
+
+                if (c.specialType === 'lab' && Array.isArray(c.labWeeks)) {
+                    c.labWeeks.forEach((w, idx) => {
+                        if (!w.date) return;
+                        addEvent({
+                            uid: `${c.id}_lab_${idx}`,
+                            summary: `[LAB ${idx + 1}] ${title}`,
+                            location: w.room || c.fallbackRoom || '',
+                            description: desc,
+                            dtStart: toICSDateTime(w.date, c.start),
+                            dtEnd: toICSDateTime(w.date, c.end)
+                        });
+                    });
+                } else {
+                    // วนซ้ำทุกสัปดาห์ 16 สัปดาห์ (1 เทอม)
+                    const day = Number(c.day);
+                    if (Number.isInteger(day) && day >= 0 && day <= 6 && c.start && c.end) {
+                        const firstDate = dateOfWeekday(ctxIso, day);
+                        addEvent({
+                            uid: `${c.id}_main`,
+                            summary: title,
+                            location: c.room || '',
+                            description: desc,
+                            dtStart: toICSDateTime(firstDate, c.start),
+                            dtEnd: toICSDateTime(firstDate, c.end),
+                            rrule: `FREQ=WEEKLY;COUNT=16;BYDAY=${ICAL_DAYS[day]}`
+                        });
+                    }
+
+                    if (c.specialType === 'multi' && Array.isArray(c.extraSessions)) {
+                        c.extraSessions.forEach((ex, idx) => {
+                            const extraDay = Number(ex.day);
+                            if (!ex.start || !ex.end || !Number.isInteger(extraDay) || extraDay < 0 || extraDay > 6) return;
+                            const exDate = dateOfWeekday(ctxIso, extraDay);
+                            addEvent({
+                                uid: `${c.id}_extra_${idx}`,
+                                summary: title,
+                                location: ex.room || c.room || '',
+                                description: desc,
+                                dtStart: toICSDateTime(exDate, ex.start),
+                                dtEnd: toICSDateTime(exDate, ex.end),
+                                rrule: `FREQ=WEEKLY;COUNT=16;BYDAY=${ICAL_DAYS[extraDay]}`
+                            });
+                        });
+                    }
+                }
+
+                // วันสอบ Midterm / Final
+                ['midterm', 'final'].forEach((type) => {
+                    const exam = c.exams && c.exams[type];
+                    if (exam && exam.date && exam.start && exam.end) {
+                        addEvent({
+                            uid: `${c.id}_exam_${type}`,
+                            summary: `[สอบ${type === 'midterm' ? 'กลางภาค' : 'ปลายภาค'}] ${title}`,
+                            location: exam.room || '',
+                            description: desc,
+                            dtStart: toICSDateTime(exam.date, exam.start),
+                            dtEnd: toICSDateTime(exam.date, exam.end)
+                        });
+                    }
+                });
+
+                // การบ้าน / งาน / ประกาศที่ยังไม่เสร็จ
+                getCourseNotes(c).forEach((note) => {
+                    if (note.type === 'permanent' || !note.date || note.done) return;
+                    const dateObj = parseISODateLocal(note.date);
+                    if (!dateObj) return;
+                    const dateClean = note.date.replace(/-/g, '');
+                    const nextDay = formatISODate(addDays(dateObj, 1)).replace(/-/g, '');
+                    const tag = note.type === 'cancel' ? 'งดคลาส' : note.type === 'homework' ? 'ส่งงาน' : 'ประกาศ';
+                    addEvent({
+                        uid: `${c.id}_note_${note.id}`,
+                        summary: `[${tag}] ${title}: ${note.text || ''}`,
+                        description: note.text || '',
+                        dtStart: dateClean,
+                        dtEnd: nextDay,
+                        isAllDay: true
+                    });
+                });
+            });
+
+            lines.push('END:VCALENDAR');
+            const blob = new Blob(['\uFEFF', lines.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `uni_schedule_${ctxIso}.ics`;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            showToast('ดาวน์โหลดไฟล์ปฏิทิน (.ics) แล้ว แตะเปิดไฟล์เพื่อเพิ่มลงปฏิทินมือถือได้เลย', 'success');
+        }
+
     </script>
 
     <script>
