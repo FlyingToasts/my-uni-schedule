@@ -898,6 +898,7 @@
             loadAllFromStorage();
             syncPreferenceControls();
             autoRoute();
+            syncNativeWidgetData(true);
             setInterval(() => updateTick(false), 1000);
         };
 
@@ -943,6 +944,48 @@
             } catch (e) {
                 showToast('ไม่สามารถบันทึกข้อมูลตารางเรียนได้', 'error');
             }
+            syncNativeWidgetData(true);
+        }
+
+
+        // --- NATIVE HOME SCREEN WIDGET DATA BRIDGE (Android + iOS) ---
+        let lastNativeWidgetSyncMinute = '';
+        function buildNativeWidgetPayload() {
+            const now = new Date();
+            const sessions = [];
+            for (let offset = 0; offset < 14; offset++) {
+                const dayIso = formatISODate(addDays(now, offset));
+                const daySessions = getExamWeekInfo(dayIso)
+                    ? getExamSessionsOnDate(dayIso)
+                    : getExpandedSessions(dayIso).filter(x => x.dateIso === dayIso && !x.isInactive && !x.cancelNote);
+                daySessions.forEach(x => sessions.push({
+                    date: dayIso, start: x.start, end: x.end,
+                    code: x.code || '', name: x.name || '', room: x.room || '',
+                    teacher: x.teacher || '', kind: x.examType ? 'exam' : (x.specialType === 'lab' ? 'lab' : 'class'),
+                    label: x.labBadgeText || x.sessionLabel || ''
+                }));
+            }
+            const tasks = [];
+            scheduleData.forEach(course => getCourseNotes(course).forEach(note => {
+                if (!note || note.type === 'permanent' || note.type === 'cancel' || !note.date || note.done) return;
+                tasks.push({ id: String(note.id || ''), date: note.date,
+                    title: String(note.text || 'งานที่ต้องทำ'), type: String(note.type || 'homework'),
+                    course: [course.code, course.name].filter(Boolean).join(' ') });
+            }));
+            tasks.sort((a,b) => a.date.localeCompare(b.date));
+            return { version: 1, generatedAt: now.toISOString(), timezoneOffsetMinutes: -now.getTimezoneOffset(),
+                sessions: sessions.sort((a,b) => (a.date+a.start).localeCompare(b.date+b.start)), tasks: tasks.slice(0, 30) };
+        }
+        function syncNativeWidgetData(force = false) {
+            try {
+                const now = new Date();
+                const minuteKey = `${formatISODate(now)}_${now.getHours()}:${now.getMinutes()}`;
+                if (!force && minuteKey === lastNativeWidgetSyncMinute) return;
+                lastNativeWidgetSyncMinute = minuteKey;
+                const payload = JSON.stringify(buildNativeWidgetPayload());
+                if (window.WidgetBridge && typeof window.WidgetBridge.updateWidgetData === 'function') window.WidgetBridge.updateWidgetData(payload);
+                if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.widgetData) window.webkit.messageHandlers.widgetData.postMessage(payload);
+            } catch (err) { console.warn('Native widget sync failed:', err); }
         }
 
         function saveColorsToStorage() {
@@ -1775,6 +1818,7 @@
             // 3. Update Live Status Cards
             renderCurrentClassCard(currentSession, nextSession, todaySessions, todayCancelledSessions, nowTotalSecs);
             renderNextClassCard(nextSession, upcomingSessions.length, todaySessions.length, todayCancelledSessions);
+            syncNativeWidgetData(false);
 
             // 4. Re-render Weekly Summary & Timetable when minute/state/mode changes
             const minuteKey = `${ctx.isoDate}_${ctx.day}_${ctx.hours}:${ctx.minutes}_${viewMode}_${weeklyLayoutMode}_${showWeekend}_${selectedDayTab}_${pageMode}_${examViewType}_${summaryFilterMode}`;
