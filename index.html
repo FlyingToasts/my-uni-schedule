@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ตารางเรียนอัจฉริยะ (Smart Class Schedule)</title>
+    <!-- PWA Settings -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ตารางเรียน">
+    <link rel="apple-touch-icon" href="./icon-192.png">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -107,6 +114,11 @@
                 <button id="btn-toggle-sim" onclick="toggleSimulatorPanel()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-slate-300 transition-all flex items-center gap-1.5 shadow-sm">
                     <i class="fa-solid fa-clock-rotate-left text-amber-400"></i>
                     <span class="hidden md:inline">จำลองวัน/เวลา</span>
+                </button>
+
+                <button id="btn-install-app" onclick="triggerInstallPWA()" class="hidden px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white transition-all flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-mobile-screen-button"></i>
+                    <span>ติดตั้งแอป</span>
                 </button>
 
                 <!-- Real-time Clock Badge -->
@@ -3627,5 +3639,57 @@
             list.innerHTML = html;
         }
     </script>
+
+    <script>
+        // --- PWA SERVICE WORKER & INSTALL PROMPT ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch((err) => {
+                    console.warn('SW registration failed:', err);
+                });
+            });
+        }
+
+        let deferredPrompt = null;
+        const installBtn = document.getElementById('btn-install-app');
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+
+        // Android / Desktop Chrome: จับ event ติดตั้งแอป
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (!isStandalone && installBtn) {
+                installBtn.classList.remove('hidden');
+            }
+        });
+
+        // iOS Safari: แสดงปุ่มให้กดดูวิธี Add to Home Screen
+        if (isIOS && !isStandalone && installBtn) {
+            installBtn.classList.remove('hidden');
+        }
+
+        window.addEventListener('appinstalled', () => {
+            deferredPrompt = null;
+            if (installBtn) installBtn.classList.add('hidden');
+            showToast('ติดตั้งแอปลงหน้าจอโฮมเรียบร้อยแล้ว!', 'success');
+        });
+
+        async function triggerInstallPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted' && installBtn) {
+                    installBtn.classList.add('hidden');
+                }
+                deferredPrompt = null;
+            } else if (isIOS) {
+                showToast('บน iPhone/iPad: แตะปุ่ม "แชร์" (สี่เหลี่ยมมีลูกศรชี้ขึ้น) ด้านล่าง แล้วเลือก "เพิ่มไปยังหน้าจอโฮม"', 'info');
+            } else {
+                showToast('เปิดเมนูเบราว์เซอร์ (⋮) แล้วเลือก "ติดตั้งแอป" หรือ "เพิ่มลงหน้าจอหลัก"', 'info');
+            }
+        }
+    </script>
+
 </body>
 </html>
