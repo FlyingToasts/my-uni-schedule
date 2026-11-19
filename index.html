@@ -367,6 +367,9 @@
     <footer class="bg-slate-950 text-slate-400 text-xs py-4 border-t border-slate-800 mt-8">
         <div class="max-w-7xl mx-auto px-4 text-center space-y-1">
             <p>ตารางเรียนอัจฉริยะ (Smart Class Schedule) • ระบบจัดตารางเรียนรายชั่วโมง โน้ตรายวิชา สรุปงานรายสัปดาห์ และแจ้งเตือนคาบเรียนเรียลไทม์</p>
+            <p id="app-version-text" class="text-[11px] text-slate-500 tracking-wide pt-0.5">
+                © Smart Schedule · Website Version <span class="font-mono text-slate-400">...</span>
+            </p>
         </div>
     </footer>
 
@@ -893,12 +896,46 @@
         let pageMode = 'class';
         let activeNotesCourseId = null;
 
+        // --- FETCH WEBSITE VERSION FROM version.json ---
+        async function loadWebsiteVersion() {
+            const versionEl = document.getElementById('app-version-text');
+            if (!versionEl) return;
+
+            try {
+                // ป้องกัน Cache ทั้งบนเบราว์เซอร์และ CDN ของ GitHub Pages ด้วย Timestamp + no-store
+                const cacheBuster = `?_t=${Date.now()}`;
+                const response = await fetch(`./version.json${cacheBuster}`, {
+                    cache: 'no-store',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP status ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data && typeof data.version === 'string' && data.version.trim()) {
+                    versionEl.innerHTML = `© Smart Schedule · Website Version <span class="font-mono text-slate-300 font-medium">${escapeHTML(data.version.trim())}</span>`;
+                } else {
+                    versionEl.innerHTML = `© Smart Schedule · Website Version <span class="font-mono text-slate-500">unavailable</span>`;
+                }
+            } catch (err) {
+                console.warn('Could not load version.json:', err);
+                versionEl.innerHTML = `© Smart Schedule · Website Version <span class="font-mono text-slate-500">unavailable</span>`;
+            }
+        }
+
         // --- INITIALIZATION ---
         window.onload = function () {
             loadAllFromStorage();
             syncPreferenceControls();
             autoRoute();
             syncNativeWidgetData(true);
+            loadWebsiteVersion();
             setInterval(() => updateTick(false), 1000);
         };
 
@@ -953,29 +990,16 @@
         // --- NATIVE HOME SCREEN WIDGET DATA BRIDGE (Android + iOS) ---
         let lastNativeWidgetSyncMinute = '';
         function buildNativeWidgetPayload() {
-            console.log('[Widget Debug] scheduleData length:', scheduleData.length);
-            console.log('[Widget Debug] scheduleData content:', scheduleData);
             const now = new Date();
-            console.log('===== NATIVE WIDGET DEBUG =====');
-    console.log('scheduleData:', scheduleData);
-    console.log('จำนวนรายวิชา:', scheduleData.length);
-
-    scheduleData.forEach((course, index) => {
-        console.log(`วิชาที่ ${index + 1}:`, {
-            id: course.id,
-            code: course.code,
-            name: course.name,
-            day: course.day,
-            start: course.start,
-            end: course.end,
-            specialType: course.specialType
-        });
-    });
-
             const sessions = [];
+            const examWeekDates = [];
             for (let offset = 0; offset < 14; offset++) {
                 const dayIso = formatISODate(addDays(now, offset));
-                const daySessions = getExamWeekInfo(dayIso)
+                const isExamWeek = !!getExamWeekInfo(dayIso);
+                if (isExamWeek) {
+                    examWeekDates.push(dayIso);
+                }
+                const daySessions = isExamWeek
                     ? getExamSessionsOnDate(dayIso)
                     : getExpandedSessions(dayIso).filter(x => x.dateIso === dayIso && !x.isInactive && !x.cancelNote);
                 daySessions.forEach(x => sessions.push({
@@ -993,21 +1017,25 @@
                     course: [course.code, course.name].filter(Boolean).join(' ') });
             }));
             tasks.sort((a,b) => a.date.localeCompare(b.date));
-            return { version: 1, generatedAt: now.toISOString(), timezoneOffsetMinutes: -now.getTimezoneOffset(),
-                sessions: sessions.sort((a,b) => (a.date+a.start).localeCompare(b.date+b.start)), tasks: tasks.slice(0, 30) };
+            return {
+                version: 1,
+                generatedAt: now.toISOString(),
+                timezoneOffsetMinutes: -now.getTimezoneOffset(),
+                examWeekDates,
+                sessions: sessions.sort((a,b) => (a.date+a.start).localeCompare(b.date+b.start)),
+                tasks: tasks.slice(0, 30)
+            };
         }
-window.debugWidgetData = function () {
-    const data = buildNativeWidgetPayload();
-
-    console.log('===== WIDGET DEBUG =====');
-    console.log('จำนวนวิชา:', data.sessions.length);
-    console.table(data.sessions);
-
-    console.log('จำนวนงาน:', data.tasks.length);
-    console.table(data.tasks);
-
-    return data;
-};
+        window.debugWidgetData = function () {
+            const data = buildNativeWidgetPayload();
+            console.log('===== WIDGET DEBUG =====');
+            console.log('สัปดาห์สอบ (examWeekDates):', data.examWeekDates);
+            console.log('จำนวนวิชา/สอบ:', data.sessions.length);
+            console.table(data.sessions);
+            console.log('จำนวนงาน:', data.tasks.length);
+            console.table(data.tasks);
+            return data;
+        };
         function syncNativeWidgetData(force = false) {
             try {
                 const now = new Date();
