@@ -896,6 +896,220 @@
         let pageMode = 'class';
         let activeNotesCourseId = null;
 
+
+        // =====================================================
+        // CREDITS AND GRADE PROJECTION
+        // =====================================================
+        const GRADE_ORDER = ['A', 'B+', 'B', 'C+', 'C', 'D+', 'D'];
+        const GRADE_POINTS = { 'A': 4, 'B+': 3.5, 'B': 3, 'C+': 2.5, 'C': 2, 'D+': 1.5, 'D': 1, 'F': 0 };
+        const DEFAULT_CUTOFFS = { 'A': 80, 'B+': 75, 'B': 70, 'C+': 65, 'C': 60, 'D+': 55, 'D': 50 };
+        const GRADE_PRESETS = ['Midterm', 'Final', 'เก็บคะแนน', 'งาน/รายงาน', 'Lab', 'โปรเจกต์'];
+        let gradeModalCourseId = null;
+        let tempGrading = null;
+
+        const newId = p => p + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        const fmtNum = n => String(Math.round(n * 100) / 100);
+        function courseLabel(c) { return c.code ? c.code : c.name; }
+        function secLabel(v) { const t = String(v || '').trim().replace(/^sec(tion)?\.?\s*/i, ''); return t ? 'Sec ' + t : ''; }
+
+        // ---------- sanitizers ----------
+        function sanitizeCredit(v) { const n = Number(v); return (v !== '' && v != null && Number.isInteger(n) && n >= 1 && n <= 6) ? n : ''; }
+        function emptyGrading() { return { components: [], cutoffs: { ...DEFAULT_CUTOFFS } }; }
+        function sanitizeGrading(g) {
+            g = g || {};
+            const components = Array.isArray(g.components) ? g.components.slice(0, 20).map(c => {
+                if (!c) return null;
+                const w = Number(c.weight);
+                if (!(w > 0 && w <= 100)) return null;
+                let sc = '';
+                if (c.score !== '' && c.score != null && Number.isFinite(Number(c.score))) sc = Math.min(Math.max(Number(c.score), 0), w);
+                return { id: ID_RE.test(c.id) ? c.id : newId('g'), name: str(c.name, 40).trim() || 'ส่วนคะแนน', weight: Math.round(w * 100) / 100, score: sc === '' ? '' : Math.round(sc * 100) / 100 };
+            }).filter(Boolean) : [];
+            let cutoffs = { ...DEFAULT_CUTOFFS };
+            const src = g.cutoffs || {};
+            const vals = GRADE_ORDER.map(k => Number(src[k]));
+            const ok = vals.every((v, i) => Number.isFinite(v) && v >= 0 && v <= 100 && (i === 0 || v < vals[i - 1]));
+            if (ok) GRADE_ORDER.forEach((k, i) => cutoffs[k] = vals[i]);
+            return { components, cutoffs };
+        }
+
+        // ---------- credits ----------
+        function setCredit(n) {
+            const el = document.getElementById('course-credit');
+            el.value = String(el.value) === String(n) ? '' : String(n);
+            renderCreditChips();
+        }
+        function renderCreditChips() {
+            const cur = Number(document.getElementById('course-credit').value) || 0;
+            document.getElementById('credit-chips').innerHTML = [1, 2, 3, 4, 5, 6].map(n =>
+                `<button type="button" onclick="setCredit(${n})" class="w-11 h-11 rounded-xl text-sm font-bold border transition-all active:scale-95 ${cur === n ? 'bg-amber-500 border-amber-400 text-slate-950 shadow' : 'bg-slate-800 border-slate-700 text-slate-300 hover:border-amber-500'}">${n}</button>`).join('');
+        }
+        function renderCreditSummary() {
+            const box = document.getElementById('credit-summary');
+            if (!box) return;
+            if (pageMode !== 'class' || viewMode !== 'weekly' || !scheduleData.length) { box.classList.add('hidden'); return; }
+            const withC = scheduleData.filter(c => c.credit);
+            const total = withC.reduce((a, c) => a + c.credit, 0);
+            const missing = scheduleData.length - withC.length;
+            box.classList.remove('hidden');
+            box.innerHTML = `<div class="bg-slate-900/70 border border-slate-700/70 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-14 h-14 rounded-2xl bg-amber-500/15 border border-amber-500/40 flex flex-col items-center justify-center"><span class="text-xl font-extrabold text-amber-300 leading-none">${total}</span><span class="text-[9px] text-amber-200/80">หน่วยกิต</span></div>
+                    <div><div class="text-sm font-bold text-white">หน่วยกิตรวมเทอมนี้</div>
+                    <div class="text-[11px] text-slate-400">${withC.length} จาก ${scheduleData.length} วิชา${missing ? ` • <span class="text-amber-300">ยังไม่ใส่หน่วยกิต ${missing} วิชา</span>` : ''}</div></div>
+                </div>
+                <div class="flex flex-wrap gap-1.5">${withC.map(c => `<span class="text-[11px] px-2 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-200"><span class="font-mono" style="color:${getColorObj(c.colorId).hex}">${escapeHTML(courseLabel(c))}</span> <b>${c.credit}</b></span>`).join('')}</div>
+            </div>`;
+        }
+
+        // ---------- grade projection ----------
+        function gradeFromScore(pct, cut) { for (const g of GRADE_ORDER) if (pct >= cut[g]) return g; return 'F'; }
+        function gradeColor(g) { return g === 'A' ? '#34d399' : g[0] === 'B' ? '#38bdf8' : g[0] === 'C' ? '#fbbf24' : g[0] === 'D' ? '#fb923c' : '#f87171'; }
+        function computeGrading(gr) {
+            if (!gr || !gr.components.length) return null;
+            const comps = gr.components, totalW = comps.reduce((a, c) => a + c.weight, 0);
+            const graded = comps.filter(c => c.score !== '');
+            const gW = graded.reduce((a, c) => a + c.weight, 0), earned = graded.reduce((a, c) => a + c.score, 0);
+            const r = { totalW, gW, earned, remainingW: totalW - gW, projected: null, grade: null, next: null, need: null, cutoffs: gr.cutoffs };
+            if (!graded.length || gW <= 0) return r;
+            r.rate = earned / gW * 100;
+            r.projected = r.rate;                                   // keep the same rate on the remaining parts
+            r.grade = gradeFromScore(r.projected, gr.cutoffs);
+            const idx = GRADE_ORDER.indexOf(r.grade);
+            r.next = r.grade === 'A' ? null : (idx === -1 ? 'D' : GRADE_ORDER[idx - 1]);
+            if (r.next && r.remainingW > 1e-9) r.need = ((gr.cutoffs[r.next] - earned / totalW * 100) / (r.remainingW / totalW * 100)) * 100;
+            return r;
+        }
+        function projectionHTML(pr) {
+            if (!pr) return '<p class="text-xs text-slate-400">ยังไม่ได้ตั้งส่วนประกอบคะแนน — กดเพื่อตั้งค่า</p>';
+            if (pr.projected === null) return '<p class="text-xs text-slate-400">ยังไม่มีคะแนนที่ทราบ — ใส่คะแนนอย่างน้อย 1 ส่วนเพื่อให้ระบบคาดการณ์</p>';
+            const done = pr.remainingW <= 1e-9;
+            let h = `<p class="text-xs text-slate-300 leading-relaxed">ตอนนี้ได้ <b class="text-white">${fmtNum(pr.earned)}/${fmtNum(pr.gW)}</b> (${fmtNum(pr.rate)}%) ${done ? `→ <b class="text-white">สรุปผล ${fmtNum(pr.projected)}/100</b>` : `→ ถ้าคงระดับนี้ จะได้ประมาณ <b class="text-white">${fmtNum(pr.projected)}/100</b>`} = เกรด <b style="color:${gradeColor(pr.grade)}">${pr.grade}</b></p>`;
+            if (!done && pr.next && pr.need !== null) {
+                h += pr.need > 100
+                    ? `<p class="text-[11px] text-slate-500 mt-1">อยากได้ ${pr.next} จะเป็นไปไม่ได้แล้วตามเกณฑ์นี้ (ต้อง ${fmtNum(pr.need)}% ของส่วนที่เหลือ)</p>`
+                    : `<p class="text-[11px] text-sky-300 mt-1">💡 อยากได้ <b>${pr.next}</b> ต้องทำส่วนที่เหลือเฉลี่ยให้ได้ ≥ <b>${fmtNum(Math.max(pr.need, 0))}%</b></p>`;
+            }
+            return h;
+        }
+        function gradeBarHTML(pr) {
+            if (!pr || !pr.totalW) return '';
+            const e = pr.earned / pr.totalW * 100, l = (pr.gW - pr.earned) / pr.totalW * 100, rest = 100 - e - l;
+            return `<div class="h-2.5 rounded-full overflow-hidden flex bg-slate-800 border border-slate-700" title="ได้แล้ว / เสียไป / ยังไม่ทราบ">
+                <div style="width:${e}%;background:#34d399"></div><div style="width:${l}%;background:#7f1d1d"></div><div style="width:${rest}%;background:repeating-linear-gradient(45deg,#334155,#334155 4px,#1e293b 4px,#1e293b 8px)"></div></div>
+                <div class="flex justify-between text-[9px] text-slate-500 mt-1"><span><span class="text-emerald-400">■</span> ได้แล้ว ${fmtNum(e)}%</span><span><span class="text-rose-900">■</span> เสียไป ${fmtNum(l)}%</span><span>▨ ยังไม่ทราบ ${fmtNum(Math.max(rest, 0))}%</span></div>`;
+        }
+        function renderGradePage() {
+            const box = document.getElementById('grade-page-body');
+            if (!box) return;
+            if (!scheduleData.length) { box.innerHTML = '<div class="py-12 text-center text-sm text-slate-400">ยังไม่มีรายวิชา — เพิ่มวิชาและหน่วยกิตก่อน แล้วกลับมาใส่คะแนนที่นี่ได้เลย</div>'; return; }
+            const rows = scheduleData.map(c => ({ c, pr: computeGrading(c.grading) }));
+            const counted = rows.filter(r => r.c.credit && r.pr && r.pr.grade);
+            const sumC = counted.reduce((a, r) => a + r.c.credit, 0);
+            const gpa = sumC ? counted.reduce((a, r) => a + GRADE_POINTS[r.pr.grade] * r.c.credit, 0) / sumC : null;
+            const totalCredits = scheduleData.reduce((a, c) => a + (c.credit || 0), 0);
+            const skipped = scheduleData.length - counted.length;
+            const summary = `<div class="rounded-2xl border border-emerald-500/30 bg-emerald-950/20 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div><div class="text-xs text-slate-400">เกรดเฉลี่ยคาดการณ์เทอมนี้</div>
+                    <div class="text-4xl font-extrabold ${gpa === null ? 'text-slate-600' : 'text-emerald-300'}">${gpa === null ? '—' : gpa.toFixed(2)}<span class="text-sm text-slate-500 font-normal"> / 4.00</span></div></div>
+                <div class="text-xs text-slate-300 space-y-1">
+                    <div>หน่วยกิตรวม <b class="text-amber-300">${totalCredits}</b> • นับใน GPA <b>${counted.length}</b> วิชา (${sumC} หน่วยกิต)</div>
+                    ${skipped ? `<div class="text-amber-300">ยังไม่นับ ${skipped} วิชา (ยังไม่มีหน่วยกิตหรือคะแนน)</div>` : ''}
+                    <div class="text-[10px] text-slate-500">คำนวณ = Σ(เกรด × หน่วยกิต) ÷ Σหน่วยกิต</div></div></div>`;
+            const cards = rows.map(({ c, pr }) => {
+                const col = getColorObj(c.colorId).hex;
+                const badge = pr && pr.grade ? `<div class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-extrabold shrink-0" style="color:${gradeColor(pr.grade)};background:${hexToRgba(gradeColor(pr.grade), 0.15)};border:1px solid ${hexToRgba(gradeColor(pr.grade), 0.5)}">${pr.grade}</div>` : `<div class="w-14 h-14 rounded-2xl flex items-center justify-center text-xl text-slate-600 bg-slate-900 border border-slate-700 shrink-0">?</div>`;
+                return `<div onclick="openGradeModal('${c.id}')" class="cursor-pointer rounded-2xl p-4 bg-slate-900/70 border border-slate-700/70 hover:border-slate-500 transition-all space-y-2.5" style="border-left:5px solid ${col}">
+                    <div class="flex items-start gap-3">${badge}
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                ${c.code ? `<span class="font-mono text-xs font-bold" style="color:${col}">${escapeHTML(c.code)}</span>` : ''}
+                                <h4 class="font-bold text-sm text-white">${escapeHTML(c.name)}</h4>
+                                ${secLabel(c.section) ? `<span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 border border-slate-600 text-slate-200">${escapeHTML(secLabel(c.section))}</span>` : ''}
+                            </div>
+                            <div class="mt-1">${c.credit ? `<span class="text-[11px] px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-300">${c.credit} หน่วยกิต</span>` : '<span class="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 border border-slate-600 text-amber-300">ยังไม่ใส่หน่วยกิต (แก้ได้ที่ฟอร์มวิชา)</span>'}</div>
+                        </div>
+                        <span class="text-xs text-slate-500 shrink-0"><i class="fa-solid fa-pen-to-square"></i></span>
+                    </div>
+                    ${pr ? gradeBarHTML(pr) : ''}${projectionHTML(pr)}</div>`;
+            }).join('');
+            box.innerHTML = summary + `<div class="grid grid-cols-1 lg:grid-cols-2 gap-3">${cards}</div>`;
+        }
+
+        // ---------- grade modal ----------
+        function openGradeModal(cid) {
+            const c = scheduleData.find(x => x.id === cid);
+            if (!c) return;
+            gradeModalCourseId = cid;
+            const g = sanitizeGrading(c.grading);
+            tempGrading = { components: g.components.map(x => ({ ...x })), cutoffs: { ...g.cutoffs } };
+            document.getElementById('grade-modal-title').innerText = `${c.code ? c.code + ' ' : ''}${c.name} — คะแนนและเกณฑ์เกรด`;
+            renderGradeModal();
+            const m = document.getElementById('grade-modal');
+            m.classList.remove('hidden'); m.classList.add('flex');
+        }
+        function closeGradeModal() { const m = document.getElementById('grade-modal'); m.classList.add('hidden'); m.classList.remove('flex'); }
+        function addGradeComp(name) {
+            tempGrading.components.push({ id: newId('g'), name: name || 'ส่วนคะแนน', weight: '', score: '' });
+            renderGradeModal();
+        }
+        function removeGradeComp(i) { tempGrading.components.splice(i, 1); renderGradeModal(); }
+        function setGC(i, f, v) { tempGrading.components[i][f] = v; refreshGradePreview(); }
+        function setCutoff(k, v) { tempGrading.cutoffs[k] = v; refreshGradePreview(); }
+        function refreshGradePreview() {
+            const g = sanitizeGrading({ components: tempGrading.components, cutoffs: tempGrading.cutoffs });
+            const tot = tempGrading.components.reduce((a, c) => a + (Number(c.weight) > 0 ? Number(c.weight) : 0), 0);
+            const t = document.getElementById('gm-total');
+            if (t) t.innerHTML = `น้ำหนักรวม <b class="${Math.abs(tot - 100) < 1e-9 ? 'text-emerald-300' : tot > 100 ? 'text-rose-400' : 'text-amber-300'}">${fmtNum(tot)}%</b> ${Math.abs(tot - 100) < 1e-9 ? '✓' : tot > 100 ? '(เกิน 100!)' : '(ยังไม่ครบ 100)'}`;
+            tempGrading.components.forEach((c, i) => { const el = document.getElementById('gm-max-' + i); if (el) el.innerText = '/ ' + (Number(c.weight) > 0 ? fmtNum(Number(c.weight)) : '—'); });
+            const pv = document.getElementById('gm-preview');
+            if (pv) { const pr = computeGrading(g); pv.innerHTML = (pr ? gradeBarHTML(pr) : '') + `<div class="mt-2">${projectionHTML(pr)}</div>`; }
+        }
+        function renderGradeModal() {
+            const comps = tempGrading.components;
+            const rows = comps.length ? `<div class="grid grid-cols-12 gap-2 text-[10px] text-slate-500 px-1"><span class="col-span-5">ส่วนคะแนน</span><span class="col-span-3">น้ำหนัก (%)</span><span class="col-span-3">คะแนนที่ได้</span></div>` + comps.map((c, i) => `
+                <div class="grid grid-cols-12 gap-2 items-center">
+                    <input type="text" value="${escapeHTML(c.name)}" maxlength="40" oninput="setGC(${i},'name',this.value)" class="col-span-5 bg-slate-800 border border-slate-600 focus:border-emerald-400 rounded-lg px-2.5 py-2 text-xs text-white outline-none">
+                    <input type="number" inputmode="decimal" min="0" max="100" step="any" value="${c.weight}" placeholder="50" oninput="setGC(${i},'weight',this.value)" class="col-span-3 bg-slate-800 border border-slate-600 focus:border-emerald-400 rounded-lg px-2 py-2 text-xs text-white font-mono outline-none">
+                    <div class="col-span-3 flex items-center gap-1"><input type="number" inputmode="decimal" min="0" step="any" value="${c.score}" placeholder="ว่าง" oninput="setGC(${i},'score',this.value)" class="w-full min-w-0 bg-slate-800 border border-slate-600 focus:border-emerald-400 rounded-lg px-2 py-2 text-xs text-white font-mono outline-none"><span id="gm-max-${i}" class="text-[10px] text-slate-500 shrink-0"></span></div>
+                    <button type="button" onclick="removeGradeComp(${i})" class="col-span-1 h-8 rounded-md text-rose-400 hover:bg-rose-950/60"><i class="fa-solid fa-xmark"></i></button>
+                </div>`).join('') : '<div class="text-xs text-slate-500 text-center py-3">ยังไม่มีส่วนคะแนน — กดปุ่มด้านล่างเพื่อเพิ่ม</div>';
+            const presets = GRADE_PRESETS.map(n => `<button type="button" onclick="addGradeComp('${n}')" class="px-3 py-1.5 rounded-full text-[11px] bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200">＋ ${n}</button>`).join('');
+            const cut = GRADE_ORDER.map(k => `<label class="block"><span class="text-[10px] font-bold" style="color:${gradeColor(k)}">${k} ≥</span>
+                <input type="number" inputmode="decimal" min="0" max="100" step="any" value="${tempGrading.cutoffs[k]}" oninput="setCutoff('${k}', this.value)" class="w-full mt-0.5 bg-slate-800 border border-slate-600 rounded-lg px-2 py-1.5 text-xs text-white font-mono outline-none"></label>`).join('');
+            document.getElementById('grade-modal-body').innerHTML = `
+                <p class="text-[11px] text-slate-400 leading-relaxed">ใส่น้ำหนักของแต่ละส่วน (รวม 100%) และ<strong class="text-slate-200">คะแนนที่ได้จริง</strong> เช่น Midterm น้ำหนัก 50 ได้ 30 — ส่วนที่ยังไม่สอบให้เว้นว่างไว้ ระบบจะคาดการณ์ว่าถ้าคงระดับเดิมจะได้เท่าไหร่</p>
+                <div class="space-y-2">${rows}</div>
+                <div class="flex flex-wrap gap-1.5">${presets}<button type="button" onclick="addGradeComp('')" class="px-3 py-1.5 rounded-full text-[11px] bg-emerald-500/15 border border-emerald-500/40 text-emerald-300">＋ กำหนดเอง</button></div>
+                <div id="gm-total" class="text-xs text-slate-300"></div>
+                <div class="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-3"><div class="text-[11px] font-bold text-emerald-300 mb-2">🔮 คาดการณ์</div><div id="gm-preview"></div></div>
+                <details class="rounded-xl border border-slate-700 bg-slate-800/50">
+                    <summary class="cursor-pointer select-none px-3 py-2.5 text-xs font-semibold text-slate-200">⚙ เกณฑ์ตัดเกรด (คะแนนขั้นต่ำ) — ค่าเริ่มต้น A=80, B+=75 …</summary>
+                    <div class="p-3 grid grid-cols-4 sm:grid-cols-7 gap-2">${cut}</div>
+                    <p class="px-3 pb-3 text-[10px] text-slate-500">ต่ำกว่าเกณฑ์ D = F • เกรดเป็นตัวเลข: A=4, B+=3.5, B=3, C+=2.5, C=2, D+=1.5, D=1, F=0</p>
+                </details>`;
+            refreshGradePreview();
+        }
+        function saveGradeModal() {
+            const c = scheduleData.find(x => x.id === gradeModalCourseId);
+            if (!c) return;
+            let tot = 0;
+            for (const x of tempGrading.components) {
+                const w = Number(x.weight);
+                if (!(w > 0 && w <= 100)) { showToast(`น้ำหนักของ "${x.name || 'ส่วนคะแนน'}" ต้องอยู่ระหว่าง 0–100`, 'error'); return; }
+                if (x.score !== '' && (!Number.isFinite(Number(x.score)) || Number(x.score) < 0 || Number(x.score) > w)) { showToast(`คะแนนของ "${x.name || 'ส่วนคะแนน'}" ต้องอยู่ระหว่าง 0 ถึง ${fmtNum(w)}`, 'error'); return; }
+                tot += w;
+            }
+            if (tot > 100 + 1e-9) { showToast('น้ำหนักรวมเกิน 100% กรุณาปรับ', 'error'); return; }
+            const vals = GRADE_ORDER.map(k => Number(tempGrading.cutoffs[k]));
+            if (!vals.every((v, i) => Number.isFinite(v) && v >= 0 && v <= 100 && (i === 0 || v < vals[i - 1]))) { showToast('เกณฑ์ตัดเกรดต้องเรียงจากมากไปน้อย (A > B+ > B > … > D) และอยู่ใน 0–100', 'error'); return; }
+            c.grading = sanitizeGrading(tempGrading);
+            saveScheduleToStorage();
+            closeGradeModal();
+            updateTick(true);
+            showToast('บันทึกคะแนนและเกณฑ์เกรดแล้ว', 'success');
+        }
+
         // --- FETCH WEBSITE VERSION FROM version.json ---
         async function loadWebsiteVersion() {
             const versionEl = document.getElementById('app-version-text');
@@ -1893,7 +2107,10 @@
                 renderWeeklyTaskSummary(ctx);
                 renderDayPills(ctx.day);
                 renderBottomNav();
-                if (pageMode === 'exam') {
+                renderCreditSummary();
+                if (pageMode === 'grade') {
+                    renderGradePage();
+                } else if (pageMode === 'exam') {
                     renderExamPage(ctx, nowTotalSecs);
                 } else if (viewMode === 'daily') {
                     renderDailyTimeline(ctx.day, ctx.isoDate, allSessions, currentSession, nextSession, nowTotalSecs);
@@ -2941,6 +3158,7 @@
                 document.getElementById('course-start').value = course.start;
                 document.getElementById('course-end').value = course.end;
                 document.getElementById('course-code').value = course.code || '';
+                document.getElementById('course-credit').value = course.credit || '';
                 document.getElementById('course-name').value = course.name;
                 document.getElementById('course-room').value = course.room || '';
                 document.getElementById('course-teacher').value = course.teacher || '';
@@ -2964,6 +3182,7 @@
             } else {
                 title.innerHTML = `<i class="fa-solid fa-book-medical text-amber-400"></i> เพิ่มรายวิชาใหม่`;
                 document.getElementById('course-id').value = '';
+                document.getElementById('course-credit').value = '';
                 document.getElementById('course-day').value = defaultDay !== null ? defaultDay : selectedDayTab;
                 document.getElementById('course-start').value = defaultStart;
                 document.getElementById('course-end').value = defaultEnd;
@@ -2975,6 +3194,7 @@
             }
 
             renderExamSection();
+            renderCreditChips();
             syncSpecialModeUI();
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -3070,6 +3290,8 @@
                 labWeeks,
                 fallbackRoom,
                 extraSessions,
+                credit: sanitizeCredit(document.getElementById('course-credit').value),
+                grading: (existingCourse && existingCourse.grading) ? sanitizeGrading(existingCourse.grading) : emptyGrading(),
                 notes: existingCourse ? getCourseNotes(existingCourse) : []
             };
 
@@ -3409,7 +3631,9 @@
                 fallbackRoom: str(c.fallbackRoom, 80).trim(),
                 extraSessions: Array.isArray(c.extraSessions) ? c.extraSessions.slice(0, 20).filter(x => x && TIME_RE.test(x.start) && TIME_RE.test(x.end) && timeToMinutes(x.end) > timeToMinutes(x.start) && Number.isInteger(Number(x.day)) && Number(x.day) >= 0 && Number(x.day) <= 6).map(x => ({ day: Number(x.day), start: x.start, end: x.end, room: str(x.room, 80).trim() })) : [],
                 exams: cloneExams(c.exams),
-                notes: Array.isArray(c.notes) ? c.notes.slice(0, 100).map(sanitizeNote).filter(Boolean) : []
+                notes: Array.isArray(c.notes) ? c.notes.slice(0, 100).map(sanitizeNote).filter(Boolean) : [],
+                credit: sanitizeCredit(c.credit),
+                grading: sanitizeGrading(c.grading)
             };
         }
         function sanitizeColor(c) {
@@ -3646,6 +3870,7 @@
             pageMode = mode;
             document.getElementById('page-class').classList.toggle('hidden', mode !== 'class');
             document.getElementById('page-exam').classList.toggle('hidden', mode !== 'exam');
+            document.getElementById('page-grade').classList.toggle('hidden', mode !== 'grade');
             updateTick(true);
         }
         function autoRoute() {
@@ -3656,9 +3881,11 @@
         }
         function selectExamType(t) { examViewType = t; updateTick(true); }
         function renderBottomNav() {
-            const base = 'py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 ';
-            document.getElementById('nav-class').className = base + (pageMode === 'class' ? 'bg-slate-800 text-amber-400 border border-slate-700' : 'text-slate-400 hover:text-slate-200');
-            document.getElementById('nav-exam').className = base + (pageMode === 'exam' ? 'bg-slate-800 text-orange-400 border border-slate-700' : 'text-slate-400 hover:text-slate-200');
+            const base = 'py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 sm:gap-2 ';
+            const on = (m, c) => base + (pageMode === m ? 'bg-slate-800 border border-slate-700 ' + c : 'text-slate-400 hover:text-slate-200');
+            document.getElementById('nav-class').className = on('class', 'text-amber-400');
+            document.getElementById('nav-exam').className = on('exam', 'text-orange-400');
+            document.getElementById('nav-grade').className = on('grade', 'text-emerald-400');
             document.getElementById('nav-exam-dot').classList.toggle('hidden', !currentExamWeek);
         }
         function examWeekBannerHTML() {
