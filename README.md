@@ -42,28 +42,7 @@
 
 ---
 
-## 🏗️ โครงสร้างโปรเจกต์ (Project Structure)
 
-```text
-SmartScheduleWidget/
-├── index.html          # โค้ดเว็บแอปพลิเคชันหลัก (Single Page Application)
-├── version.json        # ไฟล์ระบุเวอร์ชันเว็บสำหรับระบบ Auto-Update ของ Android APK
-├── README.md           # เอกสารคู่มือโปรเจกต์ (ภาษาไทย)
-├── README_TH.md        # เอกสารสรุปต้นฉบับ
-├── android/            # โปรเจกต์ Android (Kotlin + WebView + AppWidget)
-│   ├── app/
-│   │   ├── src/main/java/com/smartclass/widget/
-│   │   │   ├── MainActivity.kt           # ตัวเปิด WebView + Native Bridge + จัดการ Download
-│   │   │   ├── ScheduleWidgetProvider.kt # ตัวจัดการวิดเจ็ตหน้าจอโฮม Android
-│   │   │   └── UpdateCheckWorker.kt      # ตัวตรวจจับอัปเดตเวอร์ชันเว็บอัตโนมัติ
-│   │   └── build/outputs/apk/debug/
-│   │       └── app-debug.apk             # ไฟล์ APK พร้อมติดตั้งสำหรับทดสอบ
-│   └── build.gradle.kts
-└── ios/                # โปรเจกต์ iOS (Swift + WKWebView + WidgetKit)
-    └── project.yml     # XcodeGen configuration
-```
-
----
 
 ## 🚀 ขั้นตอนการติดตั้งและการนำไปใช้งาน
 
@@ -95,17 +74,3 @@ SmartScheduleWidget/
   - ตัวแอปเชื่อมต่อกับ Google Calendar API ผ่านสิทธิ์ `calendar.events` เท่านั้น
   - การล็อกอินจะเข้าสู่บัญชีส่วนตัวของผู้ใช้แต่ละคน ข้อมูลปฏิทินจะแยกกันโดยเด็ดขาด 100%
 
----
-
-## 📝 บันทึกการอัปเดต (Changelog)
-
-- **v1.1.2:**
-  - แก้ไขปัญหาข้อมูล Section (Sec) หายเมื่อปิด-เปิดแอปใหม่ โดยปรับปรุงฟังก์ชัน `sanitizeCourse` ให้เก็บรักษาฟิลด์ Section ไว้อย่างสมบูรณ์
-  - เพิ่มป้ายแสดง Section บนการ์ดเรียนปัจจุบัน, คาบถัดไป, ตารางรายวัน และตารางรายสัปดาห์
-  - พัฒนาระบบ `downloadFileBlob` สำหรับส่งออกไฟล์ `.json` และ `.ics` ให้ทำงานร่วมกับ `WidgetBridge.saveDownload` ของ Android เพื่อเซฟลงโฟลเดอร์ Downloads ได้ทันที
-- **v1.1.1:**
-  - ตัดหน้าต่างและการตั้งค่า API Key / Client ID ออกจากหน้าจอทั้งหมด ให้เหลือเพียงปุ่มเข้าสู่ระบบด้วย Google เพียงปุ่มเดียว (1-Click Sync)
-  - ปรับปรุงโหมด Google OAuth Redirect เพื่อแก้ปัญหาหน้าจอสีขาวบนเบราว์เซอร์มือถือและ APK
-- **v1.1.0:**
-  - เพิ่มหน้าต่างจัดการลงปฏิทินสอบกลางภาค, ปลายภาค และการบ้าน (Calendar Export Modal)
-  - เพิ่มระบบตรวจเช็คสถานะการมีอยู่จริงของกิจกรรมบน Google Calendar แบบสองทาง (Two-way Verification)
