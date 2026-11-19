@@ -976,6 +976,18 @@
             return { version: 1, generatedAt: now.toISOString(), timezoneOffsetMinutes: -now.getTimezoneOffset(),
                 sessions: sessions.sort((a,b) => (a.date+a.start).localeCompare(b.date+b.start)), tasks: tasks.slice(0, 30) };
         }
+window.debugWidgetData = function () {
+    const data = buildNativeWidgetPayload();
+
+    console.log('===== WIDGET DEBUG =====');
+    console.log('จำนวนวิชา:', data.sessions.length);
+    console.table(data.sessions);
+
+    console.log('จำนวนงาน:', data.tasks.length);
+    console.table(data.tasks);
+
+    return data;
+};
         function syncNativeWidgetData(force = false) {
             try {
                 const now = new Date();
