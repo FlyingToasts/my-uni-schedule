@@ -338,6 +338,7 @@
                 <div id="view-weekly-container" class="hidden">
                     <!-- Filled by JS -->
                 </div>
+                <div id="credit-summary" class="hidden mt-4"></div>
             </div>
         </section>
 
@@ -353,13 +354,19 @@
             </div>
         </section>
 
+        <!-- Grade Page -->
+        <section id="page-grade" class="hidden bg-slate-800/80 rounded-2xl border border-slate-700/80 overflow-hidden shadow-lg">
+            <div id="grade-page-body" class="p-4 sm:p-5 space-y-4"></div>
+        </section>
+
     </main>
 
-    <!-- Bottom Navigation: Class / Exam -->
+    <!-- Bottom Navigation: Class / Exam / Grade -->
     <nav class="fixed bottom-0 inset-x-0 z-40 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 pb-[env(safe-area-inset-bottom)]">
-        <div class="max-w-7xl mx-auto grid grid-cols-2 gap-2 p-2">
+        <div class="max-w-7xl mx-auto grid grid-cols-3 gap-2 p-2">
             <button id="nav-class" onclick="setPageMode('class')"><i class="fa-solid fa-table-cells-large"></i> ตารางเรียน</button>
             <button id="nav-exam" onclick="setPageMode('exam')"><i class="fa-solid fa-file-pen"></i> ตารางสอบ <span id="nav-exam-dot" class="hidden w-2 h-2 rounded-full bg-orange-400 animate-pulse"></span></button>
+            <button id="nav-grade" onclick="setPageMode('grade')"><i class="fa-solid fa-chart-line"></i> เกรด</button>
         </div>
     </nav>
 
@@ -492,6 +499,21 @@
         </div>
     </div>
 
+    <!-- Modal: Grade scheme -->
+    <div id="grade-modal" class="fixed inset-0 z-[62] hidden items-center justify-center bg-slate-950/85 backdrop-blur-sm p-3 sm:p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+            <div class="px-5 py-4 bg-slate-800/90 border-b border-slate-700 flex items-center justify-between gap-3">
+                <h3 id="grade-modal-title" class="font-bold text-base text-white truncate">คะแนนและเกณฑ์เกรด</h3>
+                <button onclick="closeGradeModal()" class="text-slate-400 hover:text-white w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-700 shrink-0"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="grade-modal-body" class="p-5 space-y-4 overflow-y-auto custom-scrollbar text-sm"></div>
+            <div class="px-5 py-3 bg-slate-800/60 border-t border-slate-700 flex justify-end gap-2">
+                <button type="button" onclick="closeGradeModal()" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold">ยกเลิก</button>
+                <button type="button" onclick="saveGradeModal()" class="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold">บันทึก</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal: Exam Periods -->
     <div id="exam-period-modal" class="fixed inset-0 z-[65] hidden items-center justify-center bg-slate-950/85 backdrop-blur-sm p-4">
         <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
@@ -561,6 +583,13 @@
                         <label class="block text-xs font-medium text-slate-300 mb-1">ชื่อรายวิชา <span class="text-rose-400">*</span></label>
                         <input type="text" id="course-name" required placeholder="เช่น ปฏิบัติการฟิสิกส์ หรือ คณิตศาสตร์วิศวกรรม" class="w-full bg-slate-800 border border-slate-700 focus:border-amber-500 rounded-xl px-3 py-2.5 text-white outline-none">
                     </div>
+                </div>
+
+                <!-- Credits -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1.5">หน่วยกิต <span class="text-slate-500 font-normal">(1–6 ไม่บังคับ • แตะซ้ำเพื่อยกเลิก)</span></label>
+                    <input type="hidden" id="course-credit">
+                    <div id="credit-chips" class="flex gap-2 flex-wrap"></div>
                 </div>
 
                 <!-- Primary Day, Time & Teacher -->
