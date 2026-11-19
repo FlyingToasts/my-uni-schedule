@@ -53,11 +53,7 @@
 
 ### 2. การใช้งานบน Android APK
 - หากติดตั้งแอป APK ไว้ในเครื่องแล้ว ตัวแอปจะดึงข้อมูลหน้าเว็บล่าสุดจาก GitHub Pages มาแสดงโดยอัตโนมัติ (สามารถปัดปิดแอปจาก Recent Apps แล้วเปิดใหม่เพื่อรีเฟรชได้ทันที)
-- หากต้องการคอมไพล์ APK ใหม่ด้วยตนเอง:
-  ```bash
-  cd android
-  ./gradlew assembleDebug
-  ```
+
   ไฟล์ APK ที่ได้จะอยู่ที่ `android/app/build/outputs/apk/debug/app-debug.apk`
 
 ### 3. การเพิ่ม Widget บนหน้าจอโฮม (Android)
