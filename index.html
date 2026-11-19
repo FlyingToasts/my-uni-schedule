@@ -860,20 +860,20 @@
         </div>
     </div>
 
-    <!-- Modal 4: ลงปฏิทิน (Google Calendar & .ics) -->
+    <!-- Modal 4: ลงปฏิทินตารางสอบ (Google Calendar & .ics) -->
     <div id="calendar-export-modal" class="fixed inset-0 z-[65] hidden items-center justify-center bg-slate-950/85 backdrop-blur-sm p-3 sm:p-4">
         <div class="bg-slate-900 border border-slate-700 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
             <!-- Header -->
             <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-850">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-lg">
-                        <i class="fa-solid fa-calendar-plus"></i>
+                    <div class="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center text-orange-400 text-lg">
+                        <i class="fa-solid fa-calendar-check"></i>
                     </div>
                     <div>
                         <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-                            ลงปฏิทิน (Google Calendar & .ics)
+                            ลงปฏิทินตารางสอบ (Google Calendar & .ics)
                         </h3>
-                        <p class="text-xs text-slate-400 mt-0.5">เลือกวิชาที่จะลง Google Calendar ได้ทันที หรือส่งออกทั้งหมดพร้อมรายละเอียดห้องสอบและเซก</p>
+                        <p class="text-xs text-slate-400 mt-0.5">เลือกวิชาสอบกลางภาคหรือปลายภาคเพื่อลง Google Calendar ทันที หรือส่งออกไฟล์ .ics</p>
                     </div>
                 </div>
                 <button onclick="closeCalendarExportModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-all">
@@ -881,16 +881,21 @@
                 </button>
             </div>
 
-            <!-- Filter & Selection Bar -->
+            <!-- Filter & Selection Bar (แบ่งเป็น ปลายภาค และ กลางภาค) -->
             <div class="p-3 sm:px-5 bg-slate-900/95 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2.5">
                 <div class="flex items-center gap-1.5 sm:gap-2">
-                    <button type="button" onclick="setCalendarExportFilter('all')" id="cal-filter-all" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">ทั้งหมด</button>
-                    <button type="button" onclick="setCalendarExportFilter('class')" id="cal-filter-class" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200 border border-slate-700/60">คาบเรียน</button>
-                    <button type="button" onclick="setCalendarExportFilter('exam')" id="cal-filter-exam" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200 border border-slate-700/60">ตารางสอบ</button>
-                    <button type="button" onclick="setCalendarExportFilter('task')" id="cal-filter-task" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200 border border-slate-700/60">งาน/การบ้าน</button>
+                    <button type="button" onclick="setCalendarExportFilter('all')" id="cal-filter-all" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-orange-500/20 text-orange-300 border border-orange-500/40">
+                        ทั้งหมด (<span id="count-filter-all">0</span>)
+                    </button>
+                    <button type="button" onclick="setCalendarExportFilter('midterm')" id="cal-filter-midterm" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 border border-slate-700/60">
+                        สอบกลางภาค (<span id="count-filter-midterm">0</span>)
+                    </button>
+                    <button type="button" onclick="setCalendarExportFilter('final')" id="cal-filter-final" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 border border-slate-700/60">
+                        สอบปลายภาค (<span id="count-filter-final">0</span>)
+                    </button>
                 </div>
                 <div class="flex items-center gap-2 text-xs">
-                    <button type="button" onclick="toggleAllCalendarItems(true)" class="text-amber-400 hover:text-amber-300 font-medium hover:underline flex items-center gap-1">
+                    <button type="button" onclick="toggleAllCalendarItems(true)" class="text-orange-400 hover:text-orange-300 font-medium hover:underline flex items-center gap-1">
                         <i class="fa-solid fa-check-double"></i> เลือกทั้งหมด
                     </button>
                     <span class="text-slate-600">•</span>
@@ -908,22 +913,22 @@
             <!-- Footer / Actions -->
             <div class="p-4 sm:p-5 border-t border-slate-800 bg-slate-850 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div class="text-xs text-slate-400 flex items-center gap-1.5 self-start sm:self-center">
-                    <i class="fa-solid fa-circle-info text-sky-400"></i>
-                    <span id="calendar-export-count">เลือกไว้ 0 รายการ</span>
+                    <i class="fa-solid fa-circle-info text-orange-400"></i>
+                    <span id="calendar-export-count">เลือกไว้ 0 รายการสอบ</span>
                 </div>
                 <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <button type="button" onclick="openAllSelectedGoogleCalendar()" title="เปิด Google Calendar ทุกรายการที่เลือก" class="px-3 py-2.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/40 font-semibold rounded-xl text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 active:scale-95">
+                    <button type="button" onclick="openAllSelectedGoogleCalendar()" title="เปิด Google Calendar ทุกวิชาสอบที่เลือก" class="px-3 py-2.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/40 font-semibold rounded-xl text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 active:scale-95">
                         <i class="fa-brands fa-google text-blue-400"></i>
                         <span>เปิด Google Cal ที่เลือก</span>
                     </button>
-                    <button type="button" onclick="exportSelectedCalendarICS()" class="flex-1 sm:flex-none px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold rounded-xl text-xs sm:text-sm transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
+                    <button type="button" onclick="exportSelectedCalendarICS()" class="flex-1 sm:flex-none px-4 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-slate-950 font-bold rounded-xl text-xs sm:text-sm transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
                         <i class="fa-solid fa-file-arrow-down"></i>
-                        <span>ส่งออก .ics ที่เลือก</span>
+                        <span>ส่งออก .ics ตารางสอบ</span>
                     </button>
                 </div>
             </div>
         </div>
-    </div>
+    </div>    </div>
 
     <!-- JavaScript Logic -->
     <script>
@@ -4076,10 +4081,10 @@
             list.innerHTML = html;
         }
         // =====================================================
-        // CALENDAR EXPORT & GOOGLE CALENDAR
+        // CALENDAR EXPORT (EXAM ONLY: MIDTERM & FINAL)
         // =====================================================
         let calendarExportItems = [];
-        let calExportFilter = 'all';
+        let calExportFilter = 'all'; // 'all' | 'midterm' | 'final'
 
         function getCourseSection(c) {
             if (!c) return '';
@@ -4094,121 +4099,14 @@
             const list = [];
             if (!Array.isArray(scheduleData) || scheduleData.length === 0) return list;
 
-            const ICAL_DAYS = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
             const DAY_NAMES_THAI = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
-            const ctxIso = getCurrentContextTime().isoDate;
 
             scheduleData.forEach((c) => {
                 const sec = getCourseSection(c);
                 const titleBase = `${c.code ? c.code + ' ' : ''}${c.name || 'ไม่ระบุชื่อวิชา'}`;
                 const secSuffix = sec ? ` (${sec})` : '';
 
-                // 1) Classes (Lab vs Regular vs Multi)
-                if (c.specialType === 'lab' && Array.isArray(c.labWeeks) && c.labWeeks.length > 0) {
-                    c.labWeeks.forEach((w, idx) => {
-                        if (!w.date) return;
-                        const labRoom = w.room || c.fallbackRoom || c.room || 'ไม่ระบุห้อง';
-                        const dObj = parseISODateLocal(w.date);
-                        const dayNum = dObj ? dObj.getDay() : 0;
-                        list.push({
-                            id: `${c.id}_lab_${idx}`,
-                            courseId: c.id,
-                            category: 'class',
-                            badge: `LAB สัปดาห์ ${idx + 1}`,
-                            badgeClass: 'bg-sky-500/20 text-sky-300 border border-sky-500/30',
-                            code: c.code || '',
-                            name: c.name || '',
-                            section: sec,
-                            displayTitle: titleBase,
-                            fullTitle: `[LAB ${idx + 1}] ${titleBase}${secSuffix}`,
-                            dateIso: w.date,
-                            dayLabel: `วัน${DAY_NAMES_THAI[dayNum]}ที่ ${formatThaiShortDate(w.date)}`,
-                            start: c.start,
-                            end: c.end,
-                            time: `${c.start} - ${c.end}`,
-                            room: labRoom,
-                            isExam: false,
-                            roomMissing: !w.room && !c.fallbackRoom && !c.room,
-                            teacher: c.teacher || '',
-                            description: `วิชาปฏิบัติการ Lab (สัปดาห์ที่ ${idx + 1})`,
-                            rrule: '',
-                            isAllDay: false,
-                            checked: true
-                        });
-                    });
-                } else {
-                    // Regular weekly class
-                    const day = Number(c.day);
-                    if (Number.isInteger(day) && day >= 0 && day <= 6 && c.start && c.end) {
-                        const firstDate = dateOfWeekday(ctxIso, day);
-                        list.push({
-                            id: `${c.id}_main`,
-                            courseId: c.id,
-                            category: 'class',
-                            badge: 'คาบเรียนปกติ',
-                            badgeClass: 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30',
-                            code: c.code || '',
-                            name: c.name || '',
-                            section: sec,
-                            displayTitle: titleBase,
-                            fullTitle: `${titleBase}${secSuffix}`,
-                            firstDate: firstDate,
-                            dateIso: firstDate,
-                            day: day,
-                            dayLabel: `ทุกวัน${DAY_NAMES_THAI[day]}`,
-                            start: c.start,
-                            end: c.end,
-                            time: `${c.start} - ${c.end}`,
-                            room: c.room || 'ไม่ระบุห้องเรียน',
-                            isExam: false,
-                            roomMissing: !c.room,
-                            teacher: c.teacher || '',
-                            description: `คาบเรียนประจำสัปดาห์ (16 สัปดาห์)`,
-                            rrule: `FREQ=WEEKLY;COUNT=16;BYDAY=${ICAL_DAYS[day]}`,
-                            isAllDay: false,
-                            checked: true
-                        });
-                    }
-
-                    // Extra sessions for multi-class
-                    if (c.specialType === 'multi' && Array.isArray(c.extraSessions)) {
-                        c.extraSessions.forEach((ex, idx) => {
-                            const extraDay = Number(ex.day);
-                            if (!ex.start || !ex.end || !Number.isInteger(extraDay) || extraDay < 0 || extraDay > 6) return;
-                            const exDate = dateOfWeekday(ctxIso, extraDay);
-                            const exRoom = ex.room || c.room || 'ไม่ระบุห้องเรียน';
-                            list.push({
-                                id: `${c.id}_extra_${idx}`,
-                                courseId: c.id,
-                                category: 'class',
-                                badge: `รอบเรียน ${idx + 2}`,
-                                badgeClass: 'bg-purple-500/20 text-purple-300 border border-purple-500/30',
-                                code: c.code || '',
-                                name: c.name || '',
-                                section: sec,
-                                displayTitle: titleBase,
-                                fullTitle: `${titleBase}${secSuffix} (รอบที่ ${idx + 2})`,
-                                firstDate: exDate,
-                                dateIso: exDate,
-                                day: extraDay,
-                                dayLabel: `ทุกวัน${DAY_NAMES_THAI[extraDay]}`,
-                                start: ex.start,
-                                end: ex.end,
-                                time: `${ex.start} - ${ex.end}`,
-                                room: exRoom,
-                                isExam: false,
-                                roomMissing: !exRoom || exRoom === 'ไม่ระบุห้องเรียน',
-                                teacher: c.teacher || '',
-                                description: `รอบเรียนเพิ่มเติมประจำสัปดาห์ (รอบที่ ${idx + 2})`,
-                                rrule: `FREQ=WEEKLY;COUNT=16;BYDAY=${ICAL_DAYS[extraDay]}`,
-                                isAllDay: false,
-                                checked: true
-                            });
-                        });
-                    }
-                }
-
-                // 2) Exams (Midterm & Final)
+                // เฉพาะตารางสอบเท่านั้น (Midterm & Final)
                 ['midterm', 'final'].forEach((type) => {
                     const exam = c.exams && c.exams[type];
                     if (exam && exam.date && exam.start && exam.end) {
@@ -4220,7 +4118,8 @@
                         list.push({
                             id: `${c.id}_exam_${type}`,
                             courseId: c.id,
-                            category: 'exam',
+                            examType: type, // 'midterm' | 'final'
+                            category: type,
                             badge: examLabel,
                             badgeClass: isMidterm ? 'bg-orange-500/20 text-orange-300 border border-orange-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30',
                             code: c.code || '',
@@ -4237,46 +4136,17 @@
                             isExam: true,
                             roomMissing: !exam.room,
                             teacher: c.teacher || '',
-                            description: `การ${examLabel} วิชา ${titleBase}`,
+                            description: `การ${examLabel} วิชา ${titleBase}${sec ? ' (' + sec + ')' : ''}`,
                             rrule: '',
                             isAllDay: false,
                             checked: true
                         });
                     }
                 });
-
-                // 3) Tasks / Homework / Announcements
-                getCourseNotes(c).forEach((note) => {
-                    if (note.type === 'permanent' || !note.date || note.done) return;
-                    const tag = note.type === 'cancel' ? 'งดคลาส' : note.type === 'homework' ? 'ส่งงาน' : 'ประกาศ';
-                    list.push({
-                        id: `${c.id}_note_${note.id}`,
-                        courseId: c.id,
-                        category: 'task',
-                        badge: tag,
-                        badgeClass: 'bg-amber-500/20 text-amber-300 border border-amber-500/30',
-                        code: c.code || '',
-                        name: c.name || '',
-                        section: sec,
-                        displayTitle: `${titleBase}: ${note.text || ''}`,
-                        fullTitle: `[${tag}] ${titleBase}${secSuffix}: ${note.text || ''}`,
-                        dateIso: note.date,
-                        dayLabel: `กำหนด: ${formatThaiShortDate(note.date)}`,
-                        start: '',
-                        end: '',
-                        time: 'ตลอดวัน',
-                        room: '',
-                        isExam: false,
-                        roomMissing: false,
-                        teacher: c.teacher || '',
-                        description: note.text || '',
-                        rrule: '',
-                        isAllDay: true,
-                        checked: false
-                    });
-                });
             });
 
+            // เรียงลำดับตามวันและเวลาสอบ
+            list.sort((a, b) => (a.dateIso + a.start).localeCompare(b.dateIso + b.start));
             return list;
         }
 
@@ -4307,13 +4177,13 @@
 
         function setCalendarExportFilter(filter) {
             calExportFilter = filter;
-            ['all', 'class', 'exam', 'task'].forEach(f => {
+            ['all', 'midterm', 'final'].forEach(f => {
                 const btn = document.getElementById(`cal-filter-${f}`);
                 if (!btn) return;
                 if (f === filter) {
-                    btn.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30';
+                    btn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-orange-500/20 text-orange-300 border border-orange-500/40 shadow-sm';
                 } else {
-                    btn.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200 border border-slate-700/60';
+                    btn.className = 'px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 border border-slate-700/60';
                 }
             });
             renderCalendarExportList();
@@ -4337,19 +4207,31 @@
 
         function getFilteredCalendarItems() {
             if (calExportFilter === 'all') return calendarExportItems;
-            return calendarExportItems.filter(it => it.category === calExportFilter);
+            return calendarExportItems.filter(it => it.examType === calExportFilter);
         }
 
         function updateCalendarExportCount() {
             const checkedCount = calendarExportItems.filter(it => it.checked).length;
             const totalCount = calendarExportItems.length;
+
+            const midtermCount = calendarExportItems.filter(it => it.examType === 'midterm').length;
+            const finalCount = calendarExportItems.filter(it => it.examType === 'final').length;
+
+            const elAll = document.getElementById('count-filter-all');
+            const elMidterm = document.getElementById('count-filter-midterm');
+            const elFinal = document.getElementById('count-filter-final');
+            if (elAll) elAll.textContent = String(totalCount);
+            if (elMidterm) elMidterm.textContent = String(midtermCount);
+            if (elFinal) elFinal.textContent = String(finalCount);
+
             const countEl = document.getElementById('calendar-export-count');
             if (countEl) {
-                countEl.textContent = `เลือกไว้ ${checkedCount} จาก ${totalCount} รายการ`;
+                countEl.textContent = `เลือกไว้ ${checkedCount} จาก ${totalCount} รายการสอบ`;
             }
         }
 
         function renderCalendarExportModal() {
+            updateCalendarExportCount();
             setCalendarExportFilter(calExportFilter);
         }
 
@@ -4359,10 +4241,25 @@
 
             const visibleItems = getFilteredCalendarItems();
             if (visibleItems.length === 0) {
+                const isOverallEmpty = calendarExportItems.length === 0;
                 container.innerHTML = `
-                    <div class="py-12 text-center text-slate-400 text-xs">
-                        <i class="fa-solid fa-calendar-xmark text-3xl text-slate-600 mb-3 block"></i>
-                        ไม่มีรายการในหมวดหมู่นี้
+                    <div class="py-12 px-4 text-center text-slate-400">
+                        <div class="w-14 h-14 mx-auto mb-3 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 text-2xl">
+                            <i class="fa-solid fa-calendar-xmark"></i>
+                        </div>
+                        <div class="text-sm font-bold text-white mb-1">
+                            ${isOverallEmpty ? 'ยังไม่มีข้อมูลตารางสอบ' : 'ไม่มีรายการสอบในหมวดนี้'}
+                        </div>
+                        <div class="text-xs text-slate-400 max-w-sm mx-auto mb-4">
+                            ${isOverallEmpty 
+                                ? 'ยังไม่ได้ระบุวันและเวลาสอบ (กลางภาค/ปลายภาค) ในรายวิชาของคุณ สามารถเพิ่มได้โดยแก้ไขรายวิชา หรือกดปุ่ม "ตั้งช่วงสอบ"' 
+                                : 'ไม่มีวิชาสอบที่ตั้งค่าไว้สำหรับช่วงเวลานี้'}
+                        </div>
+                        ${isOverallEmpty ? `
+                            <button type="button" onclick="closeCalendarExportModal(); openExamPeriodModal();" class="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white font-semibold rounded-xl text-xs transition-all shadow">
+                                <i class="fa-solid fa-calendar-check"></i> ไปที่ตั้งช่วงสอบ
+                            </button>
+                        ` : ''}
                     </div>
                 `;
                 updateCalendarExportCount();
@@ -4372,7 +4269,7 @@
             container.innerHTML = visibleItems.map(item => `
                 <div class="p-3 sm:p-3.5 rounded-xl border border-slate-800 bg-slate-850 hover:bg-slate-800/90 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div class="flex items-start gap-3 min-w-0">
-                        <input type="checkbox" id="cal-item-${item.id}" ${item.checked ? 'checked' : ''} onchange="onCalendarItemCheckChange('${item.id}', this.checked)" class="mt-1 w-4 h-4 rounded accent-amber-500 cursor-pointer shrink-0">
+                        <input type="checkbox" id="cal-item-${item.id}" ${item.checked ? 'checked' : ''} onchange="onCalendarItemCheckChange('${item.id}', this.checked)" class="mt-1 w-4 h-4 rounded accent-orange-500 cursor-pointer shrink-0">
                         <div class="min-w-0">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="text-[10px] font-bold px-2 py-0.5 rounded ${item.badgeClass}">
@@ -4388,13 +4285,11 @@
                                 </span>
                             </div>
                             <div class="flex items-center gap-2.5 text-xs text-slate-400 mt-1 flex-wrap">
-                                <span class="text-slate-300"><i class="fa-regular fa-clock text-amber-400"></i> ${item.dayLabel} ${item.time}</span>
-                                ${item.room ? `
-                                    <span>•</span>
-                                    <span class="${item.roomMissing ? 'text-rose-400 font-medium' : 'text-slate-300'}">
-                                        <i class="fa-solid fa-location-dot ${item.isExam ? 'text-rose-400' : 'text-sky-400'}"></i> ${escapeHTML(item.room)}
-                                    </span>
-                                ` : ''}
+                                <span class="text-slate-300"><i class="fa-regular fa-clock text-orange-400"></i> ${item.dayLabel} ${item.time}</span>
+                                <span>•</span>
+                                <span class="${item.roomMissing ? 'text-rose-400 font-semibold' : 'text-amber-300'}">
+                                    <i class="fa-solid fa-location-dot ${item.roomMissing ? 'text-rose-400' : 'text-amber-400'}"></i> ${escapeHTML(item.room)}
+                                </span>
                                 ${item.teacher ? `
                                     <span>•</span>
                                     <span class="text-slate-400"><i class="fa-solid fa-user-tie text-slate-500"></i> ${escapeHTML(item.teacher)}</span>
@@ -4403,7 +4298,7 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2 self-end sm:self-center shrink-0">
-                        <button type="button" onclick="openSingleGoogleCalendar('${item.id}')" title="เปิดลง Google Calendar รายการนี้ทันที" class="px-2.5 sm:px-3 py-1.5 bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 hover:text-white border border-sky-500/40 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 active:scale-95 whitespace-nowrap">
+                        <button type="button" onclick="openSingleGoogleCalendar('${item.id}')" title="เปิดลง Google Calendar รายการสอบนี้ทันที" class="px-2.5 sm:px-3 py-1.5 bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 hover:text-white border border-sky-500/40 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 active:scale-95 whitespace-nowrap">
                             <i class="fa-brands fa-google text-sky-400"></i>
                             <span>ลง Google Calendar ↗</span>
                         </button>
@@ -4416,34 +4311,20 @@
 
         function buildGoogleCalendarUrl(item) {
             const title = item.fullTitle || item.displayTitle;
-            let datesParam = '';
-            let recurParam = '';
-
-            if (item.isAllDay) {
-                const cleanStart = (item.dateIso || '').replace(/-/g, '');
-                const dObj = parseISODateLocal(item.dateIso);
-                const nextDay = dObj ? formatISODate(addDays(dObj, 1)).replace(/-/g, '') : cleanStart;
-                datesParam = `${cleanStart}/${nextDay}`;
-            } else {
-                const dateIso = item.dateIso || item.firstDate;
-                const [hh1, mm1] = (item.start || '09:00').split(':');
-                const [hh2, mm2] = (item.end || '10:00').split(':');
-                const dClean = (dateIso || '').replace(/-/g, '');
-                datesParam = `${dClean}T${hh1}${mm1}00/${dClean}T${hh2}${mm2}00`;
-
-                if (item.rrule) {
-                    recurParam = `&recur=RRULE:${item.rrule}`;
-                }
-            }
+            const dateIso = item.dateIso;
+            const [hh1, mm1] = (item.start || '09:00').split(':');
+            const [hh2, mm2] = (item.end || '10:00').split(':');
+            const dClean = (dateIso || '').replace(/-/g, '');
+            const datesParam = `${dClean}T${hh1}${mm1}00/${dClean}T${hh2}${mm2}00`;
 
             const detailsLines = [];
+            detailsLines.push(`ตารางสอบ: ${item.badge}`);
             if (item.code) detailsLines.push(`รหัสวิชา: ${item.code}`);
             if (item.name) detailsLines.push(`ชื่อวิชา: ${item.name}`);
             if (item.section) detailsLines.push(`Section: ${item.section}`);
             if (item.teacher) detailsLines.push(`อาจารย์ผู้สอน: ${item.teacher}`);
-            if (item.room) detailsLines.push(`${item.isExam ? 'ห้องสอบ' : 'ห้องเรียน'}: ${item.room}`);
-            if (item.time) detailsLines.push(`เวลา: ${item.time}`);
-            if (item.description) detailsLines.push(`รายละเอียด: ${item.description}`);
+            if (item.room) detailsLines.push(`ห้องสอบ: ${item.room}`);
+            if (item.time) detailsLines.push(`เวลาสอบ: ${item.time}`);
             detailsLines.push('จัดทำโดย Smart Schedule Widget');
 
             const details = detailsLines.join('\n');
@@ -4456,11 +4337,7 @@
             if (location) params.set('location', location);
             params.set('details', details);
 
-            let finalUrl = `https://calendar.google.com/calendar/render?${params.toString()}`;
-            if (recurParam) {
-                finalUrl += recurParam;
-            }
-            return finalUrl;
+            return `https://calendar.google.com/calendar/render?${params.toString()}`;
         }
 
         function openSingleGoogleCalendar(itemId) {
@@ -4468,18 +4345,18 @@
             if (!item) return;
             const url = buildGoogleCalendarUrl(item);
             window.open(url, '_blank');
-            showToast(`เปิด Google Calendar สำหรับ "${item.code || item.name}" แล้ว`, 'success');
+            showToast(`เปิด Google Calendar สำหรับ "${item.code || item.name}" (${item.badge}) แล้ว`, 'success');
         }
 
         function openAllSelectedGoogleCalendar() {
             const selected = calendarExportItems.filter(it => it.checked);
             if (selected.length === 0) {
-                showToast('กรุณาเลือกวิชาหรือรายการสอบอย่างน้อย 1 รายการ', 'error');
+                showToast('กรุณาเลือกวิชาสอบอย่างน้อย 1 รายการ', 'error');
                 return;
             }
 
             if (selected.length > 5) {
-                if (!confirm(`คุณกำลังจะเปิด Google Calendar พร้อมกัน ${selected.length} แท็บ\n(แนะนำให้ใช้ปุ่ม "ส่งออก .ics ที่เลือก" เพื่อนำเข้าทั้งหมดในคลิกเดียว)\n\nต้องการเปิดแท็บต่อไปหรือไม่?`)) {
+                if (!confirm(`คุณกำลังจะเปิด Google Calendar พร้อมกัน ${selected.length} แท็บ\n(แนะนำให้ใช้ปุ่ม "ส่งออก .ics ตารางสอบ" เพื่อนำเข้าทั้งหมดในคลิกเดียว)\n\nต้องการเปิดแท็บต่อไปหรือไม่?`)) {
                     return;
                 }
             }
@@ -4495,7 +4372,7 @@
         function exportSelectedCalendarICS() {
             const selected = calendarExportItems.filter(it => it.checked);
             if (selected.length === 0) {
-                showToast('กรุณาเลือกวิชาหรือรายการสอบอย่างน้อย 1 รายการ', 'error');
+                showToast('กรุณาเลือกวิชาสอบอย่างน้อย 1 รายการ', 'error');
                 return;
             }
 
@@ -4519,9 +4396,9 @@
             const lines = [
                 'BEGIN:VCALENDAR',
                 'VERSION:2.0',
-                'PRODID:-//SmartClassSchedule//TH',
+                'PRODID:-//SmartClassSchedule//ExamExport//TH',
                 'CALSCALE:GREGORIAN',
-                'X-WR-CALNAME:ตารางเรียนอัจฉริยะ',
+                'X-WR-CALNAME:ตารางสอบ Smart Schedule',
                 'METHOD:PUBLISH'
             ];
 
@@ -4530,24 +4407,11 @@
                 lines.push(`UID:${escICS(item.id)}@smartschedule`);
                 lines.push(`DTSTAMP:${dtStamp}`);
 
-                if (item.isAllDay) {
-                    const cleanStart = (item.dateIso || '').replace(/-/g, '');
-                    const dObj = parseISODateLocal(item.dateIso);
-                    const nextDay = dObj ? formatISODate(addDays(dObj, 1)).replace(/-/g, '') : cleanStart;
-                    lines.push(`DTSTART;VALUE=DATE:${cleanStart}`);
-                    lines.push(`DTEND;VALUE=DATE:${nextDay}`);
-                } else {
-                    const dateIso = item.dateIso || item.firstDate;
-                    const dtStart = toICSDateTime(dateIso, item.start);
-                    const dtEnd = toICSDateTime(dateIso, item.end);
-                    if (dtStart && dtEnd) {
-                        lines.push(`DTSTART:${dtStart}`);
-                        lines.push(`DTEND:${dtEnd}`);
-                    }
-                }
-
-                if (item.rrule) {
-                    lines.push(`RRULE:${item.rrule}`);
+                const dtStart = toICSDateTime(item.dateIso, item.start);
+                const dtEnd = toICSDateTime(item.dateIso, item.end);
+                if (dtStart && dtEnd) {
+                    lines.push(`DTSTART:${dtStart}`);
+                    lines.push(`DTEND:${dtEnd}`);
                 }
 
                 const summary = item.fullTitle || item.displayTitle;
@@ -4558,17 +4422,19 @@
                 }
 
                 const descLines = [];
+                descLines.push(`ประเภทการสอบ: ${item.badge}`);
                 if (item.code) descLines.push(`รหัสวิชา: ${item.code}`);
                 if (item.name) descLines.push(`ชื่อวิชา: ${item.name}`);
                 if (item.section) descLines.push(`Section: ${item.section}`);
                 if (item.teacher) descLines.push(`อาจารย์ผู้สอน: ${item.teacher}`);
-                if (item.room) descLines.push(`${item.isExam ? 'ห้องสอบ' : 'ห้องเรียน'}: ${item.room}`);
+                if (item.room) descLines.push(`ห้องสอบ: ${item.room}`);
                 if (item.time) descLines.push(`เวลา: ${item.time}`);
-                if (item.description) descLines.push(`รายละเอียด: ${item.description}`);
                 descLines.push('จัดทำโดย Smart Schedule Widget');
                 lines.push(`DESCRIPTION:${escICS(descLines.join('\n'))}`);
 
-                lines.push('BEGIN:VALARM', 'TRIGGER:-PT15M', 'ACTION:DISPLAY', 'DESCRIPTION:Reminder', 'END:VALARM');
+                // เตือนล่วงหน้า 1 วัน และ 1 ชั่วโมง
+                lines.push('BEGIN:VALARM', 'TRIGGER:-PT1H', 'ACTION:DISPLAY', 'DESCRIPTION:เตือนการสอบ (อีก 1 ชม.)', 'END:VALARM');
+                lines.push('BEGIN:VALARM', 'TRIGGER:-P1D', 'ACTION:DISPLAY', 'DESCRIPTION:เตือนการสอบวันพรุ่งนี้', 'END:VALARM');
                 lines.push('END:VEVENT');
             });
 
@@ -4577,12 +4443,12 @@
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `schedule_export_${ctxIso}.ics`;
+            link.download = `exam_schedule_${ctxIso}.ics`;
             document.body.appendChild(link);
             link.click();
             link.remove();
             setTimeout(() => URL.revokeObjectURL(url), 1000);
-            showToast(`ดาวน์โหลดไฟล์ .ics เรียบร้อยแล้ว (${selected.length} รายการ)`, 'success');
+            showToast(`ดาวน์โหลดไฟล์ตารางสอบ (.ics) เรียบร้อยแล้ว (${selected.length} รายการ)`, 'success');
         }
 
         // Backward compatibility
