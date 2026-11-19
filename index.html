@@ -3581,24 +3581,81 @@
             }).join('');
         }
 
+        // --- DOWNLOAD HELPER (รองรับทั้ง Web และ Android APK ผ่าน WidgetBridge) ---
+        function downloadFileBlob(filename, mimeType, content) {
+            // 1. ส่งตรงเข้า Android Native WidgetBridge เมื่อเปิดในแอป APK (บันทึกลงโฟลเดอร์ Downloads ทันที)
+            if (window.WidgetBridge && typeof window.WidgetBridge.saveDownload === 'function') {
+                try {
+                    const base64Data = btoa(encodeURIComponent(content).replace(/%([0-9A-F]{2})/g, (match, p1) => String.fromCharCode(parseInt(p1, 16))));
+                    window.WidgetBridge.saveDownload(filename, mimeType, base64Data);
+                    return true;
+                } catch (e) {
+                    console.warn('WidgetBridge saveDownload failed, falling back to standard download:', e);
+                }
+            }
+
+            // 2. Standard Web Browser Download (Chrome, Brave, Safari, Edge, Firefox)
+            try {
+                const blob = new Blob([content], { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    if (a.parentNode) a.parentNode.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 20000);
+                return true;
+            } catch (err) {
+                console.error('Blob download failed, trying Data URI:', err);
+                try {
+                    const dataUri = 'data:' + mimeType + ';charset=utf-8,' + encodeURIComponent(content);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = dataUri;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    setTimeout(() => {
+                        if (a.parentNode) a.parentNode.removeChild(a);
+                    }, 20000);
+                    return true;
+                } catch (err2) {
+                    console.error('Data URI download failed:', err2);
+                    return false;
+                }
+            }
+        }
+
         // --- EXPORT / IMPORT / CLEAR ALL ---
         function exportScheduleJSON() {
-            const payload = {
-                version: 5,
-                examPeriods,
-                exportedAt: new Date().toISOString(),
-                colorCategories,
-                scheduleData
-            };
-            const dataStr = JSON.stringify(payload, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `smart_class_schedule_${new Date().toISOString().slice(0, 10)}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('ดาวน์โหลดไฟล์สำรองตารางเรียนและโน้ตแล้ว', 'success');
+            try {
+                const payload = {
+                    version: 5,
+                    examPeriods: typeof examPeriods !== 'undefined' ? examPeriods : { midterm: null, final: null },
+                    exportedAt: new Date().toISOString(),
+                    colorCategories: Array.isArray(colorCategories) ? colorCategories : [],
+                    scheduleData: Array.isArray(scheduleData) ? scheduleData : []
+                };
+                const dataStr = JSON.stringify(payload, null, 2);
+                const dateStr = (typeof formatISODate === 'function')
+                    ? formatISODate(new Date())
+                    : new Date().toISOString().slice(0, 10);
+                const filename = `smart_class_schedule_${dateStr}.json`;
+
+                const ok = downloadFileBlob(filename, 'application/json', dataStr);
+                if (ok) {
+                    showToast('ดาวน์โหลดไฟล์สำรองตารางเรียนและโน้ตแล้ว', 'success');
+                } else {
+                    showToast('เกิดข้อผิดพลาดในการส่งออกไฟล์', 'error');
+                }
+            } catch (err) {
+                console.error('exportScheduleJSON error:', err);
+                showToast(`ส่งออกข้อมูลไม่สำเร็จ: ${err.message}`, 'error');
+            }
         }
 
         function importScheduleJSON(event) {
@@ -4928,16 +4985,12 @@
             });
 
             lines.push('END:VCALENDAR');
-            const blob = new Blob(['\uFEFF', lines.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `smart_schedule_${ctxIso}.ics`;
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
-            showToast(`ดาวน์โหลดไฟล์ .ics เรียบร้อยแล้ว (${selected.length} รายการ)`, 'success');
+            const icsContent = '\uFEFF' + lines.join('\r\n');
+            const filename = `smart_schedule_${ctxIso}.ics`;
+            const ok = downloadFileBlob(filename, 'text/calendar;charset=utf-8', icsContent);
+            if (ok) {
+                showToast(`ดาวน์โหลดไฟล์ .ics เรียบร้อยแล้ว (${selected.length} รายการ)`, 'success');
+            }
         }
 
         // Backward compatibility
