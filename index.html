@@ -861,46 +861,6 @@
         </div>
     </div>
 
-    <!-- Modal 4: ตั้งค่า Google OAuth Client ID -->
-    <div id="google-config-modal" class="fixed inset-0 z-[70] hidden items-center justify-center bg-slate-950/85 backdrop-blur-sm p-4">
-        <div class="bg-slate-900 border border-slate-700 w-full max-w-md rounded-2xl p-5 shadow-2xl space-y-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2.5 text-blue-400 font-bold text-base">
-                    <i class="fa-brands fa-google text-lg"></i>
-                    <span>เชื่อมต่อ Google Calendar API</span>
-                </div>
-                <button type="button" onclick="closeGoogleConfigModal()" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-all">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-            
-            <p class="text-xs text-slate-300 leading-relaxed font-sarabun">
-                เพื่อให้ระบบสามารถ <b>ตรวจเช็คสถานะการเพิ่มจริง</b> และ <b>สั่งลบกิจกรรมจาก Google Calendar ได้โดยตรง</b> จำเป็นต้องระบุ Google OAuth 2.0 Client ID (Web Application)
-            </p>
-
-            <div class="space-y-1.5">
-                <label class="block text-xs font-semibold text-slate-300">Google Client ID</label>
-                <input type="text" id="input-google-client-id" placeholder="เช่น xxxxx.apps.googleusercontent.com" class="w-full bg-slate-800 border border-slate-700 focus:border-blue-500 rounded-xl px-3 py-2 text-white font-mono text-xs outline-none">
-            </div>
-
-            <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700/80 text-[11px] text-slate-400 space-y-1.5 font-sarabun">
-                <div class="font-bold text-slate-300 flex items-center gap-1.5"><i class="fa-solid fa-circle-question text-sky-400"></i> วิธีตั้งค่าใน Google Cloud Console:</div>
-                <div>1. เปิดใช้ <b>Google Calendar API</b> ใน Google Cloud Console</div>
-                <div>2. สร้าง <b>OAuth client ID</b> ประเภท <b>Web application</b></div>
-                <div>3. ใน <b>Authorized JavaScript origins</b> ใส่: <code class="text-sky-300 select-all" id="text-js-origin">https://flyingtoasts.github.io</code></div>
-                <div>4. ใน <b>Authorized redirect URIs</b> ใส่ URL นี้: <code class="text-amber-300 select-all" id="text-redirect-uri"></code></div>
-                <div class="pt-1 border-t border-slate-700/60 text-amber-300">
-                    <b>สำคัญ (แก้ 403):</b> ในหน้า <b>OAuth consent screen</b> เลื่อนลงไปที่ <b>Test users</b> แล้วกด <b>+ ADD USERS</b> เพิ่มอีเมลของคุณ
-                </div>
-            </div>
-
-            <div class="flex items-center justify-end gap-2 pt-1">
-                <button type="button" onclick="closeGoogleConfigModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium">ยกเลิก</button>
-                <button type="button" onclick="saveGoogleConfigAndConnect()" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow">บันทึกและเชื่อมต่อ</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Modal 5: ลงปฏิทินตารางสอบ & งาน/การบ้าน (Google Calendar & .ics) -->
     <div id="calendar-export-modal" class="fixed inset-0 z-[65] hidden items-center justify-center bg-slate-950/85 backdrop-blur-sm p-3 sm:p-4">
         <div class="bg-slate-900 border border-slate-700 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
@@ -931,9 +891,6 @@
                     <button type="button" onclick="verifyGoogleCalendarStatus(false)" id="btn-sync-gcal" title="ตรวจเช็คว่ากิจกรรมยังอยู่บน Google Calendar จริงหรือไม่" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-1.5 transition-all text-xs">
                         <i class="fa-solid fa-arrows-rotate text-sky-400"></i>
                         <span>ตรวจเช็คสถานะจริง</span>
-                    </button>
-                    <button type="button" onclick="openGoogleConfigModal()" title="ตั้งค่า Google OAuth Client ID" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-all">
-                        <i class="fa-solid fa-gear"></i>
                     </button>
                 </div>
             </div>
@@ -988,7 +945,7 @@
                 </div>
             </div>
         </div>
-    </div>    </div>
+    </div>
 
     <!-- JavaScript Logic -->
     <script>
@@ -4149,14 +4106,15 @@
         let calExportFilter = 'all'; // 'all' | 'midterm' | 'final' | 'task'
 
         const STORAGE_GCAL_SYNC_KEY = 'smart_schedule_gcal_synced_v2';
-        const STORAGE_GCAL_CLIENT_ID_KEY = 'smart_schedule_google_client_id';
         const STORAGE_GCAL_TOKEN_KEY = 'smart_schedule_gcal_token';
         const STORAGE_GCAL_TOKEN_EXP_KEY = 'smart_schedule_gcal_token_exp';
+
+        const DEFAULT_GOOGLE_CLIENT_ID = '256116049348-9q7r29ak93s4br2e63fa5vv4fv5o5e4i.apps.googleusercontent.com';
 
         let googleTokenClient = null;
         let googleAccessToken = localStorage.getItem(STORAGE_GCAL_TOKEN_KEY) || null;
         let googleTokenExpiry = Number(localStorage.getItem(STORAGE_GCAL_TOKEN_EXP_KEY) || 0);
-        let googleClientId = localStorage.getItem(STORAGE_GCAL_CLIENT_ID_KEY) || '';
+        const googleClientId = DEFAULT_GOOGLE_CLIENT_ID;
 
         function getCourseSection(c) {
             if (!c) return '';
@@ -4220,6 +4178,7 @@
                             showToast('เข้าสู่ระบบ Google Calendar สำเร็จแล้ว! กำลังเปิดตารางสอบ...', 'success');
                             updateGCalAuthUI();
                             openCalendarExportModal();
+                            verifyGoogleCalendarStatus(true);
                         }, 300);
                     }
                 } catch(e) {
@@ -4228,103 +4187,71 @@
             }
         }
 
-        function openGoogleConfigModal() {
-            const input = document.getElementById('input-google-client-id');
-            if (input) input.value = googleClientId;
-            const originEl = document.getElementById('text-js-origin');
-            const redirectEl = document.getElementById('text-redirect-uri');
-            if (originEl) originEl.textContent = window.location.origin;
-            if (redirectEl) redirectEl.textContent = window.location.origin + window.location.pathname;
-
-            const modal = document.getElementById('google-config-modal');
-            if (modal) {
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
+        function getCleanRedirectUri() {
+            let loc = window.location.href.split('#')[0].split('?')[0];
+            if (loc.endsWith('index.html')) {
+                loc = loc.slice(0, -10);
             }
-        }
-
-        function closeGoogleConfigModal() {
-            const modal = document.getElementById('google-config-modal');
-            if (modal) {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
+            if (!loc.endsWith('/')) {
+                loc += '/';
             }
-        }
-
-        function saveGoogleConfigAndConnect() {
-            const input = document.getElementById('input-google-client-id');
-            const val = (input ? input.value : '').trim();
-            if (!val) {
-                showToast('กรุณาระบุ Google Client ID', 'error');
-                return;
-            }
-            googleClientId = val;
-            localStorage.setItem(STORAGE_GCAL_CLIENT_ID_KEY, val);
-            closeGoogleConfigModal();
-            showToast('บันทึก Client ID แล้ว กำลังเริ่มเชื่อมต่อ Google...', 'info');
-            connectGoogleCalendar();
+            return loc;
         }
 
         function startGoogleRedirectOAuth() {
-            if (!googleClientId) {
-                openGoogleConfigModal();
-                return;
-            }
-            const redirectUri = window.location.origin + window.location.pathname;
+            const redirectUri = getCleanRedirectUri();
             const scope = encodeURIComponent('https://www.googleapis.com/auth/calendar.events');
-            const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(googleClientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${scope}&include_granted_scopes=true&prompt=consent`;
-            showToast('กำลังนำคุณไปยังหน้าเข้าสู่ระบบ Google (โหมด Redirect ไม่ติดหน้าขาว)...', 'info');
+            const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(DEFAULT_GOOGLE_CLIENT_ID)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${scope}&include_granted_scopes=true&prompt=consent`;
             window.location.href = authUrl;
         }
 
         function connectGoogleCalendar() {
-            if (!googleClientId) {
-                openGoogleConfigModal();
-                return;
-            }
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
 
-            // บนมือถือหรือเบราว์เซอร์ที่มีการบล็อกป๊อปอัป ให้ใช้ Redirect Flow ทันที (แก้หน้าขาวถาวร)
-            const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+            // บนอุปกรณ์มือถือหรือแอป APK ให้ใช้ Redirect ทันที เพื่อป้องกันปัญหาหน้าขาว gsi/transform ของ Popup
             if (isMobile) {
                 startGoogleRedirectOAuth();
                 return;
             }
 
-            // บน Desktop ทดลองใช้ popup ก่อน หากไม่สำเร็จให้ fallback ไป redirect
-            try {
-                if (typeof google !== 'undefined' && google.accounts && google.accounts.oauth2) {
-                    googleTokenClient = google.accounts.oauth2.initTokenClient({
-                        client_id: googleClientId,
-                        scope: 'https://www.googleapis.com/auth/calendar.events',
-                        error_callback: (err) => {
-                            console.warn('Google popup error, switching to redirect flow', err);
-                            startGoogleRedirectOAuth();
-                        },
-                        callback: async (tokenResponse) => {
-                            if (tokenResponse.error) {
-                                console.error('Google Auth Error:', tokenResponse);
-                                startGoogleRedirectOAuth();
-                                return;
-                            }
-                            googleAccessToken = tokenResponse.access_token;
-                            const expiresIn = Number(tokenResponse.expires_in || 3599);
-                            googleTokenExpiry = Date.now() + (expiresIn * 1000);
-                            localStorage.setItem(STORAGE_GCAL_TOKEN_KEY, googleAccessToken);
-                            localStorage.setItem(STORAGE_GCAL_TOKEN_EXP_KEY, String(googleTokenExpiry));
-
-                            updateGCalAuthUI();
-                            showToast('เชื่อมต่อ Google Calendar สำเร็จแล้ว!', 'success');
-                            await verifyGoogleCalendarStatus(true);
-                        }
-                    });
-                    googleTokenClient.requestAccessToken({ prompt: 'consent' });
-                    return;
-                }
-            } catch (err) {
-                console.warn('initTokenClient failed, using redirect', err);
+            // บนเครื่องคอมพิวเตอร์ Desktop ให้ใช้ Google Identity Services Popup ถ้ามี
+            if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
+                startGoogleRedirectOAuth();
+                return;
             }
 
-            startGoogleRedirectOAuth();
+            try {
+                googleTokenClient = google.accounts.oauth2.initTokenClient({
+                    client_id: DEFAULT_GOOGLE_CLIENT_ID,
+                    scope: 'https://www.googleapis.com/auth/calendar.events',
+                    error_callback: (err) => {
+                        console.error('Google token error:', err);
+                        startGoogleRedirectOAuth();
+                    },
+                    callback: async (tokenResponse) => {
+                        if (tokenResponse.error) {
+                            console.error('Google Auth Error:', tokenResponse);
+                            startGoogleRedirectOAuth();
+                            return;
+                        }
+                        googleAccessToken = tokenResponse.access_token;
+                        const expiresIn = Number(tokenResponse.expires_in || 3599);
+                        googleTokenExpiry = Date.now() + (expiresIn * 1000);
+                        localStorage.setItem(STORAGE_GCAL_TOKEN_KEY, googleAccessToken);
+                        localStorage.setItem(STORAGE_GCAL_TOKEN_EXP_KEY, String(googleTokenExpiry));
+
+                        updateGCalAuthUI();
+                        showToast('เชื่อมต่อ Google Calendar สำเร็จแล้ว! กำลังตรวจเช็คสถานะกิจกรรม...', 'success');
+                        await verifyGoogleCalendarStatus(true);
+                    }
+                });
+
+                // Google Identity Services Official Prompt
+                googleTokenClient.requestAccessToken({ prompt: 'select_account' });
+            } catch (err) {
+                console.error('initTokenClient error', err);
+                startGoogleRedirectOAuth();
+            }
         }
 
         function disconnectGoogleCalendar() {
@@ -4357,9 +4284,9 @@
                 `;
             } else {
                 container.innerHTML = `
-                    <button type="button" onclick="connectGoogleCalendar()" class="px-2.5 py-1 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 font-medium flex items-center gap-1.5 transition-all text-xs">
-                        <i class="fa-brands fa-google text-blue-400"></i>
-                        <span>เชื่อมต่อ Google Calendar (ตรวจจริง & ลบได้)</span>
+                    <button type="button" onclick="connectGoogleCalendar()" class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold flex items-center gap-2 transition-all shadow text-xs active:scale-95">
+                        <i class="fa-brands fa-google text-sm"></i>
+                        <span>เข้าสู่ระบบด้วย Google (เชื่อมต่อปฏิทิน)</span>
                     </button>
                 `;
             }
