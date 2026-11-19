@@ -951,6 +951,8 @@
         // --- NATIVE HOME SCREEN WIDGET DATA BRIDGE (Android + iOS) ---
         let lastNativeWidgetSyncMinute = '';
         function buildNativeWidgetPayload() {
+            console.log('[Widget Debug] scheduleData length:', scheduleData.length);
+            console.log('[Widget Debug] scheduleData content:', scheduleData);
             const now = new Date();
             const sessions = [];
             for (let offset = 0; offset < 14; offset++) {
