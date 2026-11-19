@@ -883,11 +883,15 @@
                 <input type="text" id="input-google-client-id" placeholder="เช่น xxxxx.apps.googleusercontent.com" class="w-full bg-slate-800 border border-slate-700 focus:border-blue-500 rounded-xl px-3 py-2 text-white font-mono text-xs outline-none">
             </div>
 
-            <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700/80 text-[11px] text-slate-400 space-y-1 font-sarabun">
-                <div class="font-bold text-slate-300 flex items-center gap-1.5"><i class="fa-solid fa-circle-question text-sky-400"></i> วิธีสร้าง Client ID (ฟรี):</div>
-                <div>1. ไปที่ <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="text-sky-400 underline">Google Cloud Console</a> แล้วเปิดใช้ Calendar API</div>
-                <div>2. สร้าง Credentials &gt; OAuth client ID &gt; Web application</div>
-                <div>3. เพิ่ม Authorized JavaScript origins เป็น URL เว็บของคุณ</div>
+            <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700/80 text-[11px] text-slate-400 space-y-1.5 font-sarabun">
+                <div class="font-bold text-slate-300 flex items-center gap-1.5"><i class="fa-solid fa-circle-question text-sky-400"></i> วิธีตั้งค่าใน Google Cloud Console:</div>
+                <div>1. เปิดใช้ <b>Google Calendar API</b> ใน Google Cloud Console</div>
+                <div>2. สร้าง <b>OAuth client ID</b> ประเภท <b>Web application</b></div>
+                <div>3. ใน <b>Authorized JavaScript origins</b> ใส่: <code class="text-sky-300 select-all" id="text-js-origin">https://flyingtoasts.github.io</code></div>
+                <div>4. ใน <b>Authorized redirect URIs</b> ใส่ URL นี้: <code class="text-amber-300 select-all" id="text-redirect-uri"></code></div>
+                <div class="pt-1 border-t border-slate-700/60 text-amber-300">
+                    <b>สำคัญ (แก้ 403):</b> ในหน้า <b>OAuth consent screen</b> เลื่อนลงไปที่ <b>Test users</b> แล้วกด <b>+ ADD USERS</b> เพิ่มอีเมลของคุณ
+                </div>
             </div>
 
             <div class="flex items-center justify-end gap-2 pt-1">
@@ -1305,6 +1309,7 @@
             autoRoute();
             syncNativeWidgetData(true);
             loadWebsiteVersion();
+            checkUrlForGoogleOAuthToken();
             setInterval(() => updateTick(false), 1000);
         };
 
@@ -4198,9 +4203,39 @@
             return null;
         }
 
+        function checkUrlForGoogleOAuthToken() {
+            const hash = window.location.hash || '';
+            if (hash.includes('access_token=')) {
+                try {
+                    const params = new URLSearchParams(hash.substring(1));
+                    const token = params.get('access_token');
+                    const expiresIn = Number(params.get('expires_in') || 3599);
+                    if (token) {
+                        googleAccessToken = token;
+                        googleTokenExpiry = Date.now() + (expiresIn * 1000);
+                        localStorage.setItem(STORAGE_GCAL_TOKEN_KEY, token);
+                        localStorage.setItem(STORAGE_GCAL_TOKEN_EXP_KEY, String(googleTokenExpiry));
+                        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+                        setTimeout(() => {
+                            showToast('เข้าสู่ระบบ Google Calendar สำเร็จแล้ว! กำลังเปิดตารางสอบ...', 'success');
+                            updateGCalAuthUI();
+                            openCalendarExportModal();
+                        }, 300);
+                    }
+                } catch(e) {
+                    console.error('Error parsing OAuth token from hash', e);
+                }
+            }
+        }
+
         function openGoogleConfigModal() {
             const input = document.getElementById('input-google-client-id');
             if (input) input.value = googleClientId;
+            const originEl = document.getElementById('text-js-origin');
+            const redirectEl = document.getElementById('text-redirect-uri');
+            if (originEl) originEl.textContent = window.location.origin;
+            if (redirectEl) redirectEl.textContent = window.location.origin + window.location.pathname;
+
             const modal = document.getElementById('google-config-modal');
             if (modal) {
                 modal.classList.remove('hidden');
@@ -4230,43 +4265,66 @@
             connectGoogleCalendar();
         }
 
+        function startGoogleRedirectOAuth() {
+            if (!googleClientId) {
+                openGoogleConfigModal();
+                return;
+            }
+            const redirectUri = window.location.origin + window.location.pathname;
+            const scope = encodeURIComponent('https://www.googleapis.com/auth/calendar.events');
+            const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(googleClientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${scope}&include_granted_scopes=true&prompt=consent`;
+            showToast('กำลังนำคุณไปยังหน้าเข้าสู่ระบบ Google (โหมด Redirect ไม่ติดหน้าขาว)...', 'info');
+            window.location.href = authUrl;
+        }
+
         function connectGoogleCalendar() {
             if (!googleClientId) {
                 openGoogleConfigModal();
                 return;
             }
 
-            if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
-                showToast('กำลังโหลดระบบ Google Sign-in กรุณาลองใหม่อีกครั้งใน 2-3 วินาที', 'info');
+            // บนมือถือหรือเบราว์เซอร์ที่มีการบล็อกป๊อปอัป ให้ใช้ Redirect Flow ทันที (แก้หน้าขาวถาวร)
+            const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+            if (isMobile) {
+                startGoogleRedirectOAuth();
                 return;
             }
 
+            // บน Desktop ทดลองใช้ popup ก่อน หากไม่สำเร็จให้ fallback ไป redirect
             try {
-                googleTokenClient = google.accounts.oauth2.initTokenClient({
-                    client_id: googleClientId,
-                    scope: 'https://www.googleapis.com/auth/calendar.events',
-                    callback: async (tokenResponse) => {
-                        if (tokenResponse.error) {
-                            console.error('Google Auth Error:', tokenResponse);
-                            showToast('เชื่อมต่อ Google Calendar ไม่สำเร็จ: ' + (tokenResponse.error_description || tokenResponse.error), 'error');
-                            return;
-                        }
-                        googleAccessToken = tokenResponse.access_token;
-                        const expiresIn = Number(tokenResponse.expires_in || 3599);
-                        googleTokenExpiry = Date.now() + (expiresIn * 1000);
-                        localStorage.setItem(STORAGE_GCAL_TOKEN_KEY, googleAccessToken);
-                        localStorage.setItem(STORAGE_GCAL_TOKEN_EXP_KEY, String(googleTokenExpiry));
+                if (typeof google !== 'undefined' && google.accounts && google.accounts.oauth2) {
+                    googleTokenClient = google.accounts.oauth2.initTokenClient({
+                        client_id: googleClientId,
+                        scope: 'https://www.googleapis.com/auth/calendar.events',
+                        error_callback: (err) => {
+                            console.warn('Google popup error, switching to redirect flow', err);
+                            startGoogleRedirectOAuth();
+                        },
+                        callback: async (tokenResponse) => {
+                            if (tokenResponse.error) {
+                                console.error('Google Auth Error:', tokenResponse);
+                                startGoogleRedirectOAuth();
+                                return;
+                            }
+                            googleAccessToken = tokenResponse.access_token;
+                            const expiresIn = Number(tokenResponse.expires_in || 3599);
+                            googleTokenExpiry = Date.now() + (expiresIn * 1000);
+                            localStorage.setItem(STORAGE_GCAL_TOKEN_KEY, googleAccessToken);
+                            localStorage.setItem(STORAGE_GCAL_TOKEN_EXP_KEY, String(googleTokenExpiry));
 
-                        updateGCalAuthUI();
-                        showToast('เชื่อมต่อ Google Calendar สำเร็จแล้ว! กำลังตรวจเช็คสถานะกิจกรรม...', 'success');
-                        await verifyGoogleCalendarStatus(true);
-                    }
-                });
-                googleTokenClient.requestAccessToken({ prompt: '' });
+                            updateGCalAuthUI();
+                            showToast('เชื่อมต่อ Google Calendar สำเร็จแล้ว!', 'success');
+                            await verifyGoogleCalendarStatus(true);
+                        }
+                    });
+                    googleTokenClient.requestAccessToken({ prompt: 'consent' });
+                    return;
+                }
             } catch (err) {
-                console.error('initTokenClient error', err);
-                showToast('ไม่สามารถเริ่มเชื่อมต่อได้: ' + err.message, 'error');
+                console.warn('initTokenClient failed, using redirect', err);
             }
+
+            startGoogleRedirectOAuth();
         }
 
         function disconnectGoogleCalendar() {
