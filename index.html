@@ -956,6 +956,22 @@
             console.log('[Widget Debug] scheduleData length:', scheduleData.length);
             console.log('[Widget Debug] scheduleData content:', scheduleData);
             const now = new Date();
+            console.log('===== NATIVE WIDGET DEBUG =====');
+    console.log('scheduleData:', scheduleData);
+    console.log('จำนวนรายวิชา:', scheduleData.length);
+
+    scheduleData.forEach((course, index) => {
+        console.log(`วิชาที่ ${index + 1}:`, {
+            id: course.id,
+            code: course.code,
+            name: course.name,
+            day: course.day,
+            start: course.start,
+            end: course.end,
+            specialType: course.specialType
+        });
+    });
+
             const sessions = [];
             for (let offset = 0; offset < 14; offset++) {
                 const dayIso = formatISODate(addDays(now, offset));
