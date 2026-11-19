@@ -6172,42 +6172,6 @@
                         <span id="sync-last-time" class="font-sarabun text-slate-300">ยังไม่เคยซิงก์</span>
                     </div>
                 </div>
-
-                <!-- Firebase Config Settings Collapsible -->
-                <div class="border border-slate-800 rounded-xl overflow-hidden bg-slate-950/40">
-                    <button type="button" onclick="toggleFirebaseConfigPanel()" class="w-full px-3.5 py-2.5 flex items-center justify-between text-xs font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all">
-                        <span class="flex items-center gap-1.5">
-                            <i class="fa-solid fa-gear text-slate-500"></i>
-                            <span>ตั้งค่าการเชื่อมต่อ Firebase (Config)</span>
-                            <span id="firebase-config-status-badge" class="ml-2 text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400">ตรวจสอบ...</span>
-                        </span>
-                        <i id="firebase-config-chevron" class="fa-solid fa-chevron-down transition-transform duration-200"></i>
-                    </button>
-                    <div id="firebase-config-panel" class="hidden p-3.5 border-t border-slate-800/80 space-y-3 bg-slate-900/40">
-                        <p class="text-[11px] text-slate-400 leading-relaxed">
-                            คุณสามารถกำหนด <code class="text-amber-300 font-mono">firebaseConfig</code> ส่วนตัวของคุณได้ที่นี่ หรือนำค่าจาก Firebase Console มาวาง เพื่อเชื่อมกับ Firebase Project ของคุณเองแบบฟรี 100%
-                        </p>
-                        <div class="space-y-1">
-                            <label class="text-[11px] text-slate-300 font-medium">Firebase Config (JSON format):</label>
-                            <textarea id="firebase-config-input" rows="6" placeholder='{
-  "apiKey": "AIzaSy...",
-  "authDomain": "your-app.firebaseapp.com",
-  "projectId": "your-app",
-  "storageBucket": "your-app.appspot.com",
-  "messagingSenderId": "...",
-  "appId": "..."
-}' class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 font-mono text-[11px] text-slate-200 focus:border-amber-400 focus:outline-none custom-scrollbar"></textarea>
-                        </div>
-                        <div class="flex items-center justify-end gap-2 pt-1">
-                            <button type="button" onclick="resetFirebaseConfigToDefault()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition-all">
-                                คืนค่าเริ่มต้น
-                            </button>
-                            <button type="button" onclick="saveCustomFirebaseConfigFromUI()" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-all shadow-sm">
-                                บันทึกการตั้งค่า
-                            </button>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Footer -->
