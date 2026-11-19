@@ -1335,7 +1335,7 @@
                     : getExpandedSessions(dayIso).filter(x => x.dateIso === dayIso && !x.isInactive && !x.cancelNote);
                 daySessions.forEach(x => sessions.push({
                     date: dayIso, start: x.start, end: x.end,
-                    code: x.code || '', name: x.name || '', room: x.room || '',
+                    code: x.code || '', section: x.section || '', name: x.name || '', room: x.room || '',
                     teacher: x.teacher || '', kind: x.examType ? 'exam' : (x.specialType === 'lab' ? 'lab' : 'class'),
                     label: x.labBadgeText || x.sessionLabel || ''
                 }));
@@ -2042,6 +2042,7 @@
                 const base = {
                     courseId: course.id,
                     code: course.code,
+                    section: course.section || '',
                     name: course.name,
                     teacher: course.teacher,
                     colorId: course.colorId,
@@ -2277,6 +2278,7 @@
                         <div>
                             <div class="flex items-center gap-2 flex-wrap">
                                 ${currentSession.code ? `<span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">${escapeHTML(currentSession.code)}</span>` : ''}
+                                ${currentSession.section ? `<span class="font-mono text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-amber-300 border border-slate-700">${escapeHTML(secLabel(currentSession.section))}</span>` : ''}
                                 <span class="text-[11px] font-medium px-2 py-0.5 rounded-full flex items-center gap-1.5" style="background-color: ${hexToRgba(colObj.hex, 0.2)}; color: ${colObj.hex}; border: 1px solid ${hexToRgba(colObj.hex, 0.45)}">
                                     <span class="w-2 h-2 rounded-full" style="background-color: ${colObj.hex}"></span>
                                     ${escapeHTML(colObj.label)}
@@ -2404,6 +2406,7 @@
                         <div>
                             <div class="flex items-center gap-2 flex-wrap">
                                 ${nextSession.code ? `<span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">${escapeHTML(nextSession.code)}</span>` : ''}
+                                ${nextSession.section ? `<span class="font-mono text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-amber-300 border border-slate-700">${escapeHTML(secLabel(nextSession.section))}</span>` : ''}
                                 <span class="text-[11px] font-medium px-2 py-0.5 rounded-full flex items-center gap-1" style="background-color: ${hexToRgba(colObj.hex, 0.2)}; color: ${colObj.hex}; border: 1px solid ${hexToRgba(colObj.hex, 0.4)}">
                                     <span class="w-1.5 h-1.5 rounded-full" style="background-color: ${colObj.hex}"></span>
                                     ${escapeHTML(colObj.label)}
@@ -2642,6 +2645,7 @@
                             <div class="space-y-1 min-w-0 flex-1">
                                 <div class="flex items-center gap-2 flex-wrap">
                                     ${sess.code ? `<span class="font-mono text-xs font-bold px-2 py-0.5 rounded" style="background-color: ${hexToRgba(colObj.hex, 0.2)}; color: ${colObj.hex}; border: 1px solid ${hexToRgba(colObj.hex, 0.4)}">${escapeHTML(sess.code)}</span>` : ''}
+                                    ${sess.section ? `<span class="font-mono text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-amber-300 border border-slate-700">${escapeHTML(secLabel(sess.section))}</span>` : ''}
                                     <h4 class="font-bold text-sm sm:text-base text-white group-hover:text-amber-300 transition-colors">${escapeHTML(sess.name)}</h4>
                                     <span class="text-[10px] px-2 py-0.5 rounded-full text-slate-300 bg-slate-800 border border-slate-700">${escapeHTML(colObj.label)}</span>
                                     ${specialBadge}
@@ -2834,7 +2838,7 @@
                             <div class="min-h-0">
                                 <div class="flex items-center justify-between gap-1">
                                     <span class="font-mono font-bold truncate" style="color: ${colObj.hex}; font-size: ${isFit ? '10px' : '11px'};">
-                                        ${escapeHTML(sess.code || sess.start)}
+                                        ${escapeHTML(sess.code || sess.start)}${sess.section ? ' (' + escapeHTML(secLabel(sess.section)) + ')' : ''}
                                     </span>
                                     <div class="flex items-center gap-1 shrink-0">${noteTag}${labTag}${miniStatus}</div>
                                 </div>
@@ -3803,7 +3807,7 @@
             return {
                 id: ID_RE.test(c.id) ? c.id : 'c_' + Date.now() + Math.random().toString(36).slice(2, 7),
                 day, start: c.start, end: c.end,
-                code: str(c.code, 30).trim(), name, room: str(c.room, 80).trim(), teacher: str(c.teacher, 80).trim(),
+                code: str(c.code, 30).trim(), section: str(c.section, 30).trim(), name, room: str(c.room, 80).trim(), teacher: str(c.teacher, 80).trim(),
                 colorId: ID_RE.test(c.colorId) ? c.colorId : '',
                 specialType: ['lab', 'multi'].includes(c.specialType) ? c.specialType : 'normal',
                 labWeeks: Array.isArray(c.labWeeks) ? c.labWeeks.slice(0, 25).map(w => ({ date: isValidISO(w && w.date) ? w.date : '', room: str(w && w.room, 80).trim() })) : [],
@@ -3862,7 +3866,7 @@
                 const e = c.exams && c.exams[t];
                 if (!e || !e.date || !e.start || !e.end || !dateInPeriod(t, e.date)) return;
                 out.push({ sessionKey: `${c.id}_exam_${t}`, courseId: c.id, examType: t, dateIso: e.date, day: parseISODateLocal(e.date).getDay(),
-                    start: e.start, end: e.end, code: c.code, name: c.name, teacher: c.teacher, colorId: c.colorId, specialType: 'exam',
+                    start: e.start, end: e.end, code: c.code, section: c.section || '', name: c.name, teacher: c.teacher, colorId: c.colorId, specialType: 'exam',
                     room: e.room || 'ยังไม่ระบุห้องสอบ', roomMissing: !e.room, labBadgeText: EXAM_TYPES[t].label, isInactive: false, sessionLabel: '' });
             }));
             return out;
