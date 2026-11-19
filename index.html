@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ตารางเรียนอัจฉริยะ (Smart Class Schedule)</title>
@@ -860,9 +861,45 @@
         </div>
     </div>
 
-    <!-- Modal 4: ลงปฏิทินตารางสอบ (Google Calendar & .ics) -->
+    <!-- Modal 4: ตั้งค่า Google OAuth Client ID -->
+    <div id="google-config-modal" class="fixed inset-0 z-[70] hidden items-center justify-center bg-slate-950/85 backdrop-blur-sm p-4">
+        <div class="bg-slate-900 border border-slate-700 w-full max-w-md rounded-2xl p-5 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5 text-blue-400 font-bold text-base">
+                    <i class="fa-brands fa-google text-lg"></i>
+                    <span>เชื่อมต่อ Google Calendar API</span>
+                </div>
+                <button type="button" onclick="closeGoogleConfigModal()" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-all">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <p class="text-xs text-slate-300 leading-relaxed font-sarabun">
+                เพื่อให้ระบบสามารถ <b>ตรวจเช็คสถานะการเพิ่มจริง</b> และ <b>สั่งลบกิจกรรมจาก Google Calendar ได้โดยตรง</b> จำเป็นต้องระบุ Google OAuth 2.0 Client ID (Web Application)
+            </p>
+
+            <div class="space-y-1.5">
+                <label class="block text-xs font-semibold text-slate-300">Google Client ID</label>
+                <input type="text" id="input-google-client-id" placeholder="เช่น xxxxx.apps.googleusercontent.com" class="w-full bg-slate-800 border border-slate-700 focus:border-blue-500 rounded-xl px-3 py-2 text-white font-mono text-xs outline-none">
+            </div>
+
+            <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700/80 text-[11px] text-slate-400 space-y-1 font-sarabun">
+                <div class="font-bold text-slate-300 flex items-center gap-1.5"><i class="fa-solid fa-circle-question text-sky-400"></i> วิธีสร้าง Client ID (ฟรี):</div>
+                <div>1. ไปที่ <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="text-sky-400 underline">Google Cloud Console</a> แล้วเปิดใช้ Calendar API</div>
+                <div>2. สร้าง Credentials &gt; OAuth client ID &gt; Web application</div>
+                <div>3. เพิ่ม Authorized JavaScript origins เป็น URL เว็บของคุณ</div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 pt-1">
+                <button type="button" onclick="closeGoogleConfigModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium">ยกเลิก</button>
+                <button type="button" onclick="saveGoogleConfigAndConnect()" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow">บันทึกและเชื่อมต่อ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 5: ลงปฏิทินตารางสอบ & งาน/การบ้าน (Google Calendar & .ics) -->
     <div id="calendar-export-modal" class="fixed inset-0 z-[65] hidden items-center justify-center bg-slate-950/85 backdrop-blur-sm p-3 sm:p-4">
-        <div class="bg-slate-900 border border-slate-700 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+        <div class="bg-slate-900 border border-slate-700 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
             <!-- Header -->
             <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-850">
                 <div class="flex items-center gap-3">
@@ -871,9 +908,9 @@
                     </div>
                     <div>
                         <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-                            ลงปฏิทินตารางสอบ (Google Calendar & .ics)
+                            ลงปฏิทินตารางสอบ & การบ้าน/งาน
                         </h3>
-                        <p class="text-xs text-slate-400 mt-0.5">เลือกวิชาสอบกลางภาคหรือปลายภาคเพื่อลง Google Calendar ทันที หรือส่งออกไฟล์ .ics</p>
+                        <p class="text-xs text-slate-400 mt-0.5">ตรวจเช็คสถานะการลง Google Calendar จริง ป้องกันการเพิ่มซ้ำซ้อน และลบออกได้อัตโนมัติ</p>
                     </div>
                 </div>
                 <button onclick="closeCalendarExportModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-all">
@@ -881,17 +918,36 @@
                 </button>
             </div>
 
-            <!-- Filter & Selection Bar (แบ่งเป็น ปลายภาค และ กลางภาค) -->
+            <!-- Google Calendar Connection & Sync Bar -->
+            <div class="px-4 py-2.5 bg-slate-900 border-b border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-xs">
+                <div id="gcal-auth-status" class="flex items-center gap-2">
+                    <!-- Dynamic: Connection button or connected badge -->
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="verifyGoogleCalendarStatus(false)" id="btn-sync-gcal" title="ตรวจเช็คว่ากิจกรรมยังอยู่บน Google Calendar จริงหรือไม่" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-1.5 transition-all text-xs">
+                        <i class="fa-solid fa-arrows-rotate text-sky-400"></i>
+                        <span>ตรวจเช็คสถานะจริง</span>
+                    </button>
+                    <button type="button" onclick="openGoogleConfigModal()" title="ตั้งค่า Google OAuth Client ID" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-all">
+                        <i class="fa-solid fa-gear"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filter & Selection Bar (แบ่งเป็น ปลายภาค กลางภาค และ การบ้าน/งาน) -->
             <div class="p-3 sm:px-5 bg-slate-900/95 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2.5">
-                <div class="flex items-center gap-1.5 sm:gap-2">
-                    <button type="button" onclick="setCalendarExportFilter('all')" id="cal-filter-all" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-orange-500/20 text-orange-300 border border-orange-500/40">
+                <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                    <button type="button" onclick="setCalendarExportFilter('all')" id="cal-filter-all" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-orange-500/20 text-orange-300 border border-orange-500/40">
                         ทั้งหมด (<span id="count-filter-all">0</span>)
                     </button>
-                    <button type="button" onclick="setCalendarExportFilter('midterm')" id="cal-filter-midterm" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 border border-slate-700/60">
+                    <button type="button" onclick="setCalendarExportFilter('midterm')" id="cal-filter-midterm" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 border border-slate-700/60">
                         สอบกลางภาค (<span id="count-filter-midterm">0</span>)
                     </button>
-                    <button type="button" onclick="setCalendarExportFilter('final')" id="cal-filter-final" class="px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 border border-slate-700/60">
+                    <button type="button" onclick="setCalendarExportFilter('final')" id="cal-filter-final" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 border border-slate-700/60">
                         สอบปลายภาค (<span id="count-filter-final">0</span>)
+                    </button>
+                    <button type="button" onclick="setCalendarExportFilter('task')" id="cal-filter-task" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 border border-slate-700/60">
+                        การบ้าน/งาน (<span id="count-filter-task">0</span>)
                     </button>
                 </div>
                 <div class="flex items-center gap-2 text-xs">
@@ -914,16 +970,16 @@
             <div class="p-4 sm:p-5 border-t border-slate-800 bg-slate-850 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div class="text-xs text-slate-400 flex items-center gap-1.5 self-start sm:self-center">
                     <i class="fa-solid fa-circle-info text-orange-400"></i>
-                    <span id="calendar-export-count">เลือกไว้ 0 รายการสอบ</span>
+                    <span id="calendar-export-count">เลือกไว้ 0 รายการ</span>
                 </div>
                 <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <button type="button" onclick="openAllSelectedGoogleCalendar()" title="เปิด Google Calendar ทุกวิชาสอบที่เลือก" class="px-3 py-2.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/40 font-semibold rounded-xl text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 active:scale-95">
+                    <button type="button" onclick="openAllSelectedGoogleCalendar()" title="เพิ่ม Google Calendar ทุกรายการที่เลือก" class="px-3 py-2.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/40 font-semibold rounded-xl text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 active:scale-95">
                         <i class="fa-brands fa-google text-blue-400"></i>
-                        <span>เปิด Google Cal ที่เลือก</span>
+                        <span>ลง Google Cal ที่เลือก</span>
                     </button>
                     <button type="button" onclick="exportSelectedCalendarICS()" class="flex-1 sm:flex-none px-4 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-slate-950 font-bold rounded-xl text-xs sm:text-sm transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
                         <i class="fa-solid fa-file-arrow-down"></i>
-                        <span>ส่งออก .ics ตารางสอบ</span>
+                        <span>ส่งออก .ics ที่เลือก</span>
                     </button>
                 </div>
             </div>
@@ -4081,10 +4137,21 @@
             list.innerHTML = html;
         }
         // =====================================================
-        // CALENDAR EXPORT (EXAM ONLY: MIDTERM & FINAL)
+        // CALENDAR EXPORT & REAL GOOGLE CALENDAR SYNC
+        // (EXAMS: MIDTERM, FINAL & TASKS/HOMEWORK)
         // =====================================================
         let calendarExportItems = [];
-        let calExportFilter = 'all'; // 'all' | 'midterm' | 'final'
+        let calExportFilter = 'all'; // 'all' | 'midterm' | 'final' | 'task'
+
+        const STORAGE_GCAL_SYNC_KEY = 'smart_schedule_gcal_synced_v2';
+        const STORAGE_GCAL_CLIENT_ID_KEY = 'smart_schedule_google_client_id';
+        const STORAGE_GCAL_TOKEN_KEY = 'smart_schedule_gcal_token';
+        const STORAGE_GCAL_TOKEN_EXP_KEY = 'smart_schedule_gcal_token_exp';
+
+        let googleTokenClient = null;
+        let googleAccessToken = localStorage.getItem(STORAGE_GCAL_TOKEN_KEY) || null;
+        let googleTokenExpiry = Number(localStorage.getItem(STORAGE_GCAL_TOKEN_EXP_KEY) || 0);
+        let googleClientId = localStorage.getItem(STORAGE_GCAL_CLIENT_ID_KEY) || '';
 
         function getCourseSection(c) {
             if (!c) return '';
@@ -4095,6 +4162,210 @@
             return '';
         }
 
+        // --- Local GCal Sync Storage Helpers ---
+        function getAllGCalSyncInfo() {
+            try {
+                return JSON.parse(localStorage.getItem(STORAGE_GCAL_SYNC_KEY) || '{}');
+            } catch(e) {
+                return {};
+            }
+        }
+
+        function getGCalSyncInfo(itemId) {
+            const all = getAllGCalSyncInfo();
+            return all[itemId] || null;
+        }
+
+        function markGCalItemAsSynced(itemId, info) {
+            const all = getAllGCalSyncInfo();
+            all[itemId] = { ...info, updatedAt: Date.now() };
+            localStorage.setItem(STORAGE_GCAL_SYNC_KEY, JSON.stringify(all));
+        }
+
+        function removeGCalSyncInfo(itemId) {
+            const all = getAllGCalSyncInfo();
+            delete all[itemId];
+            localStorage.setItem(STORAGE_GCAL_SYNC_KEY, JSON.stringify(all));
+        }
+
+        // --- Google Calendar API & OAuth Helpers ---
+        function isGoogleCalendarApiReady() {
+            return !!(googleAccessToken && Date.now() < googleTokenExpiry);
+        }
+
+        function getGoogleAccessToken() {
+            if (isGoogleCalendarApiReady()) return googleAccessToken;
+            return null;
+        }
+
+        function openGoogleConfigModal() {
+            const input = document.getElementById('input-google-client-id');
+            if (input) input.value = googleClientId;
+            const modal = document.getElementById('google-config-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeGoogleConfigModal() {
+            const modal = document.getElementById('google-config-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function saveGoogleConfigAndConnect() {
+            const input = document.getElementById('input-google-client-id');
+            const val = (input ? input.value : '').trim();
+            if (!val) {
+                showToast('กรุณาระบุ Google Client ID', 'error');
+                return;
+            }
+            googleClientId = val;
+            localStorage.setItem(STORAGE_GCAL_CLIENT_ID_KEY, val);
+            closeGoogleConfigModal();
+            showToast('บันทึก Client ID แล้ว กำลังเริ่มเชื่อมต่อ Google...', 'info');
+            connectGoogleCalendar();
+        }
+
+        function connectGoogleCalendar() {
+            if (!googleClientId) {
+                openGoogleConfigModal();
+                return;
+            }
+
+            if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
+                showToast('กำลังโหลดระบบ Google Sign-in กรุณาลองใหม่อีกครั้งใน 2-3 วินาที', 'info');
+                return;
+            }
+
+            try {
+                googleTokenClient = google.accounts.oauth2.initTokenClient({
+                    client_id: googleClientId,
+                    scope: 'https://www.googleapis.com/auth/calendar.events',
+                    callback: async (tokenResponse) => {
+                        if (tokenResponse.error) {
+                            console.error('Google Auth Error:', tokenResponse);
+                            showToast('เชื่อมต่อ Google Calendar ไม่สำเร็จ: ' + (tokenResponse.error_description || tokenResponse.error), 'error');
+                            return;
+                        }
+                        googleAccessToken = tokenResponse.access_token;
+                        const expiresIn = Number(tokenResponse.expires_in || 3599);
+                        googleTokenExpiry = Date.now() + (expiresIn * 1000);
+                        localStorage.setItem(STORAGE_GCAL_TOKEN_KEY, googleAccessToken);
+                        localStorage.setItem(STORAGE_GCAL_TOKEN_EXP_KEY, String(googleTokenExpiry));
+
+                        updateGCalAuthUI();
+                        showToast('เชื่อมต่อ Google Calendar สำเร็จแล้ว! กำลังตรวจเช็คสถานะกิจกรรม...', 'success');
+                        await verifyGoogleCalendarStatus(true);
+                    }
+                });
+                googleTokenClient.requestAccessToken({ prompt: '' });
+            } catch (err) {
+                console.error('initTokenClient error', err);
+                showToast('ไม่สามารถเริ่มเชื่อมต่อได้: ' + err.message, 'error');
+            }
+        }
+
+        function disconnectGoogleCalendar() {
+            if (googleAccessToken && typeof google !== 'undefined' && google.accounts && google.accounts.oauth2) {
+                try {
+                    google.accounts.oauth2.revoke(googleAccessToken, () => {});
+                } catch(e) {}
+            }
+            googleAccessToken = null;
+            googleTokenExpiry = 0;
+            localStorage.removeItem(STORAGE_GCAL_TOKEN_KEY);
+            localStorage.removeItem(STORAGE_GCAL_TOKEN_EXP_KEY);
+            updateGCalAuthUI();
+            renderCalendarExportList();
+            showToast('ตัดการเชื่อมต่อกับ Google Calendar แล้ว', 'info');
+        }
+
+        function updateGCalAuthUI() {
+            const container = document.getElementById('gcal-auth-status');
+            if (!container) return;
+
+            if (isGoogleCalendarApiReady()) {
+                container.innerHTML = `
+                    <span class="text-emerald-400 font-semibold flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-check"></i> เชื่อมต่อ Google Calendar แล้ว
+                    </span>
+                    <button type="button" onclick="disconnectGoogleCalendar()" class="text-slate-500 hover:text-rose-400 underline text-[11px] ml-1">
+                        ตัดการเชื่อมต่อ
+                    </button>
+                `;
+            } else {
+                container.innerHTML = `
+                    <button type="button" onclick="connectGoogleCalendar()" class="px-2.5 py-1 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 font-medium flex items-center gap-1.5 transition-all text-xs">
+                        <i class="fa-brands fa-google text-blue-400"></i>
+                        <span>เชื่อมต่อ Google Calendar (ตรวจจริง & ลบได้)</span>
+                    </button>
+                `;
+            }
+        }
+
+        // --- Real Google Calendar Verification & User Deletion Detection ---
+        async function verifyGoogleCalendarStatus(silent = false) {
+            if (!isGoogleCalendarApiReady()) {
+                if (!silent) {
+                    showToast('เชื่อมต่อ Google Calendar เพื่อตรวจเช็คสถานะจริง', 'info');
+                    connectGoogleCalendar();
+                }
+                return;
+            }
+
+            const token = getGoogleAccessToken();
+            const synced = getAllGCalSyncInfo();
+            const itemIds = Object.keys(synced);
+
+            if (itemIds.length === 0) {
+                if (!silent) showToast('ยังไม่มีรายการที่เพิ่มลง Google Calendar', 'info');
+                return;
+            }
+
+            let deletedCount = 0;
+            let verifiedCount = 0;
+
+            for (const id of itemIds) {
+                const info = synced[id];
+                if (!info || !info.eventId) continue;
+
+                try {
+                    const resp = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${encodeURIComponent(info.eventId)}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+
+                    if (resp.status === 404 || resp.status === 410) {
+                        // ผู้ใช้ลบกิจกรรมนี้ใน Google Calendar แล้ว!
+                        removeGCalSyncInfo(id);
+                        deletedCount++;
+                    } else if (resp.ok) {
+                        const data = await resp.json();
+                        if (data.status === 'cancelled') {
+                            removeGCalSyncInfo(id);
+                            deletedCount++;
+                        } else {
+                            verifiedCount++;
+                        }
+                    }
+                } catch (err) {
+                    console.warn('Error checking event', id, err);
+                }
+            }
+
+            renderCalendarExportList();
+
+            if (deletedCount > 0) {
+                showToast(`ตรวจพบว่าคุณได้ลบใน Google Calendar ไป ${deletedCount} รายการ (อัปเดตปุ่มให้แล้ว)`, 'info');
+            } else if (!silent) {
+                showToast(`ตรวจเช็คสำเร็จ: ทุกรายการ (${verifiedCount}) ยังคงอยู่ใน Google Calendar จริง`, 'success');
+            }
+        }
+
+        // --- Build Calendar Export Items (Exams + Tasks/Homework) ---
         function buildCalendarExportItemList() {
             const list = [];
             if (!Array.isArray(scheduleData) || scheduleData.length === 0) return list;
@@ -4106,7 +4377,7 @@
                 const titleBase = `${c.code ? c.code + ' ' : ''}${c.name || 'ไม่ระบุชื่อวิชา'}`;
                 const secSuffix = sec ? ` (${sec})` : '';
 
-                // เฉพาะตารางสอบเท่านั้น (Midterm & Final)
+                // 1) ตารางสอบ: กลางภาค และ ปลายภาค
                 ['midterm', 'final'].forEach((type) => {
                     const exam = c.exams && c.exams[type];
                     if (exam && exam.date && exam.start && exam.end) {
@@ -4134,6 +4405,7 @@
                             time: `${exam.start} - ${exam.end}`,
                             room: examRoom,
                             isExam: true,
+                            isTask: false,
                             roomMissing: !exam.room,
                             teacher: c.teacher || '',
                             description: `การ${examLabel} วิชา ${titleBase}${sec ? ' (' + sec + ')' : ''}`,
@@ -4143,10 +4415,46 @@
                         });
                     }
                 });
+
+                // 2) การบ้าน / ส่งงาน / บันทึกสำคัญ
+                getCourseNotes(c).forEach((note) => {
+                    if (note.type === 'permanent' || !note.date || note.done) return;
+                    const tag = note.type === 'cancel' ? 'งดคลาส' : (note.type === 'homework' ? 'ส่งงาน' : 'ประกาศ');
+                    const dObj = parseISODateLocal(note.date);
+                    const dayNum = dObj ? dObj.getDay() : 0;
+                    list.push({
+                        id: `${c.id}_note_${note.id}`,
+                        courseId: c.id,
+                        noteId: note.id,
+                        examType: 'task',
+                        category: 'task',
+                        badge: tag,
+                        badgeClass: note.type === 'cancel' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : (note.type === 'homework' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'),
+                        code: c.code || '',
+                        name: c.name || '',
+                        section: sec,
+                        displayTitle: `${titleBase}: ${note.text || ''}`,
+                        fullTitle: `[${tag}] ${titleBase}${secSuffix}: ${note.text || ''}`,
+                        dateIso: note.date,
+                        dayLabel: `กำหนดส่ง: วัน${DAY_NAMES_THAI[dayNum]}ที่ ${formatThaiShortDate(note.date)}`,
+                        start: '09:00',
+                        end: '10:00',
+                        time: 'ตลอดวัน (กำหนดส่ง)',
+                        room: c.room ? `ห้องเรียน ${c.room}` : '',
+                        isExam: false,
+                        isTask: true,
+                        roomMissing: false,
+                        teacher: c.teacher || '',
+                        description: `รายการ ${tag}: ${note.text || ''}\nวิชา: ${titleBase}${sec ? ' (' + sec + ')' : ''}`,
+                        rrule: '',
+                        isAllDay: true,
+                        checked: true
+                    });
+                });
             });
 
-            // เรียงลำดับตามวันและเวลาสอบ
-            list.sort((a, b) => (a.dateIso + a.start).localeCompare(b.dateIso + b.start));
+            // เรียงลำดับตามวันที่จากใกล้ไปไกล
+            list.sort((a, b) => (a.dateIso + (a.start || '')).localeCompare(b.dateIso + (b.start || '')));
             return list;
         }
 
@@ -4160,10 +4468,17 @@
             calExportFilter = 'all';
 
             renderCalendarExportModal();
+            updateGCalAuthUI();
+
             const modal = document.getElementById('calendar-export-modal');
             if (modal) {
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
+            }
+
+            // ตรวจเช็คสถานะกิจกรรมจริงกับ Google Calendar แบบเงียบๆ ถ้าเชื่อมต่ออยู่
+            if (isGoogleCalendarApiReady()) {
+                verifyGoogleCalendarStatus(true);
             }
         }
 
@@ -4177,13 +4492,13 @@
 
         function setCalendarExportFilter(filter) {
             calExportFilter = filter;
-            ['all', 'midterm', 'final'].forEach(f => {
+            ['all', 'midterm', 'final', 'task'].forEach(f => {
                 const btn = document.getElementById(`cal-filter-${f}`);
                 if (!btn) return;
                 if (f === filter) {
-                    btn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-orange-500/20 text-orange-300 border border-orange-500/40 shadow-sm';
+                    btn.className = 'px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-orange-500/20 text-orange-300 border border-orange-500/40 shadow-sm';
                 } else {
-                    btn.className = 'px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 border border-slate-700/60';
+                    btn.className = 'px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 border border-slate-700/60';
                 }
             });
             renderCalendarExportList();
@@ -4207,26 +4522,29 @@
 
         function getFilteredCalendarItems() {
             if (calExportFilter === 'all') return calendarExportItems;
-            return calendarExportItems.filter(it => it.examType === calExportFilter);
+            return calendarExportItems.filter(it => it.category === calExportFilter);
         }
 
         function updateCalendarExportCount() {
             const checkedCount = calendarExportItems.filter(it => it.checked).length;
             const totalCount = calendarExportItems.length;
 
-            const midtermCount = calendarExportItems.filter(it => it.examType === 'midterm').length;
-            const finalCount = calendarExportItems.filter(it => it.examType === 'final').length;
+            const midtermCount = calendarExportItems.filter(it => it.category === 'midterm').length;
+            const finalCount = calendarExportItems.filter(it => it.category === 'final').length;
+            const taskCount = calendarExportItems.filter(it => it.category === 'task').length;
 
             const elAll = document.getElementById('count-filter-all');
             const elMidterm = document.getElementById('count-filter-midterm');
             const elFinal = document.getElementById('count-filter-final');
+            const elTask = document.getElementById('count-filter-task');
             if (elAll) elAll.textContent = String(totalCount);
             if (elMidterm) elMidterm.textContent = String(midtermCount);
             if (elFinal) elFinal.textContent = String(finalCount);
+            if (elTask) elTask.textContent = String(taskCount);
 
             const countEl = document.getElementById('calendar-export-count');
             if (countEl) {
-                countEl.textContent = `เลือกไว้ ${checkedCount} จาก ${totalCount} รายการสอบ`;
+                countEl.textContent = `เลือกไว้ ${checkedCount} จาก ${totalCount} รายการ`;
             }
         }
 
@@ -4248,12 +4566,12 @@
                             <i class="fa-solid fa-calendar-xmark"></i>
                         </div>
                         <div class="text-sm font-bold text-white mb-1">
-                            ${isOverallEmpty ? 'ยังไม่มีข้อมูลตารางสอบ' : 'ไม่มีรายการสอบในหมวดนี้'}
+                            ${isOverallEmpty ? 'ยังไม่มีตารางสอบหรือการบ้าน/งาน' : 'ไม่มีรายการในหมวดนี้'}
                         </div>
                         <div class="text-xs text-slate-400 max-w-sm mx-auto mb-4">
                             ${isOverallEmpty 
-                                ? 'ยังไม่ได้ระบุวันและเวลาสอบ (กลางภาค/ปลายภาค) ในรายวิชาของคุณ สามารถเพิ่มได้โดยแก้ไขรายวิชา หรือกดปุ่ม "ตั้งช่วงสอบ"' 
-                                : 'ไม่มีวิชาสอบที่ตั้งค่าไว้สำหรับช่วงเวลานี้'}
+                                ? 'ยังไม่ได้ระบุวันสอบ (กลางภาค/ปลายภาค) หรือการบ้านในรายวิชาของคุณ สามารถเพิ่มได้โดยแก้ไขรายวิชา หรือกดปุ่ม "ตั้งช่วงสอบ"' 
+                                : 'ไม่มีวิชาสอบหรืองานที่ตั้งค่าไว้สำหรับหมวดหมู่นี้'}
                         </div>
                         ${isOverallEmpty ? `
                             <button type="button" onclick="closeCalendarExportModal(); openExamPeriodModal();" class="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white font-semibold rounded-xl text-xs transition-all shadow">
@@ -4266,65 +4584,229 @@
                 return;
             }
 
-            container.innerHTML = visibleItems.map(item => `
-                <div class="p-3 sm:p-3.5 rounded-xl border border-slate-800 bg-slate-850 hover:bg-slate-800/90 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div class="flex items-start gap-3 min-w-0">
-                        <input type="checkbox" id="cal-item-${item.id}" ${item.checked ? 'checked' : ''} onchange="onCalendarItemCheckChange('${item.id}', this.checked)" class="mt-1 w-4 h-4 rounded accent-orange-500 cursor-pointer shrink-0">
-                        <div class="min-w-0">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded ${item.badgeClass}">
-                                    ${item.badge}
-                                </span>
-                                ${item.section ? `
-                                    <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-amber-300">
-                                        ${escapeHTML(item.section)}
+            container.innerHTML = visibleItems.map(item => {
+                const syncInfo = getGCalSyncInfo(item.id);
+                const isAdded = !!syncInfo;
+                const isRealApi = !!(syncInfo && syncInfo.isApi);
+
+                return `
+                    <div class="p-3 sm:p-3.5 rounded-xl border ${isAdded ? 'border-emerald-500/40 bg-emerald-950/20' : 'border-slate-800 bg-slate-850'} hover:bg-slate-800/90 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-start gap-3 min-w-0">
+                            <input type="checkbox" id="cal-item-${item.id}" ${item.checked ? 'checked' : ''} onchange="onCalendarItemCheckChange('${item.id}', this.checked)" class="mt-1 w-4 h-4 rounded accent-orange-500 cursor-pointer shrink-0">
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded ${item.badgeClass}">
+                                        ${item.badge}
                                     </span>
-                                ` : ''}
-                                <span class="font-bold text-white text-sm truncate">
-                                    ${escapeHTML(item.displayTitle)}
-                                </span>
-                            </div>
-                            <div class="flex items-center gap-2.5 text-xs text-slate-400 mt-1 flex-wrap">
-                                <span class="text-slate-300"><i class="fa-regular fa-clock text-orange-400"></i> ${item.dayLabel} ${item.time}</span>
-                                <span>•</span>
-                                <span class="${item.roomMissing ? 'text-rose-400 font-semibold' : 'text-amber-300'}">
-                                    <i class="fa-solid fa-location-dot ${item.roomMissing ? 'text-rose-400' : 'text-amber-400'}"></i> ${escapeHTML(item.room)}
-                                </span>
-                                ${item.teacher ? `
-                                    <span>•</span>
-                                    <span class="text-slate-400"><i class="fa-solid fa-user-tie text-slate-500"></i> ${escapeHTML(item.teacher)}</span>
-                                ` : ''}
+                                    ${item.section ? `
+                                        <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-amber-300">
+                                            ${escapeHTML(item.section)}
+                                        </span>
+                                    ` : ''}
+                                    ${isAdded ? `
+                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
+                                            <i class="fa-solid fa-circle-check"></i> ${isRealApi ? 'เพิ่มใน Google Cal แล้ว (ตรวจจริง)' : 'เพิ่มใน Google Cal แล้ว'}
+                                        </span>
+                                    ` : ''}
+                                    <span class="font-bold text-white text-sm truncate">
+                                        ${escapeHTML(item.displayTitle)}
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-2.5 text-xs text-slate-400 mt-1 flex-wrap">
+                                    <span class="text-slate-300"><i class="fa-regular fa-clock ${item.isTask ? 'text-amber-400' : 'text-orange-400'}"></i> ${item.dayLabel} ${item.time}</span>
+                                    ${item.room ? `
+                                        <span>•</span>
+                                        <span class="${item.roomMissing ? 'text-rose-400 font-semibold' : 'text-amber-300'}">
+                                            <i class="fa-solid fa-location-dot ${item.roomMissing ? 'text-rose-400' : 'text-amber-400'}"></i> ${escapeHTML(item.room)}
+                                        </span>
+                                    ` : ''}
+                                    ${item.teacher ? `
+                                        <span>•</span>
+                                        <span class="text-slate-400"><i class="fa-solid fa-user-tie text-slate-500"></i> ${escapeHTML(item.teacher)}</span>
+                                    ` : ''}
+                                </div>
                             </div>
                         </div>
+                        <div class="flex items-center gap-2 self-end sm:self-center shrink-0">
+                            ${isAdded ? `
+                                <button type="button" onclick="removeOrDeleteGoogleCalendar('${item.id}')" title="ลบกิจกรรมนี้ออกจาก Google Calendar" class="px-2.5 sm:px-3 py-1.5 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 hover:text-white border border-rose-500/40 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 active:scale-95 whitespace-nowrap">
+                                    <i class="fa-solid fa-trash-can text-rose-400"></i>
+                                    <span>ลบจาก Google Cal</span>
+                                </button>
+                            ` : `
+                                <button type="button" onclick="addSingleToGoogleCalendar('${item.id}')" title="เพิ่มรายการนี้ลง Google Calendar" class="px-2.5 sm:px-3 py-1.5 bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 hover:text-white border border-sky-500/40 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 active:scale-95 whitespace-nowrap">
+                                    <i class="fa-brands fa-google text-sky-400"></i>
+                                    <span>ลง Google Calendar ↗</span>
+                                </button>
+                            `}
+                        </div>
                     </div>
-                    <div class="flex items-center gap-2 self-end sm:self-center shrink-0">
-                        <button type="button" onclick="openSingleGoogleCalendar('${item.id}')" title="เปิดลง Google Calendar รายการสอบนี้ทันที" class="px-2.5 sm:px-3 py-1.5 bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 hover:text-white border border-sky-500/40 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 active:scale-95 whitespace-nowrap">
-                            <i class="fa-brands fa-google text-sky-400"></i>
-                            <span>ลง Google Calendar ↗</span>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
 
             updateCalendarExportCount();
+        }
+
+        // --- Add and Delete Handlers ---
+        async function addSingleToGoogleCalendar(itemId) {
+            const item = calendarExportItems.find(it => it.id === itemId);
+            if (!item) return;
+
+            if (isGoogleCalendarApiReady()) {
+                await insertGoogleCalendarApiEvent(item);
+            } else {
+                const url = buildGoogleCalendarUrl(item);
+                window.open(url, '_blank');
+                markGCalItemAsSynced(item.id, { isApi: false, eventId: null });
+                renderCalendarExportList();
+                showToast(`เปิด Google Calendar สำหรับ "${item.code || item.name}" แล้ว (ทำเครื่องหมายว่าเพิ่มแล้ว)`, 'success');
+            }
+        }
+
+        async function removeOrDeleteGoogleCalendar(itemId) {
+            const item = calendarExportItems.find(it => it.id === itemId);
+            const syncInfo = getGCalSyncInfo(itemId);
+            if (!syncInfo) return;
+
+            if (syncInfo.isApi && syncInfo.eventId && isGoogleCalendarApiReady()) {
+                await deleteGoogleCalendarApiEvent(itemId, syncInfo.eventId);
+            } else {
+                removeGCalSyncInfo(itemId);
+                renderCalendarExportList();
+                showToast(`นำสถานะ "เพิ่มแล้ว" ของ "${item ? (item.code || item.name) : ''}" ออกเรียบร้อย`, 'info');
+            }
+        }
+
+        async function insertGoogleCalendarApiEvent(item) {
+            const token = getGoogleAccessToken();
+            if (!token) return false;
+
+            const [hh1, mm1] = (item.start || '09:00').split(':');
+            const [hh2, mm2] = (item.end || '10:00').split(':');
+
+            let startObj, endObj;
+            if (item.isAllDay) {
+                const dObj = parseISODateLocal(item.dateIso);
+                const nextDay = dObj ? formatISODate(addDays(dObj, 1)) : item.dateIso;
+                startObj = { date: item.dateIso };
+                endObj = { date: nextDay };
+            } else {
+                startObj = {
+                    dateTime: `${item.dateIso}T${hh1}:${mm1}:00+07:00`,
+                    timeZone: 'Asia/Bangkok'
+                };
+                endObj = {
+                    dateTime: `${item.dateIso}T${hh2}:${mm2}:00+07:00`,
+                    timeZone: 'Asia/Bangkok'
+                };
+            }
+
+            const payload = {
+                summary: item.fullTitle || item.displayTitle,
+                description: item.description || '',
+                location: item.room || '',
+                start: startObj,
+                end: endObj,
+                extendedProperties: {
+                    private: {
+                        smartScheduleId: item.id,
+                        courseId: item.courseId || '',
+                        category: item.category || ''
+                    }
+                },
+                reminders: {
+                    useDefault: false,
+                    overrides: [
+                        { method: 'popup', minutes: 60 },
+                        { method: 'popup', minutes: 1440 }
+                    ]
+                }
+            };
+
+            try {
+                const resp = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!resp.ok) {
+                    const errJson = await resp.json().catch(() => ({}));
+                    throw new Error(errJson.error?.message || `HTTP ${resp.status}`);
+                }
+
+                const data = await resp.json();
+                markGCalItemAsSynced(item.id, {
+                    isApi: true,
+                    eventId: data.id,
+                    htmlLink: data.htmlLink
+                });
+
+                renderCalendarExportList();
+                showToast(`เพิ่ม "${item.code || item.name}" ลง Google Calendar จริงแล้ว!`, 'success');
+                return true;
+            } catch (err) {
+                console.error('insertGoogleCalendarApiEvent error', err);
+                showToast(`เพิ่มลง Google Calendar ไม่สำเร็จ: ${err.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function deleteGoogleCalendarApiEvent(itemId, eventId) {
+            const token = getGoogleAccessToken();
+            if (!token) return false;
+
+            try {
+                const resp = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${encodeURIComponent(eventId)}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (resp.status === 204 || resp.status === 404 || resp.status === 410 || resp.ok) {
+                    removeGCalSyncInfo(itemId);
+                    renderCalendarExportList();
+                    showToast('ลบกิจกรรมออกจาก Google Calendar จริงเรียบร้อยแล้ว', 'info');
+                    return true;
+                } else {
+                    const errJson = await resp.json().catch(() => ({}));
+                    throw new Error(errJson.error?.message || `HTTP ${resp.status}`);
+                }
+            } catch (err) {
+                console.error('deleteGoogleCalendarApiEvent error', err);
+                showToast(`ลบกิจกรรมไม่สำเร็จ: ${err.message}`, 'error');
+                return false;
+            }
         }
 
         function buildGoogleCalendarUrl(item) {
             const title = item.fullTitle || item.displayTitle;
             const dateIso = item.dateIso;
-            const [hh1, mm1] = (item.start || '09:00').split(':');
-            const [hh2, mm2] = (item.end || '10:00').split(':');
-            const dClean = (dateIso || '').replace(/-/g, '');
-            const datesParam = `${dClean}T${hh1}${mm1}00/${dClean}T${hh2}${mm2}00`;
+            let datesParam = '';
+
+            if (item.isAllDay) {
+                const cleanStart = (dateIso || '').replace(/-/g, '');
+                const dObj = parseISODateLocal(dateIso);
+                const nextDay = dObj ? formatISODate(addDays(dObj, 1)).replace(/-/g, '') : cleanStart;
+                datesParam = `${cleanStart}/${nextDay}`;
+            } else {
+                const [hh1, mm1] = (item.start || '09:00').split(':');
+                const [hh2, mm2] = (item.end || '10:00').split(':');
+                const dClean = (dateIso || '').replace(/-/g, '');
+                datesParam = `${dClean}T${hh1}${mm1}00/${dClean}T${hh2}${mm2}00`;
+            }
 
             const detailsLines = [];
-            detailsLines.push(`ตารางสอบ: ${item.badge}`);
+            detailsLines.push(`ประเภท: ${item.badge}`);
             if (item.code) detailsLines.push(`รหัสวิชา: ${item.code}`);
             if (item.name) detailsLines.push(`ชื่อวิชา: ${item.name}`);
             if (item.section) detailsLines.push(`Section: ${item.section}`);
             if (item.teacher) detailsLines.push(`อาจารย์ผู้สอน: ${item.teacher}`);
-            if (item.room) detailsLines.push(`ห้องสอบ: ${item.room}`);
-            if (item.time) detailsLines.push(`เวลาสอบ: ${item.time}`);
+            if (item.room) detailsLines.push(`สถานที่: ${item.room}`);
+            if (item.time) detailsLines.push(`เวลา: ${item.time}`);
+            if (item.description) detailsLines.push(`รายละเอียด: ${item.description}`);
             detailsLines.push('จัดทำโดย Smart Schedule Widget');
 
             const details = detailsLines.join('\n');
@@ -4340,39 +4822,50 @@
             return `https://calendar.google.com/calendar/render?${params.toString()}`;
         }
 
-        function openSingleGoogleCalendar(itemId) {
-            const item = calendarExportItems.find(it => it.id === itemId);
-            if (!item) return;
-            const url = buildGoogleCalendarUrl(item);
-            window.open(url, '_blank');
-            showToast(`เปิด Google Calendar สำหรับ "${item.code || item.name}" (${item.badge}) แล้ว`, 'success');
-        }
-
-        function openAllSelectedGoogleCalendar() {
+        async function openAllSelectedGoogleCalendar() {
             const selected = calendarExportItems.filter(it => it.checked);
             if (selected.length === 0) {
-                showToast('กรุณาเลือกวิชาสอบอย่างน้อย 1 รายการ', 'error');
+                showToast('กรุณาเลือกรายการที่ต้องการอย่างน้อย 1 รายการ', 'error');
                 return;
             }
 
-            if (selected.length > 5) {
-                if (!confirm(`คุณกำลังจะเปิด Google Calendar พร้อมกัน ${selected.length} แท็บ\n(แนะนำให้ใช้ปุ่ม "ส่งออก .ics ตารางสอบ" เพื่อนำเข้าทั้งหมดในคลิกเดียว)\n\nต้องการเปิดแท็บต่อไปหรือไม่?`)) {
+            const unadded = selected.filter(it => !getGCalSyncInfo(it.id));
+            if (unadded.length === 0) {
+                showToast('ทุกรายการที่เลือกได้ถูกเพิ่มลง Google Calendar แล้ว (เพื่อป้องกันการเพิ่มซ้ำซ้อน)', 'info');
+                return;
+            }
+
+            if (isGoogleCalendarApiReady()) {
+                let successCount = 0;
+                showToast(`กำลังเพิ่ม ${unadded.length} รายการลง Google Calendar จริง...`, 'info');
+                for (const item of unadded) {
+                    const ok = await insertGoogleCalendarApiEvent(item);
+                    if (ok) successCount++;
+                }
+                showToast(`เพิ่มเสร็จสิ้น ${successCount} จาก ${unadded.length} รายการ`, 'success');
+                return;
+            }
+
+            if (unadded.length > 5) {
+                if (!confirm(`คุณกำลังจะเปิด Google Calendar พร้อมกัน ${unadded.length} แท็บ\n(แนะนำให้ใช้ปุ่ม "ส่งออก .ics ที่เลือก" เพื่อนำเข้าทั้งหมดในคลิกเดียว)\n\nต้องการเปิดแท็บต่อไปหรือไม่?`)) {
                     return;
                 }
             }
 
-            selected.forEach((it, idx) => {
+            unadded.forEach((it, idx) => {
                 setTimeout(() => {
                     window.open(buildGoogleCalendarUrl(it), '_blank');
+                    markGCalItemAsSynced(it.id, { isApi: false, eventId: null });
+                    renderCalendarExportList();
                 }, idx * 250);
             });
-            showToast(`กำลังเปิด Google Calendar ${selected.length} รายการ`, 'success');
+            showToast(`กำลังเปิด Google Calendar ${unadded.length} รายการ`, 'success');
         }
 
         function exportSelectedCalendarICS() {
             const selected = calendarExportItems.filter(it => it.checked);
             if (selected.length === 0) {
-                showToast('กรุณาเลือกวิชาสอบอย่างน้อย 1 รายการ', 'error');
+                showToast('กรุณาเลือกรายการที่ต้องการส่งออกอย่างน้อย 1 รายการ', 'error');
                 return;
             }
 
@@ -4396,9 +4889,9 @@
             const lines = [
                 'BEGIN:VCALENDAR',
                 'VERSION:2.0',
-                'PRODID:-//SmartClassSchedule//ExamExport//TH',
+                'PRODID:-//SmartClassSchedule//ScheduleExport//TH',
                 'CALSCALE:GREGORIAN',
-                'X-WR-CALNAME:ตารางสอบ Smart Schedule',
+                'X-WR-CALNAME:ตารางสอบและการบ้าน Smart Schedule',
                 'METHOD:PUBLISH'
             ];
 
@@ -4407,11 +4900,19 @@
                 lines.push(`UID:${escICS(item.id)}@smartschedule`);
                 lines.push(`DTSTAMP:${dtStamp}`);
 
-                const dtStart = toICSDateTime(item.dateIso, item.start);
-                const dtEnd = toICSDateTime(item.dateIso, item.end);
-                if (dtStart && dtEnd) {
-                    lines.push(`DTSTART:${dtStart}`);
-                    lines.push(`DTEND:${dtEnd}`);
+                if (item.isAllDay) {
+                    const cleanStart = (item.dateIso || '').replace(/-/g, '');
+                    const dObj = parseISODateLocal(item.dateIso);
+                    const nextDay = dObj ? formatISODate(addDays(dObj, 1)).replace(/-/g, '') : cleanStart;
+                    lines.push(`DTSTART;VALUE=DATE:${cleanStart}`);
+                    lines.push(`DTEND;VALUE=DATE:${nextDay}`);
+                } else {
+                    const dtStart = toICSDateTime(item.dateIso, item.start);
+                    const dtEnd = toICSDateTime(item.dateIso, item.end);
+                    if (dtStart && dtEnd) {
+                        lines.push(`DTSTART:${dtStart}`);
+                        lines.push(`DTEND:${dtEnd}`);
+                    }
                 }
 
                 const summary = item.fullTitle || item.displayTitle;
@@ -4422,19 +4923,22 @@
                 }
 
                 const descLines = [];
-                descLines.push(`ประเภทการสอบ: ${item.badge}`);
+                descLines.push(`ประเภท: ${item.badge}`);
                 if (item.code) descLines.push(`รหัสวิชา: ${item.code}`);
                 if (item.name) descLines.push(`ชื่อวิชา: ${item.name}`);
                 if (item.section) descLines.push(`Section: ${item.section}`);
                 if (item.teacher) descLines.push(`อาจารย์ผู้สอน: ${item.teacher}`);
-                if (item.room) descLines.push(`ห้องสอบ: ${item.room}`);
+                if (item.room) descLines.push(`สถานที่: ${item.room}`);
                 if (item.time) descLines.push(`เวลา: ${item.time}`);
+                if (item.description) descLines.push(`รายละเอียด: ${item.description}`);
                 descLines.push('จัดทำโดย Smart Schedule Widget');
                 lines.push(`DESCRIPTION:${escICS(descLines.join('\n'))}`);
 
-                // เตือนล่วงหน้า 1 วัน และ 1 ชั่วโมง
-                lines.push('BEGIN:VALARM', 'TRIGGER:-PT1H', 'ACTION:DISPLAY', 'DESCRIPTION:เตือนการสอบ (อีก 1 ชม.)', 'END:VALARM');
-                lines.push('BEGIN:VALARM', 'TRIGGER:-P1D', 'ACTION:DISPLAY', 'DESCRIPTION:เตือนการสอบวันพรุ่งนี้', 'END:VALARM');
+                // เตือนล่วงหน้า 1 วัน และ 1 ชั่วโมง (สำหรับการสอบ)
+                if (item.isExam) {
+                    lines.push('BEGIN:VALARM', 'TRIGGER:-PT1H', 'ACTION:DISPLAY', 'DESCRIPTION:เตือนการสอบ (อีก 1 ชม.)', 'END:VALARM');
+                }
+                lines.push('BEGIN:VALARM', 'TRIGGER:-P1D', 'ACTION:DISPLAY', 'DESCRIPTION:เตือนกำหนดการพรุ่งนี้', 'END:VALARM');
                 lines.push('END:VEVENT');
             });
 
@@ -4443,12 +4947,12 @@
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `exam_schedule_${ctxIso}.ics`;
+            link.download = `smart_schedule_${ctxIso}.ics`;
             document.body.appendChild(link);
             link.click();
             link.remove();
             setTimeout(() => URL.revokeObjectURL(url), 1000);
-            showToast(`ดาวน์โหลดไฟล์ตารางสอบ (.ics) เรียบร้อยแล้ว (${selected.length} รายการ)`, 'success');
+            showToast(`ดาวน์โหลดไฟล์ .ics เรียบร้อยแล้ว (${selected.length} รายการ)`, 'success');
         }
 
         // Backward compatibility
