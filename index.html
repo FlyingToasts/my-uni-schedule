@@ -130,12 +130,66 @@
             box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
         }
 
-        nav.fixed.bottom-0 {
-            background: linear-gradient(180deg, rgba(15, 23, 42, 0.88) 0%, rgba(8, 12, 24, 0.95) 100%) !important;
+        /* --- LIQUID GLASS CAPSULE DOCK & SLIDING LENS PILL --- */
+        .liquid-dock {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.02) 100%), rgba(12, 17, 29, 0.85) !important;
             backdrop-filter: blur(28px) saturate(200%) !important;
             -webkit-backdrop-filter: blur(28px) saturate(200%) !important;
-            border-top: 1px solid rgba(255, 255, 255, 0.14) !important;
-            box-shadow: 0 -12px 36px 0 rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+            border: 1px solid rgba(255, 255, 255, 0.14) !important;
+            box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.75), inset 0 1px 1px 0 rgba(255, 255, 255, 0.25) !important;
+        }
+
+        .liquid-lens-pill, .liquid-lens-pill-view {
+            position: absolute;
+            top: 4px;
+            bottom: 4px;
+            left: 0;
+            pointer-events: none;
+            border-radius: 9999px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(20px) saturate(190%);
+            -webkit-backdrop-filter: blur(20px) saturate(190%);
+            box-shadow: 
+                0 4px 16px -2px rgba(0, 0, 0, 0.45),
+                inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.65),
+                inset 0 -1px 2px 0 rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 1;
+        }
+
+        /* Iridescent chromatic rim reflection (like iOS dynamic lens / liquid glass) */
+        .liquid-lens-pill::before, .liquid-lens-pill-view::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 9999px;
+            padding: 1.5px;
+            background: linear-gradient(90deg, 
+                rgba(245, 158, 11, 0.7) 0%, 
+                rgba(16, 185, 129, 0.7) 25%, 
+                rgba(56, 189, 248, 0.75) 50%, 
+                rgba(168, 85, 247, 0.7) 75%, 
+                rgba(244, 63, 94, 0.7) 100%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            opacity: 0.75;
+            filter: blur(0.6px);
+        }
+
+        /* Specular Curved Highlight */
+        .liquid-lens-pill::after, .liquid-lens-pill-view::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 10%;
+            right: 10%;
+            height: 38%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 100%);
+            border-radius: 9999px 9999px 60% 60% / 9999px 9999px 30% 30%;
+            pointer-events: none;
         }
 
         /* Specular Liquid Buttons */
@@ -308,7 +362,7 @@
     </header>
 
     <!-- Main Content Container -->
-    <main class="max-w-7xl mx-auto px-4 py-6 w-full flex-grow space-y-6 relative z-10">
+    <main class="max-w-7xl mx-auto px-4 py-6 w-full flex-grow space-y-6 relative z-10 pb-28 sm:pb-32">
 
         <!-- Live Status Cards Grid (2 Columns) -->
         <section class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -433,13 +487,19 @@
         <!-- Timetable Section -->
         <section id="page-class" class="bg-slate-800/80 rounded-2xl border border-slate-700/80 overflow-hidden shadow-lg">
             <!-- View Mode Tabs -->
-            <div class="bg-slate-900/90 p-2 flex border-b border-slate-700/80">
-                <button id="tab-daily" onclick="switchViewMode('daily')" class="flex-1 py-3 px-4 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 bg-slate-800 text-amber-400 shadow-sm border border-slate-700">
-                    <i class="fa-solid fa-calendar-day"></i> มุมมองรายวัน (Daily Timeline)
-                </button>
-                <button id="tab-weekly" onclick="switchViewMode('weekly')" class="flex-1 py-3 px-4 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 text-slate-400 hover:text-slate-200">
-                    <i class="fa-solid fa-table-cells"></i> ตารางรวมทั้งสัปดาห์ (รายชั่วโมง)
-                </button>
+            <!-- Mode Switcher: Daily Timeline vs Weekly Matrix (Capsule Pill with Sliding Lens) -->
+            <div class="bg-slate-900/70 p-2 sm:p-2.5 border-b border-slate-800/80 backdrop-blur-md">
+                <div class="relative bg-slate-950/80 p-1 rounded-2xl border border-white/5 flex items-center max-w-xl mx-auto shadow-inner">
+                    <!-- Sliding Liquid Glass Lens Pill -->
+                    <div id="liquid-view-indicator" class="liquid-lens-pill-view" style="width: 50%; transform: translateX(0%);"></div>
+
+                    <button id="tab-daily" onclick="switchViewMode('daily')" class="flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-2 text-amber-400 scale-[1.02]">
+                        <i class="fa-solid fa-calendar-day"></i> <span>มุมมองรายวัน (Daily Timeline)</span>
+                    </button>
+                    <button id="tab-weekly" onclick="switchViewMode('weekly')" class="flex-1 py-2.5 px-3 rounded-xl font-medium text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-2 text-slate-400 hover:text-slate-200 scale-100">
+                        <i class="fa-solid fa-table-cells"></i> <span>ตารางรวมทั้งสัปดาห์ (รายชั่วโมง)</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Content Wrapper -->
@@ -510,12 +570,21 @@
 
     </main>
 
-    <!-- Bottom Navigation: Class / Exam / Grade -->
-    <nav class="fixed bottom-0 inset-x-0 z-40 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 pb-[env(safe-area-inset-bottom)]">
-        <div class="max-w-7xl mx-auto grid grid-cols-3 gap-2 p-2">
-            <button id="nav-class" onclick="setPageMode('class')"><i class="fa-solid fa-table-cells-large"></i> ตารางเรียน</button>
-            <button id="nav-exam" onclick="setPageMode('exam')"><i class="fa-solid fa-file-pen"></i> ตารางสอบ <span id="nav-exam-dot" class="hidden w-2 h-2 rounded-full bg-orange-400 animate-pulse"></span></button>
-            <button id="nav-grade" onclick="setPageMode('grade')"><i class="fa-solid fa-chart-line"></i> เกรด</button>
+    <!-- Bottom Navigation: Floating Liquid Capsule Dock (Class / Exam / Grade) -->
+    <nav class="fixed bottom-3 sm:bottom-5 inset-x-0 z-40 px-3 sm:px-4 pointer-events-none pb-[env(safe-area-inset-bottom)]">
+        <div class="max-w-md mx-auto pointer-events-auto liquid-dock p-1.5 rounded-full relative flex items-center shadow-[0_16px_40px_-8px_rgba(0,0,0,0.8),0_0_1px_1px_rgba(255,255,255,0.08)]">
+            <!-- Liquid Glass Lens Pill (Sliding Indicator) -->
+            <div id="liquid-nav-indicator" class="liquid-lens-pill" style="width: calc(100% / 3); transform: translateX(0%);"></div>
+
+            <button id="nav-class" onclick="setPageMode('class')" class="flex-1 py-2.5 rounded-full font-bold text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-1.5 text-amber-400 scale-[1.03]">
+                <i class="fa-solid fa-table-cells-large"></i> <span>ตารางเรียน</span>
+            </button>
+            <button id="nav-exam" onclick="setPageMode('exam')" class="flex-1 py-2.5 rounded-full font-medium text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 scale-100">
+                <i class="fa-solid fa-file-pen"></i> <span>ตารางสอบ</span> <span id="nav-exam-dot" class="hidden w-2 h-2 rounded-full bg-orange-400 animate-pulse"></span>
+            </button>
+            <button id="nav-grade" onclick="setPageMode('grade')" class="flex-1 py-2.5 rounded-full font-medium text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 scale-100">
+                <i class="fa-solid fa-chart-line"></i> <span>เกรด</span>
+            </button>
         </div>
     </nav>
 
@@ -2615,6 +2684,10 @@
         // --- VIEW SWITCHER & WEEKLY LAYOUT CONTROLS ---
         function switchViewMode(mode) {
             viewMode = mode;
+            const ind = document.getElementById('liquid-view-indicator');
+            if (ind) {
+                ind.style.transform = (mode === 'daily') ? 'translateX(0%)' : 'translateX(100%)';
+            }
             const tabDaily = document.getElementById('tab-daily');
             const tabWeekly = document.getElementById('tab-weekly');
             const dailyContainer = document.getElementById('view-daily-container');
@@ -2623,19 +2696,19 @@
             const weeklyControls = document.getElementById('weekly-controls');
 
             if (mode === 'daily') {
-                tabDaily.className = "flex-1 py-3 px-4 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 bg-slate-800 text-amber-400 shadow-sm border border-slate-700";
-                tabWeekly.className = "flex-1 py-3 px-4 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 text-slate-400 hover:text-slate-200";
-                dailyContainer.classList.remove('hidden');
-                weeklyContainer.classList.add('hidden');
-                dayPills.classList.remove('hidden');
-                weeklyControls.classList.add('hidden');
+                if (tabDaily) tabDaily.className = "flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-2 text-amber-400 scale-[1.02]";
+                if (tabWeekly) tabWeekly.className = "flex-1 py-2.5 px-3 rounded-xl font-medium text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-2 text-slate-400 hover:text-slate-200 scale-100";
+                if (dailyContainer) dailyContainer.classList.remove('hidden');
+                if (weeklyContainer) weeklyContainer.classList.add('hidden');
+                if (dayPills) dayPills.classList.remove('hidden');
+                if (weeklyControls) weeklyControls.classList.add('hidden');
             } else {
-                tabWeekly.className = "flex-1 py-3 px-4 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 bg-slate-800 text-sky-400 shadow-sm border border-slate-700";
-                tabDaily.className = "flex-1 py-3 px-4 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 text-slate-400 hover:text-slate-200";
-                dailyContainer.classList.add('hidden');
-                weeklyContainer.classList.remove('hidden');
-                dayPills.classList.add('hidden');
-                weeklyControls.classList.remove('hidden');
+                if (tabDaily) tabDaily.className = "flex-1 py-2.5 px-3 rounded-xl font-medium text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-2 text-slate-400 hover:text-slate-200 scale-100";
+                if (tabWeekly) tabWeekly.className = "flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-2 text-amber-400 scale-[1.02]";
+                if (dailyContainer) dailyContainer.classList.add('hidden');
+                if (weeklyContainer) weeklyContainer.classList.remove('hidden');
+                if (dayPills) dayPills.classList.add('hidden');
+                if (weeklyControls) weeklyControls.classList.remove('hidden');
             }
             updateTick(true);
         }
@@ -4243,12 +4316,26 @@
         }
         function selectExamType(t) { examViewType = t; updateTick(true); }
         function renderBottomNav() {
-            const base = 'py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 sm:gap-2 ';
-            const on = (m, c) => base + (pageMode === m ? 'bg-slate-800 border border-slate-700 ' + c : 'text-slate-400 hover:text-slate-200');
-            document.getElementById('nav-class').className = on('class', 'text-amber-400');
-            document.getElementById('nav-exam').className = on('exam', 'text-orange-400');
-            document.getElementById('nav-grade').className = on('grade', 'text-emerald-400');
-            document.getElementById('nav-exam-dot').classList.toggle('hidden', !currentExamWeek);
+            const ind = document.getElementById('liquid-nav-indicator');
+            if (ind) {
+                if (pageMode === 'class') ind.style.transform = 'translateX(0%)';
+                else if (pageMode === 'exam') ind.style.transform = 'translateX(100%)';
+                else if (pageMode === 'grade') ind.style.transform = 'translateX(200%)';
+            }
+            const setBtn = (id, isActive, activeColor) => {
+                const btn = document.getElementById(id);
+                if (!btn) return;
+                if (isActive) {
+                    btn.className = `flex-1 py-2.5 rounded-full font-bold text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-1.5 ${activeColor} scale-[1.03] drop-shadow-sm`;
+                } else {
+                    btn.className = 'flex-1 py-2.5 rounded-full font-medium text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 scale-100';
+                }
+            };
+            setBtn('nav-class', pageMode === 'class', 'text-amber-400');
+            setBtn('nav-exam', pageMode === 'exam', 'text-orange-400');
+            setBtn('nav-grade', pageMode === 'grade', 'text-emerald-400');
+            const dot = document.getElementById('nav-exam-dot');
+            if (dot) dot.classList.toggle('hidden', !currentExamWeek);
         }
         function examWeekBannerHTML() {
             const t = EXAM_TYPES[currentExamWeek.type], p = currentExamWeek.period;
