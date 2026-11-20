@@ -1,4 +1,4 @@
-# 📅 Smart Schedule (ตารางเรียนอัจฉริยะ)
+# 📅 Smart Schedule (ตารางเรียนอัจฉริยะ) BY: @thunyach3t
 
 > **เว็บแอปพลิเคชันตารางเรียนอัจฉริยะ พร้อม Widget หน้าจอโฮมสำหรับ Android & iOS และระบบเชื่อมต่อ Google Calendar ในคลิกเดียว**
 
