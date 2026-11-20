@@ -130,18 +130,18 @@
             box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
         }
 
-        /* --- LIQUID GLASS CAPSULE DOCK & CRYSTAL CLEAR WATER DROPLET --- */
+        /* --- LIQUID GLASS CAPSULE DOCK & ULTRA-CLEAR WATER DROPLET --- */
         .liquid-dock {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.015) 100%), rgba(12, 17, 29, 0.82) !important;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 100%), rgba(12, 17, 29, 0.80) !important;
             backdrop-filter: blur(28px) saturate(200%) !important;
             -webkit-backdrop-filter: blur(28px) saturate(200%) !important;
             border: 1px solid rgba(255, 255, 255, 0.12) !important;
-            box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.75), inset 0 1px 1px 0 rgba(255, 255, 255, 0.2) !important;
+            box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.75), inset 0 1px 1px 0 rgba(255, 255, 255, 0.18) !important;
             --drop-light-x: 42%;
             --drop-light-y: 20%;
         }
 
-        /* Crystal Clear Liquid Water Droplet Capsule (ใสแจ๋ว เหมือนหยดน้ำใสบริสุทธิ์ ไม่ขาวขุ่น) */
+        /* 100% Crystal Pure Transparent Water Droplet (ใสแจ๋วสมบูรณ์แบบ ไร้ฝ้าขาวขุ่น) */
         .liquid-lens-pill {
             position: absolute;
             top: 4px;
@@ -149,16 +149,15 @@
             left: 0;
             pointer-events: none;
             border-radius: 9999px;
-            /* Ultra-transparent glass body - no cloudy white milky fill */
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.01) 100%);
-            backdrop-filter: blur(4px) saturate(160%);
-            -webkit-backdrop-filter: blur(4px) saturate(160%);
+            /* Completely transparent body - zero milky fill, zero blur fog */
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
             box-shadow: 
-                0 8px 24px -4px rgba(0, 0, 0, 0.65),
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.75),
-                inset 0 -1px 0 0 rgba(255, 255, 255, 0.15),
-                inset 0 -2px 4px 0 rgba(0, 0, 0, 0.35);
-            border: 1px solid rgba(255, 255, 255, 0.22);
+                0 4px 16px -2px rgba(0, 0, 0, 0.45),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.65),
+                inset 0 -1px 0 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.16);
             z-index: 1;
             overflow: hidden;
             transform-origin: center center;
@@ -166,7 +165,7 @@
             transition: transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        /* Iridescent chromatic rim reflection (Prism dispersion on clear water edge) */
+        /* Iridescent chromatic rim reflection (Prism dispersion on clean water meniscus) */
         .liquid-lens-pill::before {
             content: '';
             position: absolute;
@@ -174,62 +173,60 @@
             border-radius: 9999px;
             padding: 1px;
             background: linear-gradient(90deg, 
-                rgba(245, 158, 11, 0.7) 0%, 
-                rgba(16, 185, 129, 0.7) 25%, 
-                rgba(56, 189, 248, 0.75) 50%, 
-                rgba(168, 85, 247, 0.7) 75%, 
-                rgba(244, 63, 94, 0.7) 100%);
+                rgba(245, 158, 11, 0.6) 0%, 
+                rgba(16, 185, 129, 0.6) 25%, 
+                rgba(56, 189, 248, 0.7) 50%, 
+                rgba(168, 85, 247, 0.6) 75%, 
+                rgba(244, 63, 94, 0.6) 100%);
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
             pointer-events: none;
-            opacity: 0.75;
-            filter: blur(0.4px);
+            opacity: 0.65;
+            filter: blur(0.3px);
         }
 
-        /* Subtle caustic light focus on bottom curve (แสงรวมก้นหยดน้ำแบบใส) */
-        .droplet-caustic {
-            position: absolute;
-            bottom: 1px;
-            left: 15%;
-            right: 15%;
-            height: 22%;
-            background: radial-gradient(ellipse at center bottom, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.08) 50%, transparent 75%);
-            border-radius: 9999px;
-            filter: blur(1px);
-            pointer-events: none;
-            transform: translateX(calc((50% - var(--drop-light-x, 50%)) * 0.3));
-            transition: transform 0.12s ease-out;
-        }
-
-        /* Slender glossy curved specular highlight on upper rim (เส้นสะท้อนแสงทรงแคปซูลโค้งบน) */
+        /* Razor-thin glossy curved specular reflection on top edge (ประกายแสงเส้นโค้งสะท้อนน้ำใส) */
         .droplet-specular {
             position: absolute;
             top: 2px;
-            left: 10%;
-            right: 10%;
-            height: 26%;
-            background: radial-gradient(ellipse at var(--drop-light-x, 42%) 15%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.25) 35%, transparent 75%);
+            left: 12%;
+            right: 12%;
+            height: 18%;
+            background: radial-gradient(ellipse at var(--drop-light-x, 42%) 10%, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.15) 30%, transparent 70%);
             border-radius: 9999px 9999px 65% 65% / 9999px 9999px 40% 40%;
-            filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.4));
             pointer-events: none;
             transition: transform 0.1s ease-out;
-            opacity: 0.88;
+            opacity: 0.85;
         }
 
-        /* Secondary Star Pin Highlight (ประกายสะท้อนดวงเล็กคมชัด) */
+        /* Secondary Star Pin Highlight (ประกายแสงดวงเล็กคมชัด) */
         .droplet-specular-pin {
             position: absolute;
-            top: 3.5px;
+            top: 3px;
             left: calc(var(--drop-light-x, 42%) * 0.6 + 10%);
-            width: 4px;
-            height: 2.5px;
+            width: 3.5px;
+            height: 2px;
             background: #ffffff;
             border-radius: 9999px;
-            filter: blur(0.15px) drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
+            filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.9));
             pointer-events: none;
             opacity: 0.9;
             transition: left 0.15s ease-out;
+        }
+
+        /* Subtle bottom focal glow (แสงรวมก้นหยดน้ำบางเบา) */
+        .droplet-caustic {
+            position: absolute;
+            bottom: 1px;
+            left: 20%;
+            right: 20%;
+            height: 12%;
+            background: radial-gradient(ellipse at center bottom, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
+            border-radius: 9999px;
+            pointer-events: none;
+            transform: translateX(calc((50% - var(--drop-light-x, 50%)) * 0.25));
+            transition: transform 0.12s ease-out;
         }
 
         /* Animated light gleam across clear water when sliding (แสงสะท้อนวิ่งผ่านตอนเลื่อน) */
@@ -237,11 +234,11 @@
             position: absolute;
             inset: 0;
             border-radius: 9999px;
-            background: linear-gradient(110deg, transparent 25%, rgba(255, 255, 255, 0.15) 45%, rgba(255, 255, 255, 0.45) 50%, rgba(255, 255, 255, 0.15) 55%, transparent 75%);
+            background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.1) 45%, rgba(255, 255, 255, 0.35) 50%, rgba(255, 255, 255, 0.1) 55%, transparent 70%);
             background-size: 250% 100%;
             background-position: var(--gleam-pos, -120% 0);
             pointer-events: none;
-            opacity: 0.5;
+            opacity: 0.45;
             mix-blend-mode: overlay;
             transition: background-position 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
@@ -253,14 +250,14 @@
             transform: translate(-50%, -50%) scale(0.2);
             width: 25px;
             height: 25px;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.08) 45%, transparent 70%);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.05) 45%, transparent 70%);
+            border: 1px solid rgba(255, 255, 255, 0.4);
             pointer-events: none;
             animation: waterRippleAnim 0.55s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
             z-index: 5;
         }
         @keyframes waterRippleAnim {
-            0% { transform: translate(-50%, -50%) scale(0.2); opacity: 0.9; }
+            0% { transform: translate(-50%, -50%) scale(0.2); opacity: 0.85; }
             100% { transform: translate(-50%, -50%) scale(4.5); opacity: 0; }
         }
 
