@@ -130,15 +130,23 @@
             box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
         }
 
-        /* --- LIQUID GLASS CAPSULE DOCK & SLIDING LENS PILL --- */
+        /* --- LIQUID GLASS CAPSULE DOCK & REAL WATER DROPLET PILL --- */
         .liquid-dock {
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.02) 100%), rgba(12, 17, 29, 0.85) !important;
             backdrop-filter: blur(28px) saturate(200%) !important;
             -webkit-backdrop-filter: blur(28px) saturate(200%) !important;
             border: 1px solid rgba(255, 255, 255, 0.14) !important;
             box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.75), inset 0 1px 1px 0 rgba(255, 255, 255, 0.25) !important;
+            --drop-light-x: 42%;
+            --drop-light-y: 25%;
         }
 
+        .liquid-view-dock {
+            --drop-light-x: 42%;
+            --drop-light-y: 25%;
+        }
+
+        /* Real Water Droplet Capsule (หยดน้ำเล่นแสงแก้วเหลว) */
         .liquid-lens-pill, .liquid-lens-pill-view {
             position: absolute;
             top: 4px;
@@ -146,19 +154,29 @@
             left: 0;
             pointer-events: none;
             border-radius: 9999px;
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.05) 100%);
-            backdrop-filter: blur(20px) saturate(190%);
-            -webkit-backdrop-filter: blur(20px) saturate(190%);
+            /* Real convex water droplet meniscus gradient */
+            background: radial-gradient(circle at var(--drop-light-x, 42%) var(--drop-light-y, 25%), 
+                rgba(255, 255, 255, 0.44) 0%, 
+                rgba(255, 255, 255, 0.18) 28%, 
+                rgba(255, 255, 255, 0.05) 65%, 
+                rgba(0, 0, 0, 0.25) 100%);
+            backdrop-filter: blur(14px) saturate(220%) contrast(108%);
+            -webkit-backdrop-filter: blur(14px) saturate(220%) contrast(108%);
             box-shadow: 
-                0 4px 16px -2px rgba(0, 0, 0, 0.45),
-                inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.65),
-                inset 0 -1px 2px 0 rgba(0, 0, 0, 0.35);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+                0 10px 24px -3px rgba(0, 0, 0, 0.6),
+                0 2px 10px 1px rgba(255, 255, 255, 0.22),
+                inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.9),
+                inset 0 -2px 4px 0 rgba(0, 0, 0, 0.45),
+                inset 0 -1px 3px 0 rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.35);
             z-index: 1;
+            overflow: hidden;
+            transform-origin: center center;
+            will-change: transform;
+            transition: transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.15s ease;
         }
 
-        /* Iridescent chromatic rim reflection (like iOS dynamic lens / liquid glass) */
+        /* Iridescent chromatic rim reflection (Prism dispersion on water meniscus) */
         .liquid-lens-pill::before, .liquid-lens-pill-view::before {
             content: '';
             position: absolute;
@@ -166,30 +184,102 @@
             border-radius: 9999px;
             padding: 1.5px;
             background: linear-gradient(90deg, 
-                rgba(245, 158, 11, 0.7) 0%, 
-                rgba(16, 185, 129, 0.7) 25%, 
-                rgba(56, 189, 248, 0.75) 50%, 
-                rgba(168, 85, 247, 0.7) 75%, 
-                rgba(244, 63, 94, 0.7) 100%);
+                rgba(245, 158, 11, 0.8) 0%, 
+                rgba(16, 185, 129, 0.8) 25%, 
+                rgba(56, 189, 248, 0.85) 50%, 
+                rgba(168, 85, 247, 0.8) 75%, 
+                rgba(244, 63, 94, 0.8) 100%);
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
             pointer-events: none;
-            opacity: 0.75;
-            filter: blur(0.6px);
+            opacity: 0.85;
+            filter: blur(0.5px);
         }
 
-        /* Specular Curved Highlight */
-        .liquid-lens-pill::after, .liquid-lens-pill-view::after {
-            content: '';
+        /* Caustic internal light refraction pool (แสงรวมใต้หยดน้ำ) */
+        .droplet-caustic {
             position: absolute;
-            top: 2px;
-            left: 10%;
-            right: 10%;
+            bottom: 1.5px;
+            left: 12%;
+            right: 12%;
             height: 38%;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 100%);
-            border-radius: 9999px 9999px 60% 60% / 9999px 9999px 30% 30%;
+            background: radial-gradient(ellipse at center bottom, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.25) 45%, transparent 75%);
+            border-radius: 9999px;
+            filter: blur(1.5px);
             pointer-events: none;
+            transform: translateX(calc((50% - var(--drop-light-x, 50%)) * 0.35));
+            transition: transform 0.12s ease-out;
+        }
+
+        /* Specular highlight bead (ดวงไฟสะท้อนบนผิวน้ำโค้ง) */
+        .droplet-specular {
+            position: absolute;
+            top: 2.5px;
+            left: 8%;
+            right: 8%;
+            height: 46%;
+            background: radial-gradient(ellipse at var(--drop-light-x, 42%) 25%, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.7) 25%, rgba(255, 255, 255, 0.12) 60%, transparent 85%);
+            border-radius: 9999px 9999px 65% 65% / 9999px 9999px 40% 40%;
+            filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.6));
+            pointer-events: none;
+            transition: transform 0.1s ease-out;
+        }
+
+        /* Secondary Star Pin Highlight (ประกายแสงดวงเล็ก) */
+        .droplet-specular-pin {
+            position: absolute;
+            top: 4.5px;
+            left: calc(var(--drop-light-x, 42%) * 0.6 + 10%);
+            width: 6px;
+            height: 3px;
+            background: #ffffff;
+            border-radius: 9999px;
+            filter: blur(0.2px) drop-shadow(0 0 2px rgba(255, 255, 255, 0.9));
+            pointer-events: none;
+            opacity: 0.95;
+            transition: left 0.15s ease-out;
+        }
+
+        /* Animated light gleam that sweeps across droplet (แสงวิ่งวาบผ่านหยดน้ำ) */
+        .droplet-gleam {
+            position: absolute;
+            inset: 0;
+            border-radius: 9999px;
+            background: linear-gradient(110deg, transparent 20%, rgba(255, 255, 255, 0.25) 45%, rgba(255, 255, 255, 0.65) 50%, rgba(255, 255, 255, 0.25) 55%, transparent 80%);
+            background-size: 250% 100%;
+            background-position: var(--gleam-pos, -120% 0);
+            pointer-events: none;
+            opacity: 0.7;
+            mix-blend-mode: overlay;
+            transition: background-position 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        /* Ambient subtle shimmer pulse (หยดน้ำมีชีวิต วาวแสงเบาๆ ตลอดเวลา) */
+        @keyframes waterAmbientBreathe {
+            0%, 100% { filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.2)); }
+            50% { filter: drop-shadow(0 0 7px rgba(255, 255, 255, 0.45)); }
+        }
+        .water-droplet {
+            animation: waterAmbientBreathe 4s ease-in-out infinite;
+        }
+
+        /* Water Ripple Wave on Tap */
+        .water-ripple-wave {
+            position: absolute;
+            border-radius: 9999px;
+            transform: translate(-50%, -50%) scale(0.2);
+            width: 25px;
+            height: 25px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.15) 45%, transparent 70%);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            pointer-events: none;
+            animation: waterRippleAnim 0.55s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+            z-index: 5;
+        }
+        @keyframes waterRippleAnim {
+            0% { transform: translate(-50%, -50%) scale(0.2); opacity: 0.95; }
+            100% { transform: translate(-50%, -50%) scale(4.5); opacity: 0; }
         }
 
         /* Specular Liquid Buttons */
@@ -489,14 +579,19 @@
             <!-- View Mode Tabs -->
             <!-- Mode Switcher: Daily Timeline vs Weekly Matrix (Capsule Pill with Sliding Lens) -->
             <div class="bg-slate-900/70 p-2 sm:p-2.5 border-b border-slate-800/80 backdrop-blur-md">
-                <div class="relative bg-slate-950/80 p-1 rounded-2xl border border-white/5 flex items-center max-w-xl mx-auto shadow-inner">
-                    <!-- Sliding Liquid Glass Lens Pill -->
-                    <div id="liquid-view-indicator" class="liquid-lens-pill-view" style="width: 50%; transform: translateX(0%);"></div>
+                <div id="liquid-view-dock" class="liquid-view-dock relative bg-slate-950/80 p-1 rounded-2xl border border-white/5 flex items-center max-w-xl mx-auto shadow-inner overflow-hidden">
+                    <!-- Sliding Liquid Glass Water Droplet Pill -->
+                    <div id="liquid-view-indicator" class="liquid-lens-pill-view water-droplet" style="width: 50%; transform: translateX(0%);">
+                        <div class="droplet-caustic"></div>
+                        <div class="droplet-specular"></div>
+                        <div class="droplet-specular-pin"></div>
+                        <div class="droplet-gleam"></div>
+                    </div>
 
-                    <button id="tab-daily" onclick="switchViewMode('daily')" class="flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-2 text-amber-400 scale-[1.02]">
+                    <button id="tab-daily" onclick="switchViewMode('daily')" class="flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-2 text-amber-400 scale-[1.02] overflow-hidden">
                         <i class="fa-solid fa-calendar-day"></i> <span>มุมมองรายวัน (Daily Timeline)</span>
                     </button>
-                    <button id="tab-weekly" onclick="switchViewMode('weekly')" class="flex-1 py-2.5 px-3 rounded-xl font-medium text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-2 text-slate-400 hover:text-slate-200 scale-100">
+                    <button id="tab-weekly" onclick="switchViewMode('weekly')" class="flex-1 py-2.5 px-3 rounded-xl font-medium text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-2 text-slate-400 hover:text-slate-200 scale-100 overflow-hidden">
                         <i class="fa-solid fa-table-cells"></i> <span>ตารางรวมทั้งสัปดาห์ (รายชั่วโมง)</span>
                     </button>
                 </div>
@@ -572,17 +667,22 @@
 
     <!-- Bottom Navigation: Floating Liquid Capsule Dock (Class / Exam / Grade) -->
     <nav class="fixed bottom-3 sm:bottom-5 inset-x-0 z-40 px-3 sm:px-4 pointer-events-none pb-[env(safe-area-inset-bottom)]">
-        <div class="max-w-md mx-auto pointer-events-auto liquid-dock p-1.5 rounded-full relative flex items-center shadow-[0_16px_40px_-8px_rgba(0,0,0,0.8),0_0_1px_1px_rgba(255,255,255,0.08)]">
-            <!-- Liquid Glass Lens Pill (Sliding Indicator) -->
-            <div id="liquid-nav-indicator" class="liquid-lens-pill" style="width: calc(100% / 3); transform: translateX(0%);"></div>
+        <div id="liquid-bottom-dock" class="max-w-md mx-auto pointer-events-auto liquid-dock p-1.5 rounded-full relative flex items-center shadow-[0_16px_40px_-8px_rgba(0,0,0,0.8),0_0_1px_1px_rgba(255,255,255,0.08)] overflow-hidden">
+            <!-- Liquid Glass Water Droplet Pill (Sliding Indicator) -->
+            <div id="liquid-nav-indicator" class="liquid-lens-pill water-droplet" style="width: calc(100% / 3); transform: translateX(0%);">
+                <div class="droplet-caustic"></div>
+                <div class="droplet-specular"></div>
+                <div class="droplet-specular-pin"></div>
+                <div class="droplet-gleam"></div>
+            </div>
 
-            <button id="nav-class" onclick="setPageMode('class')" class="flex-1 py-2.5 rounded-full font-bold text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-1.5 text-amber-400 scale-[1.03]">
+            <button id="nav-class" onclick="setPageMode('class')" class="flex-1 py-2.5 rounded-full font-bold text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-1.5 text-amber-400 scale-[1.03] overflow-hidden">
                 <i class="fa-solid fa-table-cells-large"></i> <span>ตารางเรียน</span>
             </button>
-            <button id="nav-exam" onclick="setPageMode('exam')" class="flex-1 py-2.5 rounded-full font-medium text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 scale-100">
+            <button id="nav-exam" onclick="setPageMode('exam')" class="flex-1 py-2.5 rounded-full font-medium text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 scale-100 overflow-hidden">
                 <i class="fa-solid fa-file-pen"></i> <span>ตารางสอบ</span> <span id="nav-exam-dot" class="hidden w-2 h-2 rounded-full bg-orange-400 animate-pulse"></span>
             </button>
-            <button id="nav-grade" onclick="setPageMode('grade')" class="flex-1 py-2.5 rounded-full font-medium text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 scale-100">
+            <button id="nav-grade" onclick="setPageMode('grade')" class="flex-1 py-2.5 rounded-full font-medium text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 scale-100 overflow-hidden">
                 <i class="fa-solid fa-chart-line"></i> <span>เกรด</span>
             </button>
         </div>
@@ -1512,6 +1612,7 @@
             loadWebsiteVersion();
             checkUrlForGoogleOAuthToken();
             initFirebaseCloudSync();
+            initWaterDropletLighting();
             setInterval(() => updateTick(false), 1000);
         };
 
@@ -2685,8 +2786,10 @@
         function switchViewMode(mode) {
             viewMode = mode;
             const ind = document.getElementById('liquid-view-indicator');
+            const targetIdx = (mode === 'daily') ? 0 : 1;
             if (ind) {
-                ind.style.transform = (mode === 'daily') ? 'translateX(0%)' : 'translateX(100%)';
+                animateWaterDroplet(ind, targetIdx, currentViewTabIdx);
+                currentViewTabIdx = targetIdx;
             }
             const tabDaily = document.getElementById('tab-daily');
             const tabWeekly = document.getElementById('tab-weekly');
@@ -4315,20 +4418,127 @@
             setPageMode(ew ? 'exam' : 'class');
         }
         function selectExamType(t) { examViewType = t; updateTick(true); }
+        // --- REAL WATER DROPLET LIGHT PLAY & SQUASH/STRETCH ENGINE ---
+        let currentBottomNavIdx = 0; // 0: class, 1: exam, 2: grade
+        let currentViewTabIdx = 0;   // 0: daily, 1: weekly
+
+        function animateWaterDroplet(indicatorEl, targetIdx, currentIdx) {
+            if (!indicatorEl) return;
+            const diff = targetIdx - currentIdx;
+            const targetPercent = targetIdx * 100;
+
+            if (diff === 0) {
+                indicatorEl.style.transition = 'transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                indicatorEl.style.transform = `translateX(${targetPercent}%) scale(1, 1)`;
+                return;
+            }
+
+            const isRight = diff > 0;
+            const distance = Math.abs(diff);
+            // More dramatic stretch for longer distance
+            const stretchX = distance > 1 ? 1.28 : 1.18;
+            const squashY = distance > 1 ? 0.75 : 0.84;
+
+            // Flash the light gleam wave across the water droplet
+            indicatorEl.style.setProperty('--gleam-pos', isRight ? '150% 0' : '-80% 0');
+            setTimeout(() => {
+                indicatorEl.style.setProperty('--gleam-pos', '-120% 0');
+            }, 550);
+
+            // Phase 1: High velocity fluid launch (stretch in flight)
+            indicatorEl.style.transition = 'transform 0.22s cubic-bezier(0.4, 0, 0.2, 1)';
+            indicatorEl.style.transform = `translateX(${targetPercent}%) scale(${stretchX}, ${squashY})`;
+
+            // Phase 2: Impact squash at destination
+            setTimeout(() => {
+                indicatorEl.style.transition = 'transform 0.15s cubic-bezier(0.2, 0.8, 0.3, 1.3)';
+                indicatorEl.style.transform = `translateX(${targetPercent}%) scale(0.9, 1.12)`;
+
+                // Phase 3: Elastic counter-bounce
+                setTimeout(() => {
+                    indicatorEl.style.transition = 'transform 0.12s ease-out';
+                    indicatorEl.style.transform = `translateX(${targetPercent}%) scale(1.03, 0.98)`;
+
+                    // Phase 4: Settle into resting surface tension
+                    setTimeout(() => {
+                        indicatorEl.style.transition = 'transform 0.1s ease-out';
+                        indicatorEl.style.transform = `translateX(${targetPercent}%) scale(1, 1)`;
+                    }, 110);
+                }, 130);
+            }, 210);
+        }
+
+        function createWaterRipple(e, targetBtn) {
+            if (!targetBtn) return;
+            const rect = targetBtn.getBoundingClientRect();
+            const ripple = document.createElement('span');
+            ripple.className = 'water-ripple-wave';
+            const x = (e && typeof e.clientX === 'number' && e.clientX > 0) ? (e.clientX - rect.left) : (rect.width / 2);
+            const y = (e && typeof e.clientY === 'number' && e.clientY > 0) ? (e.clientY - rect.top) : (rect.height / 2);
+            ripple.style.left = `${x}px`;
+            ripple.style.top = `${y}px`;
+            targetBtn.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        }
+
+        function initWaterDropletLighting() {
+            const docks = [
+                document.getElementById('liquid-bottom-dock'),
+                document.getElementById('liquid-view-dock')
+            ].filter(Boolean);
+
+            docks.forEach(dock => {
+                const updateLight = (clientX, clientY) => {
+                    const rect = dock.getBoundingClientRect();
+                    const rawX = ((clientX - rect.left) / rect.width) * 100;
+                    const rawY = ((clientY - rect.top) / rect.height) * 100;
+                    const clampedX = Math.max(15, Math.min(85, rawX));
+                    const clampedY = Math.max(10, Math.min(60, rawY));
+                    dock.style.setProperty('--drop-light-x', `${clampedX.toFixed(1)}%`);
+                    dock.style.setProperty('--drop-light-y', `${clampedY.toFixed(1)}%`);
+                };
+
+                dock.addEventListener('pointermove', (e) => {
+                    updateLight(e.clientX, e.clientY);
+                });
+                dock.addEventListener('touchmove', (e) => {
+                    if (e.touches && e.touches[0]) {
+                        updateLight(e.touches[0].clientX, e.touches[0].clientY);
+                    }
+                }, { passive: true });
+                dock.addEventListener('pointerleave', () => {
+                    dock.style.setProperty('--drop-light-x', '42%');
+                    dock.style.setProperty('--drop-light-y', '25%');
+                });
+            });
+
+            // Tap ripple on all dock buttons
+            document.querySelectorAll('#liquid-bottom-dock button, #liquid-view-dock button').forEach(btn => {
+                btn.addEventListener('pointerdown', (e) => {
+                    createWaterRipple(e, btn);
+                });
+            });
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initWaterDropletLighting);
+        } else {
+            initWaterDropletLighting();
+        }
+
         function renderBottomNav() {
             const ind = document.getElementById('liquid-nav-indicator');
+            const targetIdx = pageMode === 'class' ? 0 : (pageMode === 'exam' ? 1 : 2);
             if (ind) {
-                if (pageMode === 'class') ind.style.transform = 'translateX(0%)';
-                else if (pageMode === 'exam') ind.style.transform = 'translateX(100%)';
-                else if (pageMode === 'grade') ind.style.transform = 'translateX(200%)';
+                animateWaterDroplet(ind, targetIdx, currentBottomNavIdx);
+                currentBottomNavIdx = targetIdx;
             }
             const setBtn = (id, isActive, activeColor) => {
                 const btn = document.getElementById(id);
                 if (!btn) return;
                 if (isActive) {
-                    btn.className = `flex-1 py-2.5 rounded-full font-bold text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-1.5 ${activeColor} scale-[1.03] drop-shadow-sm`;
+                    btn.className = `flex-1 py-2.5 rounded-full font-bold text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-1.5 ${activeColor} scale-[1.03] drop-shadow-sm overflow-hidden`;
                 } else {
-                    btn.className = 'flex-1 py-2.5 rounded-full font-medium text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 scale-100';
+                    btn.className = 'flex-1 py-2.5 rounded-full font-medium text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 scale-100 overflow-hidden';
                 }
             };
             setBtn('nav-class', pageMode === 'class', 'text-amber-400');
