@@ -6529,7 +6529,12 @@
             try {
                 const resp = await fetch('./smart-schedule-widget.js');
                 if (resp.ok) baseCode = await resp.text();
-            } catch (e) {}
+            } catch (e) {
+                try {
+                    const resp2 = await fetch('./ios/smart-schedule-widget.js');
+                    if (resp2.ok) baseCode = await resp2.text();
+                } catch (e2) {}
+            }
 
             const cleanAppUrl = window.location.href.split('#')[0].split('?')[0];
 
