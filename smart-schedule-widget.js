@@ -105,6 +105,26 @@ function parseTimeToMinutes(tStr) {
   return parseInt(p[0], 10) * 60 + parseInt(p[1], 10);
 }
 
+function formatTaskDate(dStr) {
+  if (!dStr) return "";
+  let parts = dStr.split("-");
+  if (parts.length >= 3) {
+    let day = parseInt(parts[2], 10);
+    let month = parseInt(parts[1], 10);
+    if (!isNaN(day) && !isNaN(month) && month >= 1 && month <= 12) {
+      return `${day} ${THAI_MONTHS[month - 1]}`;
+    }
+  }
+  return dStr.slice(5);
+}
+
+function formatTaskBadge(badge) {
+  if (!badge) return "";
+  if (badge === "สอบกลางภาค") return "สอบกลาง";
+  if (badge === "สอบปลายภาค") return "สอบปลาย";
+  return badge;
+}
+
 function normalizePayload(raw) {
   let sessions = [];
   let tasks = [];
@@ -296,7 +316,7 @@ async function createWidget() {
   let widget = new ListWidget();
   widget.backgroundColor = new Color("#090d16");
   widget.url = APP_URL;
-  widget.setPadding(9, 11, 9, 11);
+  widget.setPadding(8, 11, 8, 11);
 
   let family = config.widgetFamily || "medium";
 
@@ -319,7 +339,7 @@ async function createWidget() {
   dateText.font = Font.mediumSystemFont(10.5);
   dateText.textColor = new Color("#94a3b8");
 
-  widget.addSpacer(6);
+  widget.addSpacer(5);
 
   // --- BODY LAYOUT BY WIDGET SIZE ---
   if (family === "small") {
@@ -327,7 +347,7 @@ async function createWidget() {
   } else if (family === "large") {
     renderLargeWidget(widget, current, next, tasks, sessions, now);
   } else {
-    // 4x2 แนวนอน: CURRENT CLASS (แถบบน) | NEXT CLASS (แถบล่าง) | TASKS (แถบขวา 1/4)
+    // 4x2 แนวนอน: CURRENT CLASS (แถบบน) | NEXT CLASS (แถบล่าง) | TASKS (แถบขวา)
     renderMediumWidget(widget, current, next, tasks);
   }
 
@@ -356,7 +376,7 @@ function renderMediumWidget(widget, current, next, tasks) {
   curBox.cornerRadius = 10;
   curBox.borderWidth = 1;
   curBox.borderColor = new Color("#1e2e4a");
-  curBox.setPadding(5, 8, 5, 8);
+  curBox.setPadding(6, 9, 6, 9);
 
   let curHeader = curBox.addStack();
   curHeader.layoutHorizontally();
@@ -372,49 +392,47 @@ function renderMediumWidget(widget, current, next, tasks) {
   curBadge.font = Font.boldSystemFont(8);
   curBadge.textColor = current ? new Color("#34d399") : new Color("#94a3b8");
 
-  curBox.addSpacer(2);
+  curBox.addSpacer();
 
   if (current) {
     let curNameLine = curBox.addText(`${current.code ? current.code + ' ' : ''}${current.name}`);
-    curNameLine.font = Font.boldSystemFont(10.5);
+    curNameLine.font = Font.boldSystemFont(11);
     curNameLine.textColor = Color.white();
     curNameLine.lineLimit = 1;
+
+    curBox.addSpacer(2);
 
     let curDetailLine = curBox.addStack();
     curDetailLine.layoutHorizontally();
     curDetailLine.centerAlignContent();
 
     let curTime = curDetailLine.addText(`⏰ ${current.start} - ${current.end}`);
-    curTime.font = Font.mediumSystemFont(8.5);
+    curTime.font = Font.mediumSystemFont(9);
     curTime.textColor = new Color("#fbbf24");
 
     if (current.room) {
       let sep = curDetailLine.addText("  •  ");
-      sep.font = Font.systemFont(8.5);
+      sep.font = Font.systemFont(9);
       sep.textColor = new Color("#64748b");
 
       let curRoom = curDetailLine.addText(`📍 ห้อง ${current.room}`);
-      curRoom.font = Font.systemFont(8.5);
+      curRoom.font = Font.systemFont(9);
       curRoom.textColor = new Color("#94a3b8");
       curRoom.lineLimit = 1;
     }
   } else {
-    let freeRow = curBox.addStack();
-    freeRow.layoutHorizontally();
-    freeRow.centerAlignContent();
+    let freeTitle = curBox.addText("ไม่มีคาบเรียนในขณะนี้");
+    freeTitle.font = Font.boldSystemFont(11);
+    freeTitle.textColor = new Color("#f1f5f9");
 
-    let freeTitle = freeRow.addText("ไม่มีคาบเรียนในขณะนี้");
-    freeTitle.font = Font.mediumSystemFont(9.5);
-    freeTitle.textColor = new Color("#e2e8f0");
+    curBox.addSpacer(2);
 
-    let freeSep = freeRow.addText("  •  ");
-    freeSep.font = Font.systemFont(8.5);
-    freeSep.textColor = new Color("#64748b");
-
-    let freeSub = freeRow.addText("มีเวลาพักผ่อนแล้ว ✨");
-    freeSub.font = Font.systemFont(8.5);
+    let freeSub = curBox.addText("มีเวลาพักผ่อนแล้ว ✨");
+    freeSub.font = Font.systemFont(9.5);
     freeSub.textColor = new Color("#94a3b8");
   }
+
+  curBox.addSpacer();
 
   // ----------------------------------------------------
   // กล่อง 2: NEXT CLASS (แถบแนวนอนด้านล่าง)
@@ -425,7 +443,7 @@ function renderMediumWidget(widget, current, next, tasks) {
   nextBox.cornerRadius = 10;
   nextBox.borderWidth = 1;
   nextBox.borderColor = new Color("#1e2e4a");
-  nextBox.setPadding(5, 8, 5, 8);
+  nextBox.setPadding(6, 9, 6, 9);
 
   let nextHeader = nextBox.addStack();
   nextHeader.layoutHorizontally();
@@ -441,48 +459,66 @@ function renderMediumWidget(widget, current, next, tasks) {
     let dayStr = "";
     if (next.diffDays === 0) dayStr = "วันนี้";
     else if (next.diffDays === 1) dayStr = "พรุ่งนี้";
-    else if (next.day !== undefined) dayStr = THAI_DAYS[next.day];
-    else if (next.date) dayStr = next.date.slice(5);
+    else if (next.day !== undefined) {
+      dayStr = THAI_DAYS[next.day];
+      if (next.diffDays !== undefined && next.diffDays > 0) {
+        let targetDate = new Date();
+        targetDate.setDate(targetDate.getDate() + next.diffDays);
+        dayStr += ` ${targetDate.getDate()} ${THAI_MONTHS[targetDate.getMonth()]}`;
+      }
+    } else if (next.date) {
+      dayStr = formatTaskDate(next.date);
+    }
 
     let nextDayText = nextHeader.addText(dayStr);
     nextDayText.font = Font.mediumSystemFont(8);
     nextDayText.textColor = new Color("#cbd5e1");
   }
 
-  nextBox.addSpacer(2);
+  nextBox.addSpacer();
 
   if (next) {
     let nextNameLine = nextBox.addText(`${next.code ? next.code + ' ' : ''}${next.name}`);
-    nextNameLine.font = Font.boldSystemFont(10.5);
+    nextNameLine.font = Font.boldSystemFont(11);
     nextNameLine.textColor = Color.white();
     nextNameLine.lineLimit = 1;
+
+    nextBox.addSpacer(2);
 
     let nextDetailLine = nextBox.addStack();
     nextDetailLine.layoutHorizontally();
     nextDetailLine.centerAlignContent();
 
     let nextTime = nextDetailLine.addText(`⏰ ${next.start} - ${next.end}`);
-    nextTime.font = Font.mediumSystemFont(8.5);
+    nextTime.font = Font.mediumSystemFont(9);
     nextTime.textColor = new Color("#fbbf24");
 
     if (next.room) {
       let sep = nextDetailLine.addText("  •  ");
-      sep.font = Font.systemFont(8.5);
+      sep.font = Font.systemFont(9);
       sep.textColor = new Color("#64748b");
 
       let nextRoom = nextDetailLine.addText(`📍 ห้อง ${next.room}`);
-      nextRoom.font = Font.systemFont(8.5);
+      nextRoom.font = Font.systemFont(9);
       nextRoom.textColor = new Color("#94a3b8");
       nextRoom.lineLimit = 1;
     }
   } else {
     let noNext = nextBox.addText("ไม่มีข้อมูลคาบถัดไป");
-    noNext.font = Font.systemFont(9.5);
-    noNext.textColor = new Color("#64748b");
+    noNext.font = Font.boldSystemFont(11);
+    noNext.textColor = new Color("#94a3b8");
+
+    nextBox.addSpacer(2);
+
+    let noNextSub = nextBox.addText("พักผ่อนได้เต็มที่ 🎉");
+    noNextSub.font = Font.systemFont(9.5);
+    noNextSub.textColor = new Color("#64748b");
   }
 
+  nextBox.addSpacer();
+
   // ----------------------------------------------------
-  // กล่อง 3: TASKS (แถบแนวตั้งด้านขวา 1/4 ของ Widget)
+  // กล่อง 3: TASKS (แถบแนวตั้งด้านขวา)
   // ซ่อนอัตโนมัติหากไม่มีงานค้าง
   // ----------------------------------------------------
   if (hasTasks) {
@@ -492,8 +528,8 @@ function renderMediumWidget(widget, current, next, tasks) {
     taskBox.cornerRadius = 10;
     taskBox.borderWidth = 1;
     taskBox.borderColor = new Color("#1e2e4a");
-    taskBox.setPadding(5, 6, 5, 6);
-    taskBox.size = new Size(82, 0); // คุมความกว้าง 1/4 ประมาณ 82pt
+    taskBox.setPadding(6, 7, 6, 7);
+    taskBox.size = new Size(106, 0); // ขยายความกว้างเป็น 106pt เพื่อให้แสดงชื่องานและวันที่ได้ครบถ้วน ไม่ถูกตัดขอบ
 
     let taskHeader = taskBox.addStack();
     taskHeader.layoutHorizontally();
@@ -509,30 +545,90 @@ function renderMediumWidget(widget, current, next, tasks) {
     taskCount.font = Font.boldSystemFont(8);
     taskCount.textColor = new Color("#fbbf24");
 
-    taskBox.addSpacer(3);
+    let displayTasks = tasks.slice(0, 3); // แสดงสูงสุด 3 รายการ
 
-    let displayTasks = tasks.slice(0, 2);
-    for (let t of displayTasks) {
+    if (displayTasks.length === 1) {
+      taskBox.addSpacer();
+      let t = displayTasks[0];
       let itemCard = taskBox.addStack();
       itemCard.layoutVertically();
       itemCard.backgroundColor = new Color("#1a263c");
       itemCard.cornerRadius = 6;
-      itemCard.setPadding(3, 4, 3, 4);
+      itemCard.setPadding(5, 6, 5, 6);
 
-      let tText = itemCard.addText(t.title);
-      tText.font = Font.mediumSystemFont(7.5);
+      let tText = itemCard.addText(t.title || "งาน");
+      tText.font = Font.mediumSystemFont(8.5);
       tText.textColor = Color.white();
-      tText.lineLimit = 1;
+      tText.lineLimit = 2;
 
-      if (t.date) {
-        let dateLabel = t.badge ? `[${t.badge}] ${t.date.slice(5)}` : t.date.slice(5);
+      if (t.date || t.badge) {
+        itemCard.addSpacer(3);
+        let b = formatTaskBadge(t.badge);
+        let d = formatTaskDate(t.date);
+        let dateLabel = b && d ? `[${b}] ${d}` : (b ? `[${b}]` : d);
         let tDate = itemCard.addText(dateLabel);
-        tDate.font = Font.systemFont(7);
+        tDate.font = Font.systemFont(7.5);
         tDate.textColor = new Color(t.color || "#38bdf8");
         tDate.lineLimit = 1;
       }
+      taskBox.addSpacer();
+    } else if (displayTasks.length === 2) {
+      taskBox.addSpacer();
+      for (let i = 0; i < displayTasks.length; i++) {
+        let t = displayTasks[i];
+        let itemCard = taskBox.addStack();
+        itemCard.layoutVertically();
+        itemCard.backgroundColor = new Color("#1a263c");
+        itemCard.cornerRadius = 6;
+        itemCard.setPadding(4, 5, 4, 5);
 
+        let tText = itemCard.addText(t.title || "งาน");
+        tText.font = Font.mediumSystemFont(8);
+        tText.textColor = Color.white();
+        tText.lineLimit = 2; // อนุญาตให้ตัด 2 บรรทัดได้ เพื่อให้ชื่องานไม่ถูกตัดขาดด้วย ...
+
+        if (t.date || t.badge) {
+          itemCard.addSpacer(2);
+          let b = formatTaskBadge(t.badge);
+          let d = formatTaskDate(t.date);
+          let dateLabel = b && d ? `[${b}] ${d}` : (b ? `[${b}]` : d);
+          let tDate = itemCard.addText(dateLabel);
+          tDate.font = Font.systemFont(7.5);
+          tDate.textColor = new Color(t.color || "#38bdf8");
+          tDate.lineLimit = 1;
+        }
+
+        if (i === 0) taskBox.addSpacer(4);
+      }
+      taskBox.addSpacer();
+    } else {
       taskBox.addSpacer(2);
+      for (let i = 0; i < displayTasks.length; i++) {
+        let t = displayTasks[i];
+        let itemCard = taskBox.addStack();
+        itemCard.layoutVertically();
+        itemCard.backgroundColor = new Color("#1a263c");
+        itemCard.cornerRadius = 6;
+        itemCard.setPadding(3, 5, 3, 5);
+
+        let tText = itemCard.addText(t.title || "งาน");
+        tText.font = Font.mediumSystemFont(7.5);
+        tText.textColor = Color.white();
+        tText.lineLimit = 1;
+
+        if (t.date || t.badge) {
+          let b = formatTaskBadge(t.badge);
+          let d = formatTaskDate(t.date);
+          let dateLabel = b && d ? `[${b}] ${d}` : (b ? `[${b}]` : d);
+          let tDate = itemCard.addText(dateLabel);
+          tDate.font = Font.systemFont(7);
+          tDate.textColor = new Color(t.color || "#38bdf8");
+          tDate.lineLimit = 1;
+        }
+
+        if (i < displayTasks.length - 1) taskBox.addSpacer(3);
+      }
+      taskBox.addSpacer();
     }
   }
 }
