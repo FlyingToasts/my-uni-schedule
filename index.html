@@ -6634,7 +6634,7 @@
 
         function downloadScriptableJs() {
             try {
-                const scriptCode = await buildScriptableWidgetCodeForUser();
+                const scriptCode = buildScriptableWidgetCodeSync();
                 const ok = downloadFileBlob('SmartSchedule.js', 'application/javascript;charset=utf-8', scriptCode);
                 if (ok) {
                     showToast('ดาวน์โหลดไฟล์ SmartSchedule.js พร้อมตารางเรียนล่าสุดของคุณแล้ว!', 'success');
