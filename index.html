@@ -6552,16 +6552,43 @@
             return scriptCode;
         }
 
-        async function openInScriptable() {
+        async function openInScriptable(mode = 'new') {
             try {
                 const scriptCode = await buildScriptableWidgetCodeForUser();
                 if (!scriptCode) {
                     showToast('เกิดข้อผิดพลาดในการสร้างสคริปต์', 'error');
                     return;
                 }
-                const url = 'scriptable:///add?scriptName=' + encodeURIComponent('SmartSchedule') + '&script=' + encodeURIComponent(scriptCode);
-                window.location.href = url;
-                showToast('กำลังเปิดแอป Scriptable เพื่ออัปเดตสคริปต์ SmartSchedule...', 'info');
+
+                // 1. คัดลอกโค้ดสคริปต์ลง Clipboard ให้ทันทีก่อนเปิดแอป
+                let copyOk = false;
+                try {
+                    await navigator.clipboard.writeText(scriptCode);
+                    copyOk = true;
+                } catch (clipErr) {
+                    try {
+                        const ta = document.createElement('textarea');
+                        ta.value = scriptCode;
+                        document.body.appendChild(ta);
+                        ta.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(ta);
+                        copyOk = true;
+                    } catch (e2) {}
+                }
+
+                // 2. แจ้งคำแนะนำและเปิดแอป Scriptable
+                if (mode === 'existing') {
+                    showToast('คัดลอกโค้ดล่าสุดแล้ว! กำลังเปิด SmartSchedule ให้แตะเลือกทั้งหมดแล้วกด "วาง" (Paste)', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'scriptable:///open/' + encodeURIComponent('SmartSchedule');
+                    }, 350);
+                } else {
+                    showToast('คัดลอกโค้ดล่าสุดแล้ว! กำลังเปิดหน้าใหม่ ให้แตะค้างแล้วกด "วาง" (Paste) แล้วตั้งชื่อ SmartSchedule', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'scriptable:///add';
+                    }, 350);
+                }
             } catch (e) {
                 console.error(e);
                 showToast('ไม่สามารถเปิด Scriptable อัตโนมัติได้ ให้ใช้ปุ่มคัดลอกโค้ดแทน', 'error');
@@ -6582,9 +6609,9 @@
         async function downloadScriptableJs() {
             try {
                 const scriptCode = await buildScriptableWidgetCodeForUser();
-                const ok = downloadFileBlob('smart-schedule-widget.js', 'application/javascript;charset=utf-8', scriptCode);
+                const ok = downloadFileBlob('SmartSchedule.js', 'application/javascript;charset=utf-8', scriptCode);
                 if (ok) {
-                    showToast('ดาวน์โหลดไฟล์ smart-schedule-widget.js พร้อมตารางเรียนล่าสุดของคุณแล้ว!', 'success');
+                    showToast('ดาวน์โหลดไฟล์ SmartSchedule.js พร้อมตารางเรียนล่าสุดของคุณแล้ว!', 'success');
                 }
             } catch (e) {
                 console.error(e);
@@ -7102,15 +7129,15 @@
                     <div class="bg-slate-900/80 rounded-xl p-3 space-y-2 border border-slate-800 text-xs">
                         <div class="flex items-start gap-2 text-slate-300">
                             <span class="text-amber-400 font-bold shrink-0">สเต็ป 1:</span>
-                            <span>ติดตั้งแอป <strong class="text-white">Scriptable</strong> จาก App Store (ค้นหาใน App Store หรือติดตั้งฟรี 100%)</span>
+                            <span>ติดตั้งแอป <strong class="text-white">Scriptable</strong> จาก App Store (ฟรี 100%)</span>
                         </div>
                         <div class="flex items-start gap-2 text-slate-300">
                             <span class="text-amber-400 font-bold shrink-0">สเต็ป 2:</span>
-                            <span>กดปุ่ม <strong class="text-amber-300">"คัดลอกโค้ด Scriptable"</strong> ด้านล่าง (ระบบจะฝังข้อมูลตารางเรียนปัจจุบันให้ในตัวสคริปต์ทันที)</span>
+                            <span>กดปุ่ม <strong class="text-amber-300">"คัดลอกโค้ด + เปิดสร้างสคริปต์ใหม่"</strong> ด้านล่าง (ระบบจะ Copy โค้ดตารางเรียนล่าสุดให้ทันที พร้อมสลับไปที่ Scriptable)</span>
                         </div>
                         <div class="flex items-start gap-2 text-slate-300">
                             <span class="text-amber-400 font-bold shrink-0">สเต็ป 3:</span>
-                            <span>เปิดแอป Scriptable แตะเครื่องหมาย <strong class="text-white">+</strong> (ขวาบน) ตั้งชื่อสคริปต์ว่า <strong class="text-sky-300">SmartSchedule</strong> แล้ววาง (Paste) โค้ดลงไปแล้วกด Done</span>
+                            <span>เมื่อหน้าจอ Scriptable เปิดขึ้นมา (หน้า Untitled ว่างๆ) ให้ <strong class="text-white">แตะค้างที่ว่าง แล้วกด "วาง (Paste)"</strong> จากนั้นแตะชื่อด้านบนเปลี่ยนเป็น <strong class="text-sky-300">SmartSchedule</strong> แล้วกด <strong>Done</strong></span>
                         </div>
                         <div class="flex items-start gap-2 text-slate-300">
                             <span class="text-amber-400 font-bold shrink-0">สเต็ป 4:</span>
@@ -7120,17 +7147,21 @@
 
                     <!-- Action Buttons -->
                     <div class="flex flex-wrap items-center gap-2 pt-1">
-                        <button type="button" onclick="openInScriptable()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs transition-all shadow-lg flex items-center gap-2 active:scale-95">
-                            <i class="fa-solid fa-bolt"></i>
-                            <span>เปิดและอัปเดตใน Scriptable ทันที (1 คลิก)</span>
+                        <button type="button" onclick="openInScriptable('new')" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs transition-all shadow-lg flex items-center gap-2 active:scale-95">
+                            <i class="fa-solid fa-copy"></i>
+                            <span>คัดลอกโค้ด + เปิดสร้างสคริปต์ใหม่</span>
+                        </button>
+                        <button type="button" onclick="openInScriptable('existing')" class="px-3.5 py-2.5 rounded-xl bg-sky-950/70 hover:bg-sky-900 border border-sky-500/40 text-sky-200 text-xs font-medium transition-all flex items-center gap-1.5 active:scale-95" title="สำหรับผู้ที่เคยสร้างสคริปต์ SmartSchedule ไว้แล้ว">
+                            <i class="fa-solid fa-arrow-rotate-right text-sky-400"></i>
+                            <span>อัปเดตสคริปต์เดิม</span>
                         </button>
                         <button type="button" onclick="copyScriptableWidgetCode()" class="px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-medium transition-all flex items-center gap-1.5 active:scale-95">
                             <i class="fa-solid fa-copy text-amber-400"></i>
-                            <span>คัดลอกโค้ด</span>
+                            <span>คัดลอกโค้ดอย่างเดียว</span>
                         </button>
                         <button type="button" onclick="downloadScriptableJs()" class="px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-medium transition-all flex items-center gap-1.5 active:scale-95">
-                            <i class="fa-solid fa-download text-sky-400"></i>
-                            <span>โหลดไฟล์ .js</span>
+                            <i class="fa-solid fa-download text-emerald-400"></i>
+                            <span>โหลดไฟล์ SmartSchedule.js</span>
                         </button>
                     </div>
                 </div>
