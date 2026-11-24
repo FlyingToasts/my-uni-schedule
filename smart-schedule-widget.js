@@ -7,13 +7,19 @@
  * Smart Schedule iOS Widget (Scriptable)
  * สำหรับ iPhone และ iPad
  * รองรับ Widget ขนาด Medium (4x2 แนวนอน), Small (2x2), และ Large (4x4)
+ * 
+ * รูปแบบการจัดวางขนาด Medium (4x2 แนวนอน):
+ * - CURRENT CLASS: แถบแนวนอนด้านบน (กว้าง 3/4 หรือเต็มพื้นที่)
+ * - NEXT CLASS: แถบแนวนอนด้านล่าง (กว้าง 3/4 หรือเต็มพื้นที่)
+ * - TASKS: แถบแนวตั้งด้านขวา (กว้าง 1/4 ของ Widget แบ่ง 1 กล่องต่อนึง task)
+ * - ซ่อนแถบ TASKS อัตโนมัติเมื่อไม่มีงานค้าง เพื่อให้ CURRENT และ NEXT ขยายเต็มความกว้าง
  */
 
 // --- CONFIGURATION ---
 const APP_URL = "https://flyingtoasts.github.io/my-uni-schedule/"; // URL ของเว็บแอปเพื่อเปิดเมื่อแตะ Widget
-const REMOTE_DATA_URL = args.widgetParameter || ""; // ใส่ URL JSON ตารางเรียนของคุณ หรือใส่ในช่อง Parameter ของ Widget
+const REMOTE_DATA_URL = (args.widgetParameter || "").trim(); // ใส่ URL JSON ตารางเรียนของคุณ หรือใส่ในช่อง Parameter ของ Widget
 
-// ข้อมูลเริ่มต้นสำหรับกรณีที่ยังไม่ได้ใส่ URL หรือออฟไลน์
+// ข้อมูลเริ่มต้น (จะถูกแทนที่ด้วยข้อมูลจริงของผู้ใช้เมื่อกดจากในเว็บแอป)
 const DEFAULT_PAYLOAD = {
   "updatedAt": new Date().toISOString(),
   "sessions": [
@@ -47,8 +53,9 @@ const DEFAULT_PAYLOAD = {
   ],
   "tasks": [
     { "title": "ส่งแบบฝึกหัดเขียนแบบ", "date": "2026-11-26", "badge": "ส่งงาน", "color": "#f59e0b" },
-    { "title": "อ่านสอบกลางภาค Phys II", "date": "2026-11-28", "badge": "สอบ", "color": "#f43f5e" }
-  ]
+    { "title": "อ่านสอบกลางภาค Phys II", "date": "2026-11-28", "badge": "สอบกลางภาค", "color": "#f43f5e" }
+  ],
+  "exams": []
 };
 
 // --- DATA FETCHING & CACHE ---
@@ -57,11 +64,11 @@ const cacheDir = fm.documentsDirectory();
 const cacheFile = fm.joinPath(cacheDir, "smart_schedule_ios_cache.json");
 
 async function loadSchedulePayload() {
-  let url = REMOTE_DATA_URL.trim();
+  let url = REMOTE_DATA_URL;
   if (url) {
     try {
       let req = new Request(url);
-      req.timeoutInterval = 6;
+      req.timeoutInterval = 8;
       let data = await req.loadJSON();
       if (data && (data.sessions || data.scheduleData)) {
         fm.writeString(cacheFile, JSON.stringify(data));
@@ -92,14 +99,32 @@ function getBangkokNow() {
   return new Date();
 }
 
+function parseTimeToMinutes(tStr) {
+  if (!tStr) return 0;
+  let p = tStr.split(":");
+  return parseInt(p[0], 10) * 60 + parseInt(p[1], 10);
+}
+
 function normalizePayload(raw) {
   let sessions = [];
   let tasks = [];
+  let exams = [];
+
+  let now = getBangkokNow();
+  let todayIso = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
   if (Array.isArray(raw.sessions)) {
     sessions = raw.sessions;
-  } else if (Array.isArray(raw.scheduleData)) {
-    // รองรับกรณีส่งตรงจาก scheduleData ของเว็บแอป
+  }
+  if (Array.isArray(raw.tasks)) {
+    tasks = raw.tasks;
+  }
+  if (Array.isArray(raw.exams)) {
+    exams = raw.exams;
+  }
+
+  // หากเป็นก้อน scheduleData ดั้งเดิมจากเว็บแอป
+  if (Array.isArray(raw.scheduleData)) {
     raw.scheduleData.forEach(c => {
       if (c.day !== undefined && c.start && c.end) {
         sessions.push({
@@ -127,11 +152,12 @@ function normalizePayload(raw) {
           }
         });
       }
+      // ดึงการบ้าน/งาน
       if (Array.isArray(c.notes)) {
         c.notes.forEach(n => {
           if (!n.done && n.date) {
             tasks.push({
-              title: n.text || "งานวิชา " + (c.code || c.name),
+              title: n.text || ("งาน " + (c.code || c.name)),
               date: n.date,
               badge: n.type === "homework" ? "ส่งงาน" : (n.type === "cancel" ? "งดคลาส" : "ประกาศ"),
               color: n.type === "homework" ? "#f59e0b" : "#38bdf8"
@@ -139,44 +165,65 @@ function normalizePayload(raw) {
           }
         });
       }
+      // ดึงตารางสอบ
+      if (c.exams) {
+        ['midterm', 'final'].forEach(t => {
+          let ex = c.exams[t];
+          if (ex && ex.date && ex.start) {
+            let exLabel = t === 'midterm' ? "สอบกลางภาค" : "สอบปลายภาค";
+            exams.push({
+              code: c.code || "",
+              name: c.name || "",
+              room: ex.room || "",
+              start: ex.start,
+              end: ex.end || ex.start,
+              date: ex.date,
+              badge: exLabel,
+              color: "#f43f5e"
+            });
+            tasks.push({
+              title: `สอบ ${c.code || c.name} (${t === 'midterm' ? 'กลางภาค' : 'ปลายภาค'})`,
+              date: ex.date,
+              badge: exLabel,
+              color: "#f43f5e"
+            });
+          }
+        });
+      }
     });
   }
 
-  if (Array.isArray(raw.tasks)) {
-    tasks = raw.tasks;
-  }
+  // กรองงานและสอบที่ยังไม่หมดอายุ (วันนี้เป็นต้นไป)
+  tasks = tasks.filter(t => !t.date || t.date >= todayIso);
+  tasks.sort((a, b) => (a.date || "").localeCompare(b.date || ""));
 
-  return { sessions, tasks };
+  return { sessions, tasks, exams };
 }
 
-function parseTimeToMinutes(tStr) {
-  if (!tStr) return 0;
-  let p = tStr.split(":");
-  return parseInt(p[0], 10) * 60 + parseInt(p[1], 10);
-}
-
-function findCurrentAndNextSession(sessions) {
+function findCurrentAndNextSession(sessions, exams = []) {
   let now = getBangkokNow();
-  let currentDay = now.getDay(); // 0 = อาทิตย์, 1 = จันทร์, ...
+  let currentDay = now.getDay();
   let currentMinutes = now.getHours() * 60 + now.getMinutes();
 
   let current = null;
   let next = null;
 
-  // 1. ค้นหาคาบที่กำลังเรียนอยู่ตอนนี้
+  // 1. ค้นหาคาบเรียนที่กำลังเรียนอยู่ตอนนี้
   for (let s of sessions) {
     if (s.day === currentDay) {
       let sMin = parseTimeToMinutes(s.start);
       let eMin = parseTimeToMinutes(s.end);
       if (currentMinutes >= sMin && currentMinutes < eMin) {
-        current = s;
+        current = Object.assign({}, s);
+        current.isExam = false;
         break;
       }
     }
   }
 
-  // 2. ค้นหาคาบถัดไปที่ใกล้ที่สุด
+  // 2. ค้นหาคาบถัดไปที่ใกล้ที่สุด (วิชาเรียน + วันสอบ)
   let candidates = [];
+
   for (let s of sessions) {
     let diffDays = (s.day - currentDay + 7) % 7;
     let sMin = parseTimeToMinutes(s.start);
@@ -184,7 +231,48 @@ function findCurrentAndNextSession(sessions) {
       diffDays = 7; // ผ่านไปแล้วในวันนี้ ให้เป็นสัปดาห์หน้า
     }
     let totalScore = diffDays * 1440 + sMin;
-    candidates.push({ session: s, diffDays, score: totalScore });
+    candidates.push({
+      session: {
+        code: s.code,
+        name: s.name,
+        room: s.room,
+        start: s.start,
+        end: s.end,
+        day: s.day,
+        isExam: false
+      },
+      diffDays,
+      score: totalScore
+    });
+  }
+
+  // รวมวันสอบที่ใกล้จะถึง
+  if (Array.isArray(exams)) {
+    for (let ex of exams) {
+      if (ex.date && ex.start) {
+        let exDate = new Date(ex.date + "T" + ex.start + ":00");
+        let diffMs = exDate.getTime() - now.getTime();
+        if (diffMs > 0) {
+          let diffDays = Math.floor(diffMs / (24 * 3600 * 1000));
+          let sMin = parseTimeToMinutes(ex.start);
+          let totalScore = diffDays * 1440 + sMin;
+          candidates.push({
+            session: {
+              code: ex.code,
+              name: `[${ex.badge || 'สอบ'}] ${ex.name}`,
+              room: ex.room || 'ยังไม่ระบุห้องสอบ',
+              start: ex.start,
+              end: ex.end || ex.start,
+              date: ex.date,
+              day: exDate.getDay(),
+              isExam: true
+            },
+            diffDays,
+            score: totalScore
+          });
+        }
+      }
+    }
   }
 
   candidates.sort((a, b) => a.score - b.score);
@@ -199,8 +287,8 @@ function findCurrentAndNextSession(sessions) {
 // --- WIDGET BUILDER ---
 async function createWidget() {
   let raw = await loadSchedulePayload();
-  let { sessions, tasks } = normalizePayload(raw);
-  let { current, next } = findCurrentAndNextSession(sessions);
+  let { sessions, tasks, exams } = normalizePayload(raw);
+  let { current, next } = findCurrentAndNextSession(sessions, exams);
 
   let now = getBangkokNow();
   let dateThai = `${THAI_DAYS_SHORT[now.getDay()]} ${now.getDate()} ${THAI_MONTHS[now.getMonth()]}`;
@@ -208,7 +296,7 @@ async function createWidget() {
   let widget = new ListWidget();
   widget.backgroundColor = new Color("#090d16");
   widget.url = APP_URL;
-  widget.setPadding(12, 14, 12, 14);
+  widget.setPadding(9, 11, 9, 11);
 
   let family = config.widgetFamily || "medium";
 
@@ -218,189 +306,233 @@ async function createWidget() {
   headerRow.centerAlignContent();
 
   let dot = headerRow.addText("● ");
-  dot.font = Font.systemFont(10);
+  dot.font = Font.systemFont(9);
   dot.textColor = new Color("#38bdf8");
 
   let appTitle = headerRow.addText("Smart Schedule");
-  appTitle.font = Font.boldSystemFont(11);
+  appTitle.font = Font.boldSystemFont(10.5);
   appTitle.textColor = new Color("#e2e8f0");
 
   headerRow.addSpacer();
 
   let dateText = headerRow.addText(dateThai);
-  dateText.font = Font.mediumSystemFont(11);
+  dateText.font = Font.mediumSystemFont(10.5);
   dateText.textColor = new Color("#94a3b8");
 
-  widget.addSpacer(8);
+  widget.addSpacer(6);
 
   // --- BODY LAYOUT BY WIDGET SIZE ---
   if (family === "small") {
-    // ขนาดเล็ก (2x2)
     renderSmallWidget(widget, current, next);
   } else if (family === "large") {
-    // ขนาดใหญ่ (4x4)
     renderLargeWidget(widget, current, next, tasks, sessions, now);
   } else {
-    // ขนาดกลาง (4x2 แนวนอน) - ดีไซน์สไตล์ Android Widget
+    // 4x2 แนวนอน: CURRENT CLASS (แถบบน) | NEXT CLASS (แถบล่าง) | TASKS (แถบขวา 1/4)
     renderMediumWidget(widget, current, next, tasks);
   }
 
   return widget;
 }
 
-// 4x2 แนวนอน: CURRENT CLASS (ซ้าย) | NEXT CLASS (กลาง) | TASKS (ขวา 1/4)
+// ขนาดกลาง (4x2 แนวนอน)
 function renderMediumWidget(widget, current, next, tasks) {
-  let mainRow = widget.addStack();
-  mainRow.layoutHorizontally();
-  mainRow.spacing = 8;
+  let bodyRow = widget.addStack();
+  bodyRow.layoutHorizontally();
+  bodyRow.spacing = 6;
 
   let hasTasks = tasks && tasks.length > 0;
 
-  // กล่อง 1: CURRENT CLASS
-  let currentCard = mainRow.addStack();
-  currentCard.layoutVertically();
-  currentCard.backgroundColor = new Color("#131d2e");
-  currentCard.cornerRadius = 12;
-  currentCard.borderWidth = 1;
-  currentCard.borderColor = new Color("#1e2e4a");
-  currentCard.setPadding(8, 10, 8, 10);
+  // ฝั่งซ้าย: CURRENT CLASS (บน) + NEXT CLASS (ล่าง)
+  let leftCol = bodyRow.addStack();
+  leftCol.layoutVertically();
+  leftCol.spacing = 5;
 
-  let curHeader = currentCard.addStack();
+  // ----------------------------------------------------
+  // กล่อง 1: CURRENT CLASS (แถบแนวนอนด้านบน)
+  // ----------------------------------------------------
+  let curBox = leftCol.addStack();
+  curBox.layoutVertically();
+  curBox.backgroundColor = new Color("#131d2e");
+  curBox.cornerRadius = 10;
+  curBox.borderWidth = 1;
+  curBox.borderColor = new Color("#1e2e4a");
+  curBox.setPadding(5, 8, 5, 8);
+
+  let curHeader = curBox.addStack();
   curHeader.layoutHorizontally();
-  let curLabel = curHeader.addText("CURRENT CLASS");
-  curLabel.font = Font.boldSystemFont(9);
-  curLabel.textColor = new Color("#38bdf8");
+  curHeader.centerAlignContent();
+
+  let curTitle = curHeader.addText(current && current.isExam ? "CURRENT EXAM" : "CURRENT CLASS");
+  curTitle.font = Font.boldSystemFont(8.5);
+  curTitle.textColor = new Color("#38bdf8");
+
   curHeader.addSpacer();
 
-  let curBadge = curHeader.addText(current ? "● IN CLASS" : "○ FREE");
+  let curBadge = curHeader.addText(current ? (current.isExam ? "● IN EXAM" : "● IN CLASS") : "○ FREE");
   curBadge.font = Font.boldSystemFont(8);
   curBadge.textColor = current ? new Color("#34d399") : new Color("#94a3b8");
 
-  currentCard.addSpacer(4);
+  curBox.addSpacer(2);
 
   if (current) {
-    let codeText = currentCard.addText(current.code || "วิชาเรียน");
-    codeText.font = Font.boldSystemFont(11);
-    codeText.textColor = Color.white();
-    codeText.lineLimit = 1;
+    let curNameLine = curBox.addText(`${current.code ? current.code + ' ' : ''}${current.name}`);
+    curNameLine.font = Font.boldSystemFont(10.5);
+    curNameLine.textColor = Color.white();
+    curNameLine.lineLimit = 1;
 
-    let nameText = currentCard.addText(current.name || "");
-    nameText.font = Font.systemFont(10);
-    nameText.textColor = new Color("#cbd5e1");
-    nameText.lineLimit = 1;
+    let curDetailLine = curBox.addStack();
+    curDetailLine.layoutHorizontally();
+    curDetailLine.centerAlignContent();
 
-    currentCard.addSpacer();
-
-    let timeText = currentCard.addText(`⏰ ${current.start} - ${current.end}`);
-    timeText.font = Font.mediumSystemFont(9);
-    timeText.textColor = new Color("#fbbf24");
-    timeText.lineLimit = 1;
+    let curTime = curDetailLine.addText(`⏰ ${current.start} - ${current.end}`);
+    curTime.font = Font.mediumSystemFont(8.5);
+    curTime.textColor = new Color("#fbbf24");
 
     if (current.room) {
-      let roomText = currentCard.addText(`📍 ${current.room}`);
-      roomText.font = Font.systemFont(9);
-      roomText.textColor = new Color("#94a3b8");
-      roomText.lineLimit = 1;
+      let sep = curDetailLine.addText("  •  ");
+      sep.font = Font.systemFont(8.5);
+      sep.textColor = new Color("#64748b");
+
+      let curRoom = curDetailLine.addText(`📍 ห้อง ${current.room}`);
+      curRoom.font = Font.systemFont(8.5);
+      curRoom.textColor = new Color("#94a3b8");
+      curRoom.lineLimit = 1;
     }
   } else {
-    currentCard.addSpacer();
-    let freeTitle = currentCard.addText("ไม่มีคาบเรียนในขณะนี้");
-    freeTitle.font = Font.mediumSystemFont(10);
-    freeTitle.textColor = new Color("#e2e8f0");
-    freeTitle.lineLimit = 1;
+    let freeRow = curBox.addStack();
+    freeRow.layoutHorizontally();
+    freeRow.centerAlignContent();
 
-    let freeSub = currentCard.addText("มีเวลาพักผ่อนแล้ว ✨");
-    freeSub.font = Font.systemFont(9);
+    let freeTitle = freeRow.addText("ไม่มีคาบเรียนในขณะนี้");
+    freeTitle.font = Font.mediumSystemFont(9.5);
+    freeTitle.textColor = new Color("#e2e8f0");
+
+    let freeSep = freeRow.addText("  •  ");
+    freeSep.font = Font.systemFont(8.5);
+    freeSep.textColor = new Color("#64748b");
+
+    let freeSub = freeRow.addText("มีเวลาพักผ่อนแล้ว ✨");
+    freeSub.font = Font.systemFont(8.5);
     freeSub.textColor = new Color("#94a3b8");
-    currentCard.addSpacer();
   }
 
-  // กล่อง 2: NEXT CLASS
-  let nextCard = mainRow.addStack();
-  nextCard.layoutVertically();
-  nextCard.backgroundColor = new Color("#131d2e");
-  nextCard.cornerRadius = 12;
-  nextCard.borderWidth = 1;
-  nextCard.borderColor = new Color("#1e2e4a");
-  nextCard.setPadding(8, 10, 8, 10);
+  // ----------------------------------------------------
+  // กล่อง 2: NEXT CLASS (แถบแนวนอนด้านล่าง)
+  // ----------------------------------------------------
+  let nextBox = leftCol.addStack();
+  nextBox.layoutVertically();
+  nextBox.backgroundColor = new Color("#131d2e");
+  nextBox.cornerRadius = 10;
+  nextBox.borderWidth = 1;
+  nextBox.borderColor = new Color("#1e2e4a");
+  nextBox.setPadding(5, 8, 5, 8);
 
-  let nextLabel = nextCard.addText("NEXT CLASS");
-  nextLabel.font = Font.boldSystemFont(9);
+  let nextHeader = nextBox.addStack();
+  nextHeader.layoutHorizontally();
+  nextHeader.centerAlignContent();
+
+  let nextLabel = nextHeader.addText(next && next.isExam ? "NEXT EXAM" : "NEXT CLASS");
+  nextLabel.font = Font.boldSystemFont(8.5);
   nextLabel.textColor = new Color("#94a3b8");
 
-  nextCard.addSpacer(4);
+  nextHeader.addSpacer();
 
   if (next) {
-    let nextCode = nextCard.addText(next.code ? `${next.code} ${next.name}` : next.name);
-    nextCode.font = Font.boldSystemFont(11);
-    nextCode.textColor = Color.white();
-    nextCode.lineLimit = 2;
+    let dayStr = "";
+    if (next.diffDays === 0) dayStr = "วันนี้";
+    else if (next.diffDays === 1) dayStr = "พรุ่งนี้";
+    else if (next.day !== undefined) dayStr = THAI_DAYS[next.day];
+    else if (next.date) dayStr = next.date.slice(5);
 
-    nextCard.addSpacer();
+    let nextDayText = nextHeader.addText(dayStr);
+    nextDayText.font = Font.mediumSystemFont(8);
+    nextDayText.textColor = new Color("#cbd5e1");
+  }
 
-    let dayStr = next.diffDays === 0 ? "วันนี้" : (next.diffDays === 1 ? "พรุ่งนี้" : THAI_DAYS[next.day]);
-    let nextTime = nextCard.addText(`${dayStr} • ⏰ ${next.start} - ${next.end}`);
-    nextTime.font = Font.mediumSystemFont(9);
+  nextBox.addSpacer(2);
+
+  if (next) {
+    let nextNameLine = nextBox.addText(`${next.code ? next.code + ' ' : ''}${next.name}`);
+    nextNameLine.font = Font.boldSystemFont(10.5);
+    nextNameLine.textColor = Color.white();
+    nextNameLine.lineLimit = 1;
+
+    let nextDetailLine = nextBox.addStack();
+    nextDetailLine.layoutHorizontally();
+    nextDetailLine.centerAlignContent();
+
+    let nextTime = nextDetailLine.addText(`⏰ ${next.start} - ${next.end}`);
+    nextTime.font = Font.mediumSystemFont(8.5);
     nextTime.textColor = new Color("#fbbf24");
-    nextTime.lineLimit = 1;
 
     if (next.room) {
-      let nextRoom = nextCard.addText(`📍 ห้อง ${next.room}`);
-      nextRoom.font = Font.systemFont(9);
+      let sep = nextDetailLine.addText("  •  ");
+      sep.font = Font.systemFont(8.5);
+      sep.textColor = new Color("#64748b");
+
+      let nextRoom = nextDetailLine.addText(`📍 ห้อง ${next.room}`);
+      nextRoom.font = Font.systemFont(8.5);
       nextRoom.textColor = new Color("#94a3b8");
       nextRoom.lineLimit = 1;
     }
   } else {
-    nextCard.addSpacer();
-    let noNext = nextCard.addText("ไม่มีข้อมูลคาบถัดไป");
-    noNext.font = Font.systemFont(10);
+    let noNext = nextBox.addText("ไม่มีข้อมูลคาบถัดไป");
+    noNext.font = Font.systemFont(9.5);
     noNext.textColor = new Color("#64748b");
-    nextCard.addSpacer();
   }
 
-  // กล่อง 3: TASKS (กินพื้นที่ 1/4 ทางขวา แสดงเฉพาะเมื่อมีงาน)
+  // ----------------------------------------------------
+  // กล่อง 3: TASKS (แถบแนวตั้งด้านขวา 1/4 ของ Widget)
+  // ซ่อนอัตโนมัติหากไม่มีงานค้าง
+  // ----------------------------------------------------
   if (hasTasks) {
-    let taskCard = mainRow.addStack();
-    taskCard.layoutVertically();
-    taskCard.backgroundColor = new Color("#131d2e");
-    taskCard.cornerRadius = 12;
-    taskCard.borderWidth = 1;
-    taskCard.borderColor = new Color("#1e2e4a");
-    taskCard.setPadding(8, 8, 8, 8);
+    let taskBox = bodyRow.addStack();
+    taskBox.layoutVertically();
+    taskBox.backgroundColor = new Color("#131d2e");
+    taskBox.cornerRadius = 10;
+    taskBox.borderWidth = 1;
+    taskBox.borderColor = new Color("#1e2e4a");
+    taskBox.setPadding(5, 6, 5, 6);
+    taskBox.size = new Size(82, 0); // คุมความกว้าง 1/4 ประมาณ 82pt
 
-    let taskHeader = taskCard.addStack();
+    let taskHeader = taskBox.addStack();
     taskHeader.layoutHorizontally();
+    taskHeader.centerAlignContent();
+
     let taskTitle = taskHeader.addText("TASKS");
-    taskTitle.font = Font.boldSystemFont(9);
+    taskTitle.font = Font.boldSystemFont(8.5);
     taskTitle.textColor = new Color("#f59e0b");
+
     taskHeader.addSpacer();
 
     let taskCount = taskHeader.addText(String(tasks.length));
-    taskCount.font = Font.boldSystemFont(9);
+    taskCount.font = Font.boldSystemFont(8);
     taskCount.textColor = new Color("#fbbf24");
 
-    taskCard.addSpacer(4);
+    taskBox.addSpacer(3);
 
     let displayTasks = tasks.slice(0, 2);
     for (let t of displayTasks) {
-      let tRow = taskCard.addStack();
-      tRow.layoutVertically();
-      tRow.backgroundColor = new Color("#1a263c");
-      tRow.cornerRadius = 6;
-      tRow.setPadding(3, 4, 3, 4);
+      let itemCard = taskBox.addStack();
+      itemCard.layoutVertically();
+      itemCard.backgroundColor = new Color("#1a263c");
+      itemCard.cornerRadius = 6;
+      itemCard.setPadding(3, 4, 3, 4);
 
-      let tText = tRow.addText(t.title);
-      tText.font = Font.mediumSystemFont(8);
+      let tText = itemCard.addText(t.title);
+      tText.font = Font.mediumSystemFont(7.5);
       tText.textColor = Color.white();
       tText.lineLimit = 1;
 
       if (t.date) {
-        let tDate = tRow.addText(t.badge ? `[${t.badge}] ${t.date.slice(5)}` : t.date.slice(5));
+        let dateLabel = t.badge ? `[${t.badge}] ${t.date.slice(5)}` : t.date.slice(5);
+        let tDate = itemCard.addText(dateLabel);
         tDate.font = Font.systemFont(7);
         tDate.textColor = new Color(t.color || "#38bdf8");
+        tDate.lineLimit = 1;
       }
 
-      taskCard.addSpacer(2);
+      taskBox.addSpacer(2);
     }
   }
 }
@@ -409,15 +541,15 @@ function renderMediumWidget(widget, current, next, tasks) {
 function renderSmallWidget(widget, current, next) {
   let body = widget.addStack();
   body.layoutVertically();
-  body.spacing = 4;
+  body.spacing = 3;
 
   let curHeader = body.addText(current ? "🟢 กำลังเรียน" : "⚪ ไม่มีเรียนขณะนี้");
-  curHeader.font = Font.boldSystemFont(9);
+  curHeader.font = Font.boldSystemFont(8.5);
   curHeader.textColor = current ? new Color("#34d399") : new Color("#94a3b8");
 
   if (current) {
-    let curTitle = body.addText(`${current.code} ${current.name}`);
-    curTitle.font = Font.boldSystemFont(10);
+    let curTitle = body.addText(`${current.code ? current.code + ' ' : ''}${current.name}`);
+    curTitle.font = Font.boldSystemFont(9.5);
     curTitle.textColor = Color.white();
     curTitle.lineLimit = 1;
 
@@ -425,30 +557,30 @@ function renderSmallWidget(widget, current, next) {
     curTime.font = Font.systemFont(8);
     curTime.textColor = new Color("#94a3b8");
   } else {
-    let free = body.addText("มีเวลาพักผ่อน");
-    free.font = Font.systemFont(9);
+    let free = body.addText("มีเวลาพักผ่อน ✨");
+    free.font = Font.systemFont(8.5);
     free.textColor = new Color("#64748b");
   }
 
-  body.addSpacer(4);
+  body.addSpacer(3);
 
-  let nextHeader = body.addText("🟡 คาบถัดไป");
-  nextHeader.font = Font.boldSystemFont(9);
-  nextHeader.textColor = new Color("#fbbf24");
+  let nextHeader = body.addText(next && next.isExam ? "🔴 สอบถัดไป" : "🟡 คาบถัดไป");
+  nextHeader.font = Font.boldSystemFont(8.5);
+  nextHeader.textColor = next && next.isExam ? new Color("#f43f5e") : new Color("#fbbf24");
 
   if (next) {
-    let nextTitle = body.addText(`${next.code} ${next.name}`);
-    nextTitle.font = Font.boldSystemFont(10);
+    let nextTitle = body.addText(`${next.code ? next.code + ' ' : ''}${next.name}`);
+    nextTitle.font = Font.boldSystemFont(9.5);
     nextTitle.textColor = Color.white();
     nextTitle.lineLimit = 1;
 
-    let dayStr = next.diffDays === 0 ? "วันนี้" : THAI_DAYS[next.day];
+    let dayStr = next.diffDays === 0 ? "วันนี้" : (next.diffDays === 1 ? "พรุ่งนี้" : THAI_DAYS[next.day]);
     let nextTime = body.addText(`${dayStr} ${next.start} · ${next.room || ""}`);
     nextTime.font = Font.systemFont(8);
     nextTime.textColor = new Color("#94a3b8");
   } else {
     let noNext = body.addText("ไม่มีข้อมูล");
-    noNext.font = Font.systemFont(9);
+    noNext.font = Font.systemFont(8.5);
     noNext.textColor = new Color("#64748b");
   }
 }
@@ -457,10 +589,10 @@ function renderSmallWidget(widget, current, next) {
 function renderLargeWidget(widget, current, next, tasks, sessions, now) {
   renderMediumWidget(widget, current, next, tasks);
 
-  widget.addSpacer(10);
+  widget.addSpacer(8);
 
   let listHeader = widget.addText("ตารางเรียนวันนี้ทั้งหมด");
-  listHeader.font = Font.boldSystemFont(11);
+  listHeader.font = Font.boldSystemFont(10.5);
   listHeader.textColor = new Color("#e2e8f0");
 
   widget.addSpacer(4);
@@ -470,7 +602,7 @@ function renderLargeWidget(widget, current, next, tasks, sessions, now) {
 
   if (todaySessions.length === 0) {
     let empty = widget.addText("วันนี้ไม่มีคาบเรียน พักผ่อนได้เต็มที่ 🎉");
-    empty.font = Font.systemFont(10);
+    empty.font = Font.systemFont(9.5);
     empty.textColor = new Color("#64748b");
   } else {
     for (let s of todaySessions.slice(0, 4)) {
@@ -478,16 +610,16 @@ function renderLargeWidget(widget, current, next, tasks, sessions, now) {
       row.layoutHorizontally();
       row.backgroundColor = new Color("#131d2e");
       row.cornerRadius = 8;
-      row.setPadding(4, 8, 4, 8);
+      row.setPadding(4, 7, 4, 7);
 
       let time = row.addText(`${s.start}-${s.end}`);
-      time.font = Font.mediumSystemFont(9);
+      time.font = Font.mediumSystemFont(8.5);
       time.textColor = new Color("#38bdf8");
 
-      row.addSpacer(8);
+      row.addSpacer(6);
 
       let title = row.addText(`${s.code} ${s.name}`);
-      title.font = Font.systemFont(9);
+      title.font = Font.systemFont(8.5);
       title.textColor = Color.white();
       title.lineLimit = 1;
 
