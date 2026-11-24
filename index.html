@@ -6392,7 +6392,44 @@
         }
 
         // --- IOS WIDGET & SCRIPTABLE INTEGRATION ---
+        function updateIosWidgetDataSummary() {
+            const summaryEl = document.getElementById('ios-widget-data-summary');
+            if (!summaryEl) return;
+
+            const cCount = Array.isArray(scheduleData) ? scheduleData.length : 0;
+            let taskCount = 0;
+            if (Array.isArray(scheduleData)) {
+                scheduleData.forEach(c => {
+                    getCourseNotes(c).forEach(n => { if (!n.done && n.date) taskCount++; });
+                    if (c.exams) {
+                        if (c.exams.midterm && c.exams.midterm.date) taskCount++;
+                        if (c.exams.final && c.exams.final.date) taskCount++;
+                    }
+                });
+            }
+
+            if (cCount > 0) {
+                summaryEl.className = 'bg-emerald-950/40 border border-emerald-500/40 rounded-xl p-3 text-xs text-emerald-200 flex items-center justify-between flex-wrap gap-2';
+                summaryEl.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+                        <span><strong>พร้อมซิงก์:</strong> มีตารางเรียน <strong>${cCount}</strong> รายวิชา และงาน/สอบค้าง <strong>${taskCount}</strong> รายการ</span>
+                    </div>
+                    <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/40">ข้อมูลสดในเครื่อง</span>
+                `;
+            } else {
+                summaryEl.className = 'bg-amber-950/40 border border-amber-500/40 rounded-xl p-3 text-xs text-amber-200 flex items-center justify-between flex-wrap gap-2';
+                summaryEl.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-400 text-sm"></i>
+                        <span><strong>ยังไม่มีรายวิชาในเครื่องนี้:</strong> กรุณากด "นำเข้า" ไฟล์ JSON หรือ "ซิงก์คลาวด์" ดึงข้อมูลมาก่อน</span>
+                    </div>
+                `;
+            }
+        }
+
         function openIosWidgetModal() {
+            updateIosWidgetDataSummary();
             const modal = document.getElementById('ios-widget-modal');
             if (modal) {
                 modal.classList.remove('hidden');
@@ -6408,91 +6445,144 @@
             }
         }
 
-        async function copyScriptableWidgetCode() {
-            try {
-                // สร้าง payload จากข้อมูลปัจจุบันในเครื่อง
-                const currentPayload = {
-                    updatedAt: new Date().toISOString(),
-                    sessions: [],
-                    tasks: []
-                };
+        async function buildScriptableWidgetCodeForUser() {
+            const currentPayload = {
+                updatedAt: new Date().toISOString(),
+                sessions: [],
+                tasks: [],
+                exams: []
+            };
 
-                if (Array.isArray(scheduleData)) {
-                    scheduleData.forEach(c => {
-                        if (c.day !== undefined && c.start && c.end) {
-                            currentPayload.sessions.push({
-                                day: Number(c.day),
-                                start: c.start,
-                                end: c.end,
-                                code: c.code || '',
-                                name: c.name || '',
-                                room: c.room || '',
-                                color: c.color || '#38bdf8'
-                            });
-                        }
-                        if (Array.isArray(c.extraSessions)) {
-                            c.extraSessions.forEach(ex => {
-                                if (ex.day !== undefined && ex.start && ex.end) {
-                                    currentPayload.sessions.push({
-                                        day: Number(ex.day),
-                                        start: ex.start,
-                                        end: ex.end,
-                                        code: c.code || '',
-                                        name: c.name || '',
-                                        room: ex.room || c.room || '',
-                                        color: c.color || '#38bdf8'
-                                    });
-                                }
-                            });
-                        }
-                        getCourseNotes(c).forEach(n => {
-                            if (!n.done && n.date) {
-                                currentPayload.tasks.push({
-                                    title: n.text || ('งาน ' + (c.code || c.name)),
-                                    date: n.date,
-                                    badge: n.type === 'homework' ? 'ส่งงาน' : (n.type === 'cancel' ? 'งดคลาส' : 'ประกาศ'),
-                                    color: n.type === 'homework' ? '#f59e0b' : '#38bdf8'
+            const now = new Date();
+            const todayIso = formatISODate(now);
+
+            if (Array.isArray(scheduleData) && scheduleData.length > 0) {
+                scheduleData.forEach(c => {
+                    if (c.day !== undefined && c.start && c.end) {
+                        currentPayload.sessions.push({
+                            day: Number(c.day),
+                            start: c.start,
+                            end: c.end,
+                            code: c.code || '',
+                            name: c.name || '',
+                            room: c.room || '',
+                            color: c.color || '#38bdf8'
+                        });
+                    }
+                    if (Array.isArray(c.extraSessions)) {
+                        c.extraSessions.forEach(ex => {
+                            if (ex.day !== undefined && ex.start && ex.end) {
+                                currentPayload.sessions.push({
+                                    day: Number(ex.day),
+                                    start: ex.start,
+                                    end: ex.end,
+                                    code: c.code || '',
+                                    name: c.name || '',
+                                    room: ex.room || c.room || '',
+                                    color: c.color || '#38bdf8'
                                 });
                             }
                         });
+                    }
+                    getCourseNotes(c).forEach(n => {
+                        if (!n.done && n.date) {
+                            currentPayload.tasks.push({
+                                title: n.text || ('งาน ' + (c.code || c.name)),
+                                date: n.date,
+                                badge: n.type === 'homework' ? 'ส่งงาน' : (n.type === 'cancel' ? 'งดคลาส' : 'ประกาศ'),
+                                color: n.type === 'homework' ? '#f59e0b' : '#38bdf8'
+                            });
+                        }
                     });
+                    if (c.exams) {
+                        ['midterm', 'final'].forEach(t => {
+                            const ex = c.exams[t];
+                            if (ex && ex.date && ex.start) {
+                                const exLabel = t === 'midterm' ? 'สอบกลางภาค' : 'สอบปลายภาค';
+                                currentPayload.exams.push({
+                                    code: c.code || '',
+                                    name: c.name || '',
+                                    room: ex.room || '',
+                                    start: ex.start,
+                                    end: ex.end || ex.start,
+                                    date: ex.date,
+                                    badge: exLabel,
+                                    color: '#f43f5e'
+                                });
+                                currentPayload.tasks.push({
+                                    title: `สอบ ${c.code || c.name} (${t === 'midterm' ? 'กลางภาค' : 'ปลายภาค'})`,
+                                    date: ex.date,
+                                    badge: exLabel,
+                                    color: '#f43f5e'
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+
+            // กรองงานและสอบที่ยังไม่หมดอายุ
+            currentPayload.tasks = currentPayload.tasks.filter(t => !t.date || t.date >= todayIso);
+            currentPayload.tasks.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+
+            let baseCode = '';
+            try {
+                const resp = await fetch('./smart-schedule-widget.js');
+                if (resp.ok) baseCode = await resp.text();
+            } catch (e) {}
+
+            const cleanAppUrl = window.location.href.split('#')[0].split('?')[0];
+
+            let scriptCode = baseCode;
+            if (scriptCode && scriptCode.includes('const DEFAULT_PAYLOAD =')) {
+                scriptCode = scriptCode.replace(
+                    /const APP_URL = .*?;/,
+                    `const APP_URL = "${cleanAppUrl}";`
+                );
+                scriptCode = scriptCode.replace(
+                    /const DEFAULT_PAYLOAD = [\s\S]*?;\r?\n\r?\n\/\/ --- DATA FETCHING/,
+                    `const DEFAULT_PAYLOAD = ${JSON.stringify(currentPayload, null, 2)};\r\n\r\n// --- DATA FETCHING`
+                );
+            }
+            return scriptCode;
+        }
+
+        async function openInScriptable() {
+            try {
+                const scriptCode = await buildScriptableWidgetCodeForUser();
+                if (!scriptCode) {
+                    showToast('เกิดข้อผิดพลาดในการสร้างสคริปต์', 'error');
+                    return;
                 }
+                const url = 'scriptable:///add?scriptName=' + encodeURIComponent('SmartSchedule') + '&script=' + encodeURIComponent(scriptCode);
+                window.location.href = url;
+                showToast('กำลังเปิดแอป Scriptable เพื่ออัปเดตสคริปต์ SmartSchedule...', 'info');
+            } catch (e) {
+                console.error(e);
+                showToast('ไม่สามารถเปิด Scriptable อัตโนมัติได้ ให้ใช้ปุ่มคัดลอกโค้ดแทน', 'error');
+            }
+        }
 
-                let scriptCode = '';
-                try {
-                    const resp = await fetch('./smart-schedule-widget.js');
-                    if (resp.ok) scriptCode = await resp.text();
-                } catch(e) {}
-
-                if (!scriptCode || !scriptCode.includes('const DEFAULT_PAYLOAD =')) {
-                    // ถ้า fetch ไม่สำเร็จ ให้สร้างสคริปต์สำรอง
-                    scriptCode = `// Smart Schedule iOS Widget (Scriptable)\nconst APP_URL = "${window.location.href.split('#')[0]}";\nconst DEFAULT_PAYLOAD = ${JSON.stringify(currentPayload, null, 2)};\n\n// กรุณาดูโค้ดเต็มในไฟล์ smart-schedule-widget.js\n`;
-                } else {
-                    // แทนที่ DEFAULT_PAYLOAD ด้วยข้อมูลตารางเรียนปัจจุบันของผู้ใช้
-                    scriptCode = scriptCode.replace(
-                        /const DEFAULT_PAYLOAD = [\s\S]*?;\n\n\/\/ --- DATA FETCHING/,
-                        `const DEFAULT_PAYLOAD = ${JSON.stringify(currentPayload, null, 2)};\n\n// --- DATA FETCHING`
-                    );
-                }
-
+        async function copyScriptableWidgetCode() {
+            try {
+                const scriptCode = await buildScriptableWidgetCodeForUser();
                 await navigator.clipboard.writeText(scriptCode);
-                showToast('คัดลอกโค้ด Scriptable (พร้อมข้อมูลตารางเรียนล่าสุด) แล้ว! นำไปวางในแอป Scriptable ได้เลย', 'success');
+                showToast('คัดลอกโค้ด Scriptable (พร้อมข้อมูลตารางเรียนล่าสุดของคุณ) แล้ว! นำไปวางในแอป Scriptable ได้เลย', 'success');
             } catch (err) {
                 console.error('Copy scriptable error:', err);
                 showToast('ไม่สามารถคัดลอกอัตโนมัติได้ ให้กดปุ่ม "โหลดไฟล์ .js" แทน', 'error');
             }
         }
 
-        function downloadScriptableJs() {
+        async function downloadScriptableJs() {
             try {
-                const a = document.createElement('a');
-                a.href = './smart-schedule-widget.js';
-                a.download = 'smart-schedule-widget.js';
-                document.body.appendChild(a);
-                a.click();
-                setTimeout(() => a.remove(), 2000);
-                showToast('เริ่มดาวน์โหลดไฟล์ smart-schedule-widget.js แล้ว', 'success');
+                const scriptCode = await buildScriptableWidgetCodeForUser();
+                const ok = downloadFileBlob('smart-schedule-widget.js', 'application/javascript;charset=utf-8', scriptCode);
+                if (ok) {
+                    showToast('ดาวน์โหลดไฟล์ smart-schedule-widget.js พร้อมตารางเรียนล่าสุดของคุณแล้ว!', 'success');
+                }
             } catch (e) {
+                console.error(e);
                 showToast('เกิดข้อผิดพลาดในการดาวน์โหลด', 'error');
             }
         }
@@ -6976,13 +7066,18 @@
             </div>
 
             <!-- Modal Content -->
-            <div class="p-5 space-y-5 overflow-y-auto custom-scrollbar text-xs sm:text-sm">
+            <div class="p-5 space-y-4 overflow-y-auto custom-scrollbar text-xs sm:text-sm">
+                <!-- Live Data Summary Badge -->
+                <div id="ios-widget-data-summary">
+                    <!-- Filled dynamically by updateIosWidgetDataSummary() -->
+                </div>
+
                 <!-- Info Alert -->
                 <div class="bg-sky-950/40 border border-sky-500/30 rounded-xl p-3.5 text-sky-200 leading-relaxed text-xs">
                     <div class="font-bold text-sky-300 flex items-center gap-1.5 mb-1 text-sm">
-                        <i class="fa-solid fa-circle-info text-sky-400"></i> ทำไม iOS ต้องใช้วิธีนี้?
+                        <i class="fa-solid fa-circle-info text-sky-400"></i> วิธีแสดง Widget ตารางเรียนบนหน้าจอโฮม iOS
                     </div>
-                    ระบบปฏิบัติการ iOS (Safari) ไม่อนุญาตให้หน้าเว็บติดตั้ง Widget หน้าจอโฮมโดยตรง เราจึงเตรียม <strong>2 แนวทางที่ดีที่สุด</strong> ให้คุณเลือกใช้งานได้ทันที:
+                    บน iPhone / iPad สามารถเลือกใช้งานได้ <strong>2 แนวทางที่ดีที่สุด</strong>:
                 </div>
 
                 <!-- Option 1: Scriptable Widget (Recommended) -->
@@ -7020,17 +7115,17 @@
 
                     <!-- Action Buttons -->
                     <div class="flex flex-wrap items-center gap-2 pt-1">
-                        <button type="button" onclick="copyScriptableWidgetCode()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs transition-all shadow flex items-center gap-2 active:scale-95">
-                            <i class="fa-solid fa-copy"></i>
-                            <span>คัดลอกโค้ด Scriptable (ข้อมูลปัจจุบัน)</span>
+                        <button type="button" onclick="openInScriptable()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs transition-all shadow-lg flex items-center gap-2 active:scale-95">
+                            <i class="fa-solid fa-bolt"></i>
+                            <span>เปิดและอัปเดตใน Scriptable ทันที (1 คลิก)</span>
+                        </button>
+                        <button type="button" onclick="copyScriptableWidgetCode()" class="px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-medium transition-all flex items-center gap-1.5 active:scale-95">
+                            <i class="fa-solid fa-copy text-amber-400"></i>
+                            <span>คัดลอกโค้ด</span>
                         </button>
                         <button type="button" onclick="downloadScriptableJs()" class="px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-medium transition-all flex items-center gap-1.5 active:scale-95">
                             <i class="fa-solid fa-download text-sky-400"></i>
                             <span>โหลดไฟล์ .js</span>
-                        </button>
-                        <button type="button" onclick="openScriptableApp()" class="px-3 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-700 border border-slate-700 text-sky-400 text-xs font-medium transition-all flex items-center gap-1.5 active:scale-95">
-                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                            <span>เปิด Scriptable</span>
                         </button>
                     </div>
                 </div>
