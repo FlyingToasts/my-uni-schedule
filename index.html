@@ -354,7 +354,8 @@
         #clear-modal,
         #calendar-export-modal,
         #app-icon-modal,
-        #cloud-sync-modal {
+        #cloud-sync-modal,
+        #ios-widget-modal {
             -webkit-backdrop-filter: none !important;
             backdrop-filter: none !important;
             background-color: rgba(7, 11, 20, 0.95) !important;
@@ -576,6 +577,9 @@
                     </button>
                     <button onclick="openCalendarExportModal()" title="เลือกลง Google Calendar หรือส่งออกปฏิทิน (.ics)" class="px-2 sm:px-3 py-2.5 bg-slate-900 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl text-xs font-medium transition-all flex items-center justify-center gap-1.5 whitespace-nowrap">
                         <i class="fa-solid fa-calendar-plus text-amber-400"></i> <span>ลงปฏิทิน</span>
+                    </button>
+                    <button onclick="openIosWidgetModal()" title="วิธีติดตั้ง Widget บน iPhone / iPad (Scriptable & Apple Calendar)" class="px-2 sm:px-3 py-2.5 bg-slate-900 hover:bg-slate-700 border border-sky-500/40 hover:border-sky-400 text-sky-300 rounded-xl text-xs font-medium transition-all flex items-center justify-center gap-1.5 whitespace-nowrap shadow-sm active:scale-95">
+                        <i class="fa-brands fa-apple text-sky-400"></i> <span>วิดเจ็ต iOS</span>
                     </button>
                     <label title="นำเข้าข้อมูลจากไฟล์ JSON" class="px-2 sm:px-3 py-2.5 bg-slate-900 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl text-xs font-medium transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap">
                         <i class="fa-solid fa-upload text-emerald-400"></i> <span>นำเข้า</span>
@@ -808,6 +812,8 @@
             </div>
         </div>
     </div>
+        </div>
+    </div>
 
 
     <!-- Modal: Quick Course Picker for Adding Note -->
@@ -826,6 +832,8 @@
             </div>
         </div>
     </div>
+        </div>
+    </div>
 
 
     <!-- Modal: Grade scheme -->
@@ -840,6 +848,8 @@
                 <button type="button" onclick="closeGradeModal()" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold">ยกเลิก</button>
                 <button type="button" onclick="saveGradeModal()" class="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold">บันทึก</button>
             </div>
+        </div>
+    </div>
         </div>
     </div>
 
@@ -880,6 +890,8 @@
             <div class="px-5 py-3 bg-slate-800/60 border-t border-slate-700 flex justify-end">
                 <button onclick="closeExamPeriodModal()" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold">เสร็จสิ้น</button>
             </div>
+        </div>
+    </div>
         </div>
     </div>
 
@@ -1065,6 +1077,8 @@
             </form>
         </div>
     </div>
+        </div>
+    </div>
 
 
     <!-- Custom Day-Locked Calendar Modal -->
@@ -1110,6 +1124,8 @@
                     <button type="button" onclick="clearSelectedLabDate()" class="text-rose-400 hover:underline">ล้างวันที่เลือก</button>
                 </div>
             </div>
+        </div>
+    </div>
         </div>
     </div>
 
@@ -1177,6 +1193,8 @@
             </div>
         </div>
     </div>
+        </div>
+    </div>
 
 
     <!-- Modal 3: Confirm Clear All Data -->
@@ -1195,6 +1213,8 @@
                 <button onclick="closeConfirmClearModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium">ยกเลิก</button>
                 <button onclick="confirmClearAllSchedule()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow">ยืนยันล้างข้อมูล</button>
             </div>
+        </div>
+    </div>
         </div>
     </div>
 
@@ -1239,6 +1259,9 @@
                     <button type="button" onclick="setCalendarExportFilter('all')" id="cal-filter-all" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-orange-500/20 text-orange-300 border border-orange-500/40">
                         ทั้งหมด (<span id="count-filter-all">0</span>)
                     </button>
+                    <button type="button" onclick="setCalendarExportFilter('class')" id="cal-filter-class" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 border border-slate-700/60">
+                        วิชาเรียน (<span id="count-filter-class">0</span>)
+                    </button>
                     <button type="button" onclick="setCalendarExportFilter('midterm')" id="cal-filter-midterm" class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 border border-slate-700/60">
                         สอบกลางภาค (<span id="count-filter-midterm">0</span>)
                     </button>
@@ -1271,7 +1294,11 @@
                     <i class="fa-solid fa-circle-info text-orange-400"></i>
                     <span id="calendar-export-count">เลือกไว้ 0 รายการ</span>
                 </div>
-                <div class="flex items-center gap-2 w-full sm:w-auto">
+                <div class="flex items-center gap-2 w-full sm:w-auto flex-wrap sm:flex-nowrap">
+                    <button type="button" onclick="exportToAppleCalendar()" title="ซิงก์เข้า Apple Calendar บน iPhone / iPad / Mac ด้วยคลิกเดียว" class="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 font-semibold rounded-xl text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 active:scale-95 shadow">
+                        <i class="fa-brands fa-apple text-white text-base"></i>
+                        <span>ลง Apple Calendar</span>
+                    </button>
                     <button type="button" onclick="openAllSelectedGoogleCalendar()" title="เพิ่ม Google Calendar ทุกรายการที่เลือก" class="px-3 py-2.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/40 font-semibold rounded-xl text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 active:scale-95">
                         <i class="fa-brands fa-google text-blue-400"></i>
                         <span>ลง Google Cal ที่เลือก</span>
@@ -1282,6 +1309,8 @@
                     </button>
                 </div>
             </div>
+        </div>
+    </div>
         </div>
     </div>
 
@@ -5720,6 +5749,58 @@
                 const titleBase = `${c.code ? c.code + ' ' : ''}${c.name || 'ไม่ระบุชื่อวิชา'}`;
                 const secSuffix = sec ? ` (${sec})` : '';
 
+                // 0) คาบเรียนประจำสัปดาห์ (Weekly Classes สำหรับ Apple Calendar & Google Calendar)
+                const ICS_DAYS = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+                const classSessions = [];
+                if (c.day !== undefined && c.start && c.end) {
+                    classSessions.push({ day: Number(c.day), start: c.start, end: c.end, room: c.room || '', isExtra: false });
+                }
+                if (Array.isArray(c.extraSessions)) {
+                    c.extraSessions.forEach((ex, exIdx) => {
+                        if (ex.day !== undefined && ex.start && ex.end) {
+                            classSessions.push({ day: Number(ex.day), start: ex.start, end: ex.end, room: ex.room || c.room || '', isExtra: true, exIdx });
+                        }
+                    });
+                }
+
+                classSessions.forEach((sess, sIdx) => {
+                    const dNum = sess.day;
+                    const byDay = ICS_DAYS[dNum] || 'MO';
+                    const today = new Date();
+                    const dayDiff = (dNum - today.getDay() + 7) % 7;
+                    const nextDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + dayDiff);
+                    const classDateIso = formatISODate(nextDate);
+
+                    list.push({
+                        id: `${c.id}_class_${sIdx}`,
+                        courseId: c.id,
+                        examType: 'class',
+                        category: 'class',
+                        badge: sess.isExtra ? 'คาบเสริม' : 'วิชาเรียน',
+                        badgeClass: 'bg-teal-500/20 text-teal-300 border border-teal-500/30',
+                        code: c.code || '',
+                        name: c.name || '',
+                        section: sec,
+                        displayTitle: titleBase,
+                        fullTitle: `${titleBase}${secSuffix}`,
+                        dateIso: classDateIso,
+                        dayLabel: `ทุกวัน${DAY_NAMES_THAI[dNum]} (${sess.start} - ${sess.end} น.)`,
+                        start: sess.start,
+                        end: sess.end,
+                        time: `${sess.start} - ${sess.end}`,
+                        room: sess.room ? `ห้อง ${sess.room}` : 'ไม่ระบุห้องเรียน',
+                        isExam: false,
+                        isTask: false,
+                        isClass: true,
+                        roomMissing: !sess.room,
+                        teacher: c.teacher || '',
+                        description: `วิชาเรียนประจำสัปดาห์: ${titleBase}${sec ? ' (' + sec + ')' : ''}\nห้องเรียน: ${sess.room || 'ไม่ระบุ'}\nอาจารย์: ${c.teacher || 'ไม่ระบุ'}`,
+                        rrule: `FREQ=WEEKLY;BYDAY=${byDay}`,
+                        isAllDay: false,
+                        checked: true
+                    });
+                });
+
                 // 1) ตารางสอบ: กลางภาค และ ปลายภาค
                 ['midterm', 'final'].forEach((type) => {
                     const exam = c.exams && c.exams[type];
@@ -5835,7 +5916,7 @@
 
         function setCalendarExportFilter(filter) {
             calExportFilter = filter;
-            ['all', 'midterm', 'final', 'task'].forEach(f => {
+            ['all', 'class', 'midterm', 'final', 'task'].forEach(f => {
                 const btn = document.getElementById(`cal-filter-${f}`);
                 if (!btn) return;
                 if (f === filter) {
@@ -5872,15 +5953,18 @@
             const checkedCount = calendarExportItems.filter(it => it.checked).length;
             const totalCount = calendarExportItems.length;
 
+            const classCount = calendarExportItems.filter(it => it.category === 'class').length;
             const midtermCount = calendarExportItems.filter(it => it.category === 'midterm').length;
             const finalCount = calendarExportItems.filter(it => it.category === 'final').length;
             const taskCount = calendarExportItems.filter(it => it.category === 'task').length;
 
             const elAll = document.getElementById('count-filter-all');
+            const elClass = document.getElementById('count-filter-class');
             const elMidterm = document.getElementById('count-filter-midterm');
             const elFinal = document.getElementById('count-filter-final');
             const elTask = document.getElementById('count-filter-task');
             if (elAll) elAll.textContent = String(totalCount);
+            if (elClass) elClass.textContent = String(classCount);
             if (elMidterm) elMidterm.textContent = String(midtermCount);
             if (elFinal) elFinal.textContent = String(finalCount);
             if (elTask) elTask.textContent = String(taskCount);
@@ -6261,6 +6345,10 @@
                 const summary = item.fullTitle || item.displayTitle;
                 lines.push(`SUMMARY:${escICS(summary)}`);
 
+                if (item.rrule) {
+                    lines.push(`RRULE:${item.rrule}`);
+                }
+
                 if (item.room) {
                     lines.push(`LOCATION:${escICS(item.room)}`);
                 }
@@ -6277,11 +6365,15 @@
                 descLines.push('จัดทำโดย Smart Schedule Widget');
                 lines.push(`DESCRIPTION:${escICS(descLines.join('\n'))}`);
 
-                // เตือนล่วงหน้า 1 วัน และ 1 ชั่วโมง (สำหรับการสอบ)
+                // แจ้งเตือน: วิชาเรียนเตือนก่อน 15 นาที, สอบเตือน 1 ชม. และ 1 วัน, งานเตือน 1 วัน
                 if (item.isExam) {
                     lines.push('BEGIN:VALARM', 'TRIGGER:-PT1H', 'ACTION:DISPLAY', 'DESCRIPTION:เตือนการสอบ (อีก 1 ชม.)', 'END:VALARM');
+                    lines.push('BEGIN:VALARM', 'TRIGGER:-P1D', 'ACTION:DISPLAY', 'DESCRIPTION:เตือนกำหนดการสอบพรุ่งนี้', 'END:VALARM');
+                } else if (item.isClass) {
+                    lines.push('BEGIN:VALARM', 'TRIGGER:-PT15M', 'ACTION:DISPLAY', 'DESCRIPTION:เตือนก่อนเข้าเรียน 15 นาที', 'END:VALARM');
+                } else {
+                    lines.push('BEGIN:VALARM', 'TRIGGER:-P1D', 'ACTION:DISPLAY', 'DESCRIPTION:เตือนกำหนดส่งการบ้าน/งาน', 'END:VALARM');
                 }
-                lines.push('BEGIN:VALARM', 'TRIGGER:-P1D', 'ACTION:DISPLAY', 'DESCRIPTION:เตือนกำหนดการพรุ่งนี้', 'END:VALARM');
                 lines.push('END:VEVENT');
             });
 
@@ -6298,6 +6390,129 @@
         function exportScheduleICS() {
             openCalendarExportModal();
         }
+
+        // --- IOS WIDGET & SCRIPTABLE INTEGRATION ---
+        function openIosWidgetModal() {
+            const modal = document.getElementById('ios-widget-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeIosWidgetModal() {
+            const modal = document.getElementById('ios-widget-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        async function copyScriptableWidgetCode() {
+            try {
+                // สร้าง payload จากข้อมูลปัจจุบันในเครื่อง
+                const currentPayload = {
+                    updatedAt: new Date().toISOString(),
+                    sessions: [],
+                    tasks: []
+                };
+
+                if (Array.isArray(scheduleData)) {
+                    scheduleData.forEach(c => {
+                        if (c.day !== undefined && c.start && c.end) {
+                            currentPayload.sessions.push({
+                                day: Number(c.day),
+                                start: c.start,
+                                end: c.end,
+                                code: c.code || '',
+                                name: c.name || '',
+                                room: c.room || '',
+                                color: c.color || '#38bdf8'
+                            });
+                        }
+                        if (Array.isArray(c.extraSessions)) {
+                            c.extraSessions.forEach(ex => {
+                                if (ex.day !== undefined && ex.start && ex.end) {
+                                    currentPayload.sessions.push({
+                                        day: Number(ex.day),
+                                        start: ex.start,
+                                        end: ex.end,
+                                        code: c.code || '',
+                                        name: c.name || '',
+                                        room: ex.room || c.room || '',
+                                        color: c.color || '#38bdf8'
+                                    });
+                                }
+                            });
+                        }
+                        getCourseNotes(c).forEach(n => {
+                            if (!n.done && n.date) {
+                                currentPayload.tasks.push({
+                                    title: n.text || ('งาน ' + (c.code || c.name)),
+                                    date: n.date,
+                                    badge: n.type === 'homework' ? 'ส่งงาน' : (n.type === 'cancel' ? 'งดคลาส' : 'ประกาศ'),
+                                    color: n.type === 'homework' ? '#f59e0b' : '#38bdf8'
+                                });
+                            }
+                        });
+                    });
+                }
+
+                let scriptCode = '';
+                try {
+                    const resp = await fetch('./smart-schedule-widget.js');
+                    if (resp.ok) scriptCode = await resp.text();
+                } catch(e) {}
+
+                if (!scriptCode || !scriptCode.includes('const DEFAULT_PAYLOAD =')) {
+                    // ถ้า fetch ไม่สำเร็จ ให้สร้างสคริปต์สำรอง
+                    scriptCode = `// Smart Schedule iOS Widget (Scriptable)\nconst APP_URL = "${window.location.href.split('#')[0]}";\nconst DEFAULT_PAYLOAD = ${JSON.stringify(currentPayload, null, 2)};\n\n// กรุณาดูโค้ดเต็มในไฟล์ smart-schedule-widget.js\n`;
+                } else {
+                    // แทนที่ DEFAULT_PAYLOAD ด้วยข้อมูลตารางเรียนปัจจุบันของผู้ใช้
+                    scriptCode = scriptCode.replace(
+                        /const DEFAULT_PAYLOAD = [\s\S]*?;\n\n\/\/ --- DATA FETCHING/,
+                        `const DEFAULT_PAYLOAD = ${JSON.stringify(currentPayload, null, 2)};\n\n// --- DATA FETCHING`
+                    );
+                }
+
+                await navigator.clipboard.writeText(scriptCode);
+                showToast('คัดลอกโค้ด Scriptable (พร้อมข้อมูลตารางเรียนล่าสุด) แล้ว! นำไปวางในแอป Scriptable ได้เลย', 'success');
+            } catch (err) {
+                console.error('Copy scriptable error:', err);
+                showToast('ไม่สามารถคัดลอกอัตโนมัติได้ ให้กดปุ่ม "โหลดไฟล์ .js" แทน', 'error');
+            }
+        }
+
+        function downloadScriptableJs() {
+            try {
+                const a = document.createElement('a');
+                a.href = './smart-schedule-widget.js';
+                a.download = 'smart-schedule-widget.js';
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => a.remove(), 2000);
+                showToast('เริ่มดาวน์โหลดไฟล์ smart-schedule-widget.js แล้ว', 'success');
+            } catch (e) {
+                showToast('เกิดข้อผิดพลาดในการดาวน์โหลด', 'error');
+            }
+        }
+
+        function openScriptableApp() {
+            window.location.href = 'scriptable://';
+        }
+
+        function exportToAppleCalendar() {
+            // ตรวจสอบว่ามีรายการที่เลือกหรือไม่ ถ้าไม่มีให้ติ๊กทั้งหมด
+            const selected = calendarExportItems.filter(it => it.checked);
+            if (selected.length === 0) {
+                calendarExportItems.forEach(it => it.checked = true);
+                renderCalendarExportList();
+                updateCalendarExportCount();
+            }
+            exportSelectedCalendarICS();
+            showToast('ดาวน์โหลดไฟล์ .ics สำหรับ Apple Calendar แล้ว! แตะไฟล์เพื่อกด "เพิ่มทั้งหมด" ลงในปฏิทิน iPhone/iPad ได้เลย', 'success');
+        }
+
 
     </script>
 
@@ -6736,6 +6951,124 @@
             </div>
         </div>
     </div>
+        </div>
+    </div>
+
+    <!-- Modal: iOS Home Screen Widget & Apple Calendar Guide -->
+    <div id="ios-widget-modal" class="fixed inset-0 z-[65] hidden items-center justify-center bg-slate-950/85 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden my-auto flex flex-col max-h-[92vh]">
+            <!-- Header -->
+            <div class="px-5 py-4 bg-slate-800/90 border-b border-slate-700 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 text-xl shadow-inner">
+                        <i class="fa-brands fa-apple"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-base sm:text-lg text-white flex items-center gap-2">
+                            วิดเจ็ตหน้าจอโฮม iOS (iPhone & iPad)
+                        </h3>
+                        <p class="text-xs text-slate-400 mt-0.5">วิธีแสดงตารางเรียนบนหน้าจอโฮมสำหรับผู้ใช้ Apple iOS</p>
+                    </div>
+                </div>
+                <button onclick="closeIosWidgetModal()" class="text-slate-400 hover:text-white w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-700 transition-all">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="p-5 space-y-5 overflow-y-auto custom-scrollbar text-xs sm:text-sm">
+                <!-- Info Alert -->
+                <div class="bg-sky-950/40 border border-sky-500/30 rounded-xl p-3.5 text-sky-200 leading-relaxed text-xs">
+                    <div class="font-bold text-sky-300 flex items-center gap-1.5 mb-1 text-sm">
+                        <i class="fa-solid fa-circle-info text-sky-400"></i> ทำไม iOS ต้องใช้วิธีนี้?
+                    </div>
+                    ระบบปฏิบัติการ iOS (Safari) ไม่อนุญาตให้หน้าเว็บติดตั้ง Widget หน้าจอโฮมโดยตรง เราจึงเตรียม <strong>2 แนวทางที่ดีที่สุด</strong> ให้คุณเลือกใช้งานได้ทันที:
+                </div>
+
+                <!-- Option 1: Scriptable Widget (Recommended) -->
+                <div class="bg-slate-800/70 border border-slate-700 rounded-xl p-4 space-y-3.5">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center justify-center font-bold text-xs">1</span>
+                            <div>
+                                <h4 class="font-bold text-white text-sm">แนวทางที่ 1: วิดเจ็ตผ่านแอป Scriptable (แนะนำ ⭐)</h4>
+                                <p class="text-[11px] text-slate-400">หน้าตาแบบเดียวกับ Android Widget 4×2 (Current Class | Next Class | Tasks)</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">ยอดนิยมในไทย</span>
+                    </div>
+
+                    <!-- Steps Checklist -->
+                    <div class="bg-slate-900/80 rounded-xl p-3 space-y-2 border border-slate-800 text-xs">
+                        <div class="flex items-start gap-2 text-slate-300">
+                            <span class="text-amber-400 font-bold shrink-0">สเต็ป 1:</span>
+                            <span>ติดตั้งแอป <strong class="text-white">Scriptable</strong> จาก App Store (ค้นหาใน App Store หรือติดตั้งฟรี 100%)</span>
+                        </div>
+                        <div class="flex items-start gap-2 text-slate-300">
+                            <span class="text-amber-400 font-bold shrink-0">สเต็ป 2:</span>
+                            <span>กดปุ่ม <strong class="text-amber-300">"คัดลอกโค้ด Scriptable"</strong> ด้านล่าง (ระบบจะฝังข้อมูลตารางเรียนปัจจุบันให้ในตัวสคริปต์ทันที)</span>
+                        </div>
+                        <div class="flex items-start gap-2 text-slate-300">
+                            <span class="text-amber-400 font-bold shrink-0">สเต็ป 3:</span>
+                            <span>เปิดแอป Scriptable แตะเครื่องหมาย <strong class="text-white">+</strong> (ขวาบน) ตั้งชื่อสคริปต์ว่า <strong class="text-sky-300">SmartSchedule</strong> แล้ววาง (Paste) โค้ดลงไปแล้วกด Done</span>
+                        </div>
+                        <div class="flex items-start gap-2 text-slate-300">
+                            <span class="text-amber-400 font-bold shrink-0">สเต็ป 4:</span>
+                            <span>กลับมาหน้าจอโฮม iOS แตะค้างที่ว่าง -> กด <strong class="text-white">+</strong> มุมซ้ายบน -> ค้นหา <strong class="text-white">Scriptable</strong> -> เลือกขนาด <strong>กลาง (Medium 4×2)</strong> -> แตะที่วิดเจ็ตเพื่อเลือกสคริปต์ <strong>SmartSchedule</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-wrap items-center gap-2 pt-1">
+                        <button type="button" onclick="copyScriptableWidgetCode()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs transition-all shadow flex items-center gap-2 active:scale-95">
+                            <i class="fa-solid fa-copy"></i>
+                            <span>คัดลอกโค้ด Scriptable (ข้อมูลปัจจุบัน)</span>
+                        </button>
+                        <button type="button" onclick="downloadScriptableJs()" class="px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-medium transition-all flex items-center gap-1.5 active:scale-95">
+                            <i class="fa-solid fa-download text-sky-400"></i>
+                            <span>โหลดไฟล์ .js</span>
+                        </button>
+                        <button type="button" onclick="openScriptableApp()" class="px-3 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-700 border border-slate-700 text-sky-400 text-xs font-medium transition-all flex items-center gap-1.5 active:scale-95">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            <span>เปิด Scriptable</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Option 2: Apple Calendar Sync -->
+                <div class="bg-slate-800/70 border border-slate-700 rounded-xl p-4 space-y-3.5">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/40 flex items-center justify-center font-bold text-xs">2</span>
+                            <div>
+                                <h4 class="font-bold text-white text-sm">แนวทางที่ 2: ซิงก์ปฏิทิน Apple Calendar (1 คลิก)</h4>
+                                <p class="text-[11px] text-slate-400">ไม่ต้องลงแอปเพิ่ม ใช้วิดเจ็ตปฏิทินดั้งเดิมของ iPhone/iPad มีแจ้งเตือนก่อนเรียน 15 นาที</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30">Native 100%</span>
+                    </div>
+
+                    <div class="bg-slate-900/80 rounded-xl p-3 space-y-2 border border-slate-800 text-xs">
+                        <div class="flex items-start gap-2 text-slate-300">
+                            <span class="text-sky-400 font-bold shrink-0">วิธีใช้งาน:</span>
+                            <span>กดปุ่ม <strong class="text-white">"เปิดหน้าต่างส่งออกปฏิทิน"</strong> ด้านล่าง แล้วเลือก <strong class="text-sky-300">"ลง Apple Calendar"</strong> จากนั้น Safari จะเปิดไฟล์ ให้แตะ <strong class="text-sky-300">"เพิ่มทั้งหมด" (Add All)</strong></span>
+                        </div>
+                        <div class="flex items-start gap-2 text-slate-300">
+                            <span class="text-sky-400 font-bold shrink-0">การตั้งค่าวิดเจ็ต:</span>
+                            <span>แตะค้างหน้าจอโฮม iOS -> กด <strong class="text-white">+</strong> -> เลือก <strong class="text-white">"ปฏิทิน (Calendar)"</strong> -> เลือกขนาดที่ชอบ และสามารถวางบนหน้าจอล็อก (Lock Screen) ได้ด้วย</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2 pt-1">
+                        <button type="button" onclick="closeIosWidgetModal(); openCalendarExportModal();" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-700 border border-sky-500/40 text-white font-bold text-xs transition-all shadow flex items-center gap-2 active:scale-95">
+                            <i class="fa-brands fa-apple text-sky-400 text-sm"></i>
+                            <span>เปิดหน้าต่างส่งออกปฏิทิน (Apple Calendar)</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal 6: Firebase Cloud Sync (ซิงก์ข้อมูลคลาวด์ & บัญชีผู้ใช้) -->
     <div id="cloud-sync-modal" class="fixed inset-0 z-[65] hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 overflow-y-auto">
@@ -6792,6 +7125,8 @@
                     ปิด
                 </button>
             </div>
+        </div>
+    </div>
         </div>
     </div>
 
