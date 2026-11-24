@@ -16,7 +16,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ตารางเรียน">
-    <link rel="apple-touch-icon" href="./icon-192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+    <link rel="apple-touch-icon-precomposed" sizes="180x180" href="./apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -338,6 +341,40 @@
         input[type="color"]::-webkit-color-swatch {
             border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: 0.65rem;
+        }
+
+        /* --- ANTI-FLICKER & COMPOSITOR OPTIMIZATIONS FOR MODALS (MOBILE & WEBVIEW) --- */
+        #course-notes-modal,
+        #quick-note-picker-modal,
+        #course-modal,
+        #grade-modal,
+        #exam-period-modal,
+        #locked-calendar-modal,
+        #color-manager-modal,
+        #clear-modal,
+        #calendar-export-modal,
+        #app-icon-modal,
+        #cloud-sync-modal {
+            -webkit-backdrop-filter: none !important;
+            backdrop-filter: none !important;
+            background-color: rgba(7, 11, 20, 0.95) !important;
+        }
+
+        #course-notes-modal *,
+        #quick-note-picker-modal *,
+        #course-modal * {
+            -webkit-backdrop-filter: none !important;
+            backdrop-filter: none !important;
+        }
+
+        /* Hide heavy floating blurred orbs when any modal is active to prevent multi-layer GPU repaint thrashing */
+        body.modal-active .liquid-orb,
+        body:has(#course-notes-modal:not(.hidden)) .liquid-orb,
+        body:has(#quick-note-picker-modal:not(.hidden)) .liquid-orb,
+        body:has(#course-modal:not(.hidden)) .liquid-orb,
+        body:has(#grade-modal:not(.hidden)) .liquid-orb,
+        body:has(#exam-period-modal:not(.hidden)) .liquid-orb {
+            display: none !important;
         }
     </style>
 </head>
@@ -2020,12 +2057,14 @@
             const modal = document.getElementById('quick-note-picker-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
+            document.body.classList.add('modal-active');
         }
 
         function closeQuickNotePicker() {
             const modal = document.getElementById('quick-note-picker-modal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
+            document.body.classList.remove('modal-active');
         }
 
         function openNotesFromCourseModal() {
@@ -2055,6 +2094,7 @@
             const modal = document.getElementById('course-notes-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
+            document.body.classList.add('modal-active');
         }
 
         function renderQuickDateButtons(course) {
@@ -2082,6 +2122,7 @@
             const modal = document.getElementById('course-notes-modal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
+            document.body.classList.remove('modal-active');
             if (reopenCourseIdAfterNotes) {
                 const targetId = reopenCourseIdAfterNotes;
                 reopenCourseIdAfterNotes = null;
@@ -6265,37 +6306,206 @@
         const STORAGE_APP_ICON_KEY = 'smart_schedule_custom_icon_v1';
         let currentManifestBlobUrl = null;
 
-        // สร้างไอคอนเริ่มต้นด้วย Canvas (ไม่ต้องมีไฟล์ icon แยก)
+        // สร้างไอคอนเริ่มต้นด้วย Canvas ตามมาตรฐาน Apple HIG & Material Design (Safe Area ~65% ไม่ตกขอบ 100%)
         function generateDefaultIconDataUrl(size) {
             const canvas = document.createElement('canvas');
             canvas.width = size;
             canvas.height = size;
             const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#0f172a';
+            const s = (v) => Math.max(1, Math.round(v * size / 512));
+
+            // 1. Full-bleed background gradient (Slate 900 to 950)
+            const bgGrad = ctx.createLinearGradient(0, 0, 0, size);
+            bgGrad.addColorStop(0, '#0f172a');
+            bgGrad.addColorStop(1, '#020617');
+            ctx.fillStyle = bgGrad;
             ctx.fillRect(0, 0, size, size);
-            const pad = size * 0.1;
-            const radius = size * 0.2;
+
+            // 2. Ambient radial glow behind calendar
+            const glow = ctx.createRadialGradient(size / 2, size * 0.48, 0, size / 2, size * 0.48, size * 0.38);
+            glow.addColorStop(0, 'rgba(56, 189, 248, 0.16)');
+            glow.addColorStop(1, 'rgba(56, 189, 248, 0)');
+            ctx.fillStyle = glow;
+            ctx.fillRect(0, 0, size, size);
+
+            // 3. Calendar Card Bounds (Safe Area ~65% - อยู่กึ่งกลาง ไม่โดน Squircle iOS ตัดขอบแน่นอน)
+            const cw = s(326);
+            const ch = s(350);
+            const cx0 = Math.round((size - cw) / 2);
+            const cy0 = Math.round((size - ch) / 2 + s(14));
+            const cr = s(52);
+
+            // Card Drop Shadow
+            ctx.save();
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
+            ctx.shadowBlur = s(16);
+            ctx.shadowOffsetY = s(10);
+
+            // Calendar Body (Dark Slate)
             ctx.fillStyle = '#1e293b';
             ctx.beginPath();
             if (typeof ctx.roundRect === 'function') {
-                ctx.roundRect(pad, pad, size - pad * 2, size - pad * 2, radius);
+                ctx.roundRect(cx0, cy0, cw, ch, cr);
             } else {
-                ctx.rect(pad, pad, size - pad * 2, size - pad * 2);
+                ctx.rect(cx0, cy0, cw, ch);
             }
             ctx.fill();
-            ctx.fillStyle = '#f59e0b';
+            ctx.restore();
+
+            // Card Border
+            ctx.strokeStyle = 'rgba(71, 85, 105, 0.9)';
+            ctx.lineWidth = Math.max(1, s(3));
             ctx.beginPath();
             if (typeof ctx.roundRect === 'function') {
-                ctx.roundRect(pad, pad, size - pad * 2, size * 0.24, [radius, radius, 0, 0]);
+                ctx.roundRect(cx0, cy0, cw, ch, cr);
             } else {
-                ctx.rect(pad, pad, size - pad * 2, size * 0.24);
+                ctx.rect(cx0, cy0, cw, ch);
             }
+            ctx.stroke();
+
+            // 4. Header Banner (Amber/Orange gradient)
+            const hh = s(110);
+            ctx.save();
+            ctx.beginPath();
+            if (typeof ctx.roundRect === 'function') {
+                ctx.roundRect(cx0, cy0, cw, ch, cr);
+            } else {
+                ctx.rect(cx0, cy0, cw, ch);
+            }
+            ctx.clip();
+
+            const bannerGrad = ctx.createLinearGradient(0, cy0, 0, cy0 + hh);
+            bannerGrad.addColorStop(0, '#f59e0b');
+            bannerGrad.addColorStop(1, '#ea580c');
+            ctx.fillStyle = bannerGrad;
+            ctx.fillRect(cx0, cy0, cw, hh);
+
+            // Banner bottom border
+            ctx.strokeStyle = 'rgba(180, 83, 9, 0.8)';
+            ctx.lineWidth = Math.max(1, s(2));
+            ctx.beginPath();
+            ctx.moveTo(cx0, cy0 + hh);
+            ctx.lineTo(cx0 + cw, cy0 + hh);
+            ctx.stroke();
+
+            // Clock emblem in banner
+            const clockX = cx0 + cw / 2;
+            const clockY = cy0 + hh / 2 - s(2);
+            const clockR = s(24);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.18)';
+            ctx.beginPath();
+            ctx.arc(clockX, clockY, clockR, 0, Math.PI * 2);
             ctx.fill();
-            ctx.fillStyle = '#f8fafc';
-            ctx.font = `bold ${Math.round(size * 0.32)}px sans-serif`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('ตาราง', size / 2, size * 0.62);
+
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.lineWidth = Math.max(1, s(3));
+            ctx.beginPath();
+            ctx.arc(clockX, clockY, clockR, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Clock hands
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(clockX, clockY);
+            ctx.lineTo(clockX - s(9), clockY - s(11));
+            ctx.moveTo(clockX, clockY);
+            ctx.lineTo(clockX + s(13), clockY - s(4));
+            ctx.stroke();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(clockX, clockY, Math.max(1, s(3)), 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+
+            // 5. Two Binder Loops / Rings
+            const loopW = s(26);
+            const loopH = s(58);
+            const loopY0 = cy0 - s(18);
+            const ringXs = [cx0 + s(75), cx0 + cw - s(75) - loopW];
+
+            ringXs.forEach(rx => {
+                // Loop anchor hole
+                ctx.fillStyle = '#0f172a';
+                ctx.beginPath();
+                ctx.arc(rx + loopW / 2, cy0 + s(14) + (loopW - s(8)) / 2, (loopW - s(8)) / 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Loop body (metallic silver)
+                ctx.fillStyle = '#f1f5f9';
+                ctx.beginPath();
+                if (typeof ctx.roundRect === 'function') {
+                    ctx.roundRect(rx, loopY0, loopW, loopH, loopW / 2);
+                } else {
+                    ctx.rect(rx, loopY0, loopW, loopH);
+                }
+                ctx.fill();
+
+                ctx.strokeStyle = '#cbd5e1';
+                ctx.lineWidth = Math.max(1, s(2));
+                ctx.stroke();
+
+                // Loop inner shine highlight
+                ctx.strokeStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.moveTo(rx + s(7), loopY0 + s(8));
+                ctx.lineTo(rx + s(7), loopY0 + loopH - s(8));
+                ctx.stroke();
+            });
+
+            // 6. Timetable Schedule Slots inside Card Body
+            const slotX = cx0 + s(38);
+            const slotW = cw - s(76);
+            const slotH = s(42);
+            const slotR = s(12);
+
+            // Slot 1: Cyan (Class 1)
+            const s1Y = cy0 + hh + s(30);
+            ctx.fillStyle = '#06b6d4';
+            ctx.beginPath();
+            if (typeof ctx.roundRect === 'function') { ctx.roundRect(slotX, s1Y, slotW, slotH, slotR); } else { ctx.rect(slotX, s1Y, slotW, slotH); }
+            ctx.fill();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.beginPath();
+            ctx.arc(slotX + s(20), s1Y + slotH / 2, s(8), 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.beginPath();
+            if (typeof ctx.roundRect === 'function') { ctx.roundRect(slotX + s(38), s1Y + s(15), slotW - s(62), s(12), s(6)); } else { ctx.rect(slotX + s(38), s1Y + s(15), slotW - s(62), s(12)); }
+            ctx.fill();
+
+            // Slot 2: Emerald (Class 2)
+            const s2Y = s1Y + slotH + s(20);
+            ctx.fillStyle = '#10b981';
+            ctx.beginPath();
+            if (typeof ctx.roundRect === 'function') { ctx.roundRect(slotX, s2Y, slotW, slotH, slotR); } else { ctx.rect(slotX, s2Y, slotW, slotH); }
+            ctx.fill();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.beginPath();
+            ctx.arc(slotX + s(20), s2Y + slotH / 2, s(8), 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.beginPath();
+            if (typeof ctx.roundRect === 'function') { ctx.roundRect(slotX + s(38), s2Y + s(15), slotW - s(86), s(12), s(6)); } else { ctx.rect(slotX + s(38), s2Y + s(15), slotW - s(86), s(12)); }
+            ctx.fill();
+
+            // Slot 3: Violet (Task / Lab)
+            const s3Y = s2Y + slotH + s(20);
+            const s3W = Math.round(slotW * 0.75);
+            ctx.fillStyle = '#8b5cf6';
+            ctx.beginPath();
+            if (typeof ctx.roundRect === 'function') { ctx.roundRect(slotX, s3Y, s3W, slotH, slotR); } else { ctx.rect(slotX, s3Y, s3W, slotH); }
+            ctx.fill();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.beginPath();
+            ctx.arc(slotX + s(20), s3Y + slotH / 2, s(8), 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.beginPath();
+            if (typeof ctx.roundRect === 'function') { ctx.roundRect(slotX + s(38), s3Y + s(15), s3W - s(62), s(12), s(6)); } else { ctx.rect(slotX + s(38), s3Y + s(15), s3W - s(62), s(12)); }
+            ctx.fill();
+
             return canvas.toDataURL('image/png');
         }
 
@@ -6376,6 +6586,13 @@
                 document.head.appendChild(appleIcon);
             }
             appleIcon.href = icons.icon192;
+            let appleIconPre = document.querySelector('link[rel="apple-touch-icon-precomposed"]');
+            if (!appleIconPre) {
+                appleIconPre = document.createElement('link');
+                appleIconPre.rel = 'apple-touch-icon-precomposed';
+                document.head.appendChild(appleIconPre);
+            }
+            appleIconPre.href = icons.icon192;
             let favicon = document.querySelector('link[rel="icon"]');
             if (!favicon) {
                 favicon = document.createElement('link');
@@ -6502,6 +6719,10 @@
                 <div class="bg-amber-950/30 border border-amber-500/30 rounded-xl p-3 text-[11px] text-amber-200 leading-relaxed">
                     <i class="fa-solid fa-circle-info text-amber-400 mr-1"></i>
                     <strong>แนะนำ:</strong> เลือกรูปไอคอนที่ต้องการให้เรียบร้อย<strong>ก่อน</strong>กดปุ่ม "ติดตั้งแอป" หากติดตั้งไปแล้วอยากเปลี่ยนรูป ให้ลบแอปเดิมบนหน้าจอแล้วติดตั้งใหม่
+                </div>
+                <div class="bg-sky-950/30 border border-sky-500/30 rounded-xl p-3 text-[11px] text-sky-200 leading-relaxed">
+                    <i class="fa-brands fa-apple text-sky-400 mr-1"></i>
+                    <strong>สำหรับ iOS (iPhone / iPad):</strong> ระบบจะตัดขอบมุมมน (Squircle) อัตโนมัติ ไอคอนเริ่มต้นได้รับการจัดวางในพื้นที่ปลอดภัย (Safe Area) ไม่ตกขอบ 100% หากอัปโหลดรูปเอง ควรเลือกรูปที่มีจุดเด่นอยู่ตรงกลาง
                 </div>
                 <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
                     <label class="px-4 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs cursor-pointer shadow transition-all flex items-center gap-1.5">
