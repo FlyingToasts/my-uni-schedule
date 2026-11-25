@@ -48,98 +48,81 @@
                 radial-gradient(at 100% 0%, rgba(245, 158, 11, 0.16) 0px, transparent 40%),
                 radial-gradient(at 50% 50%, rgba(16, 185, 129, 0.1) 0px, transparent 50%),
                 radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.22) 0px, transparent 50%);
-            background-attachment: fixed;
             color: #f8fafc;
             padding-bottom: 5.5rem;
             position: relative;
             overflow-x: hidden;
         }
 
-        /* --- LIQUID GLASS AMBIENT LIGHTS --- */
+        /* --- LIQUID GLASS AMBIENT LIGHTS (Static pre-feathered gradients for smooth GPU scroll) --- */
         .liquid-orb {
             position: absolute;
             border-radius: 9999px;
-            filter: blur(90px);
             pointer-events: none;
-            opacity: 0.45;
-            mix-blend-mode: screen;
-            animation: orbFloat 22s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+            opacity: 0.42;
         }
         .orb-indigo {
             width: 500px;
             height: 500px;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.6) 0%, rgba(59, 130, 246, 0.15) 50%, transparent 70%);
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.52) 0%, rgba(59, 130, 246, 0.14) 50%, transparent 70%);
             top: -120px;
             left: -120px;
         }
         .orb-amber {
             width: 540px;
             height: 540px;
-            background: radial-gradient(circle, rgba(245, 158, 11, 0.45) 0%, rgba(234, 88, 12, 0.15) 50%, transparent 70%);
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.4) 0%, rgba(234, 88, 12, 0.12) 50%, transparent 70%);
             top: 25%;
             right: -150px;
-            animation-duration: 28s;
-            animation-delay: -6s;
         }
         .orb-emerald {
             width: 460px;
             height: 460px;
-            background: radial-gradient(circle, rgba(16, 185, 129, 0.45) 0%, rgba(6, 182, 212, 0.15) 50%, transparent 70%);
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.4) 0%, rgba(6, 182, 212, 0.12) 50%, transparent 70%);
             bottom: 80px;
             left: 10%;
-            animation-duration: 25s;
-            animation-delay: -12s;
         }
         .orb-cyan {
             width: 420px;
             height: 420px;
-            background: radial-gradient(circle, rgba(6, 182, 212, 0.4) 0%, rgba(14, 165, 233, 0.15) 50%, transparent 70%);
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.35) 0%, rgba(14, 165, 233, 0.12) 50%, transparent 70%);
             bottom: 30%;
             left: 55%;
-            animation-duration: 32s;
-            animation-delay: -18s;
-        }
-        @keyframes orbFloat {
-            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
-            33% { transform: translate(50px, -40px) scale(1.08) rotate(60deg); }
-            66% { transform: translate(-35px, 60px) scale(0.94) rotate(120deg); }
-            100% { transform: translate(40px, 30px) scale(1.04) rotate(180deg); }
         }
 
         /* --- LIQUID GLASS CORE SPECULAR EFFECT --- */
         .liquid-glass {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.015) 100%), rgba(15, 23, 42, 0.68) !important;
-            backdrop-filter: blur(24px) saturate(190%) !important;
-            -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.015) 100%), rgba(15, 23, 42, 0.84) !important;
             border: 1px solid rgba(255, 255, 255, 0.14) !important;
-            box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.5), inset 0 1px 1px 0 rgba(255, 255, 255, 0.22) !important;
+            box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.45), inset 0 1px 1px 0 rgba(255, 255, 255, 0.2) !important;
         }
 
         /* Global Theme Override for Slate cards to Liquid Glass */
         .bg-slate-800\/80, .bg-slate-800\/70, .bg-slate-800\/90, .bg-slate-800\/60, .bg-slate-850 {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.015) 100%), rgba(15, 23, 42, 0.65) !important;
-            backdrop-filter: blur(20px) saturate(180%) !important;
-            -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.015) 100%), rgba(15, 23, 42, 0.84) !important;
             border-color: rgba(255, 255, 255, 0.12) !important;
-            box-shadow: 0 14px 36px -10px rgba(0, 0, 0, 0.45), inset 0 1px 1px 0 rgba(255, 255, 255, 0.18) !important;
+            box-shadow: 0 10px 26px -8px rgba(0, 0, 0, 0.42), inset 0 1px 1px 0 rgba(255, 255, 255, 0.16) !important;
         }
 
         /* Floating Header & Navigation Glassmorphism */
         header {
-            background: linear-gradient(180deg, rgba(15, 23, 42, 0.88) 0%, rgba(10, 16, 30, 0.78) 100%) !important;
-            backdrop-filter: blur(28px) saturate(200%) !important;
-            -webkit-backdrop-filter: blur(28px) saturate(200%) !important;
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.96) 0%, rgba(10, 16, 30, 0.94) 100%) !important;
+            -webkit-backdrop-filter: none !important;
+            backdrop-filter: none !important;
             border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
-            box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+            box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+        }
+
+        #simulator-panel {
+            -webkit-backdrop-filter: none !important;
+            backdrop-filter: none !important;
         }
 
         /* --- LIQUID GLASS CAPSULE DOCK & ULTRA-CLEAR WATER DROPLET --- */
         .liquid-dock {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 100%), rgba(12, 17, 29, 0.80) !important;
-            backdrop-filter: blur(28px) saturate(200%) !important;
-            -webkit-backdrop-filter: blur(28px) saturate(200%) !important;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 100%), rgba(12, 17, 29, 0.92) !important;
             border: 1px solid rgba(255, 255, 255, 0.12) !important;
-            box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.75), inset 0 1px 1px 0 rgba(255, 255, 255, 0.18) !important;
+            box-shadow: 0 14px 32px -8px rgba(0, 0, 0, 0.7), inset 0 1px 1px 0 rgba(255, 255, 255, 0.18) !important;
             --drop-light-x: 42%;
             --drop-light-y: 20%;
         }
@@ -267,9 +250,9 @@
             100% { transform: translate(-50%, -50%) scale(4.5); opacity: 0; }
         }
 
-        /* Specular Liquid Buttons */
+        /* Specular Liquid Buttons (compositor-friendly properties only) */
         button, a[class*="rounded-xl"], a[class*="rounded-2xl"] {
-            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            transition: transform 0.16s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.16s ease, background-color 0.16s ease, border-color 0.16s ease !important;
         }
         button:active, a[class*="rounded-xl"]:active {
             transform: scale(0.96) !important;
@@ -291,11 +274,9 @@
 
         /* Modal Backdrop & Crystal Container */
         div[id$="-modal"] > div.bg-slate-900, div[id$="-modal"] > div.bg-slate-800 {
-            background: linear-gradient(145deg, rgba(30, 41, 59, 0.88) 0%, rgba(15, 23, 42, 0.94) 100%) !important;
-            backdrop-filter: blur(32px) saturate(210%) !important;
-            -webkit-backdrop-filter: blur(32px) saturate(210%) !important;
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.96) 0%, rgba(15, 23, 42, 0.98) 100%) !important;
             border: 1px solid rgba(255, 255, 255, 0.18) !important;
-            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.75), inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.3) !important;
+            box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.75), inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.26) !important;
         }
 
         /* Custom Scrollbar */
@@ -315,13 +296,9 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: rgba(148, 163, 184, 0.55);
         }
-        /* Pulse Animation for Live Status */
+        /* Static Glow for Live Status (avoids continuous box-shadow repaint) */
         .pulse-glow {
-            animation: pulseGlow 2s infinite;
-        }
-        @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 12px rgba(16, 185, 129, 0.3); }
-            50% { box-shadow: 0 0 22px rgba(16, 185, 129, 0.65); }
+            box-shadow: 0 0 18px rgba(16, 185, 129, 0.38);
         }
         /* Custom Input Time, Date & Color Picker */
         input[type="time"]::-webkit-calendar-picker-indicator,
@@ -344,37 +321,17 @@
         }
 
         /* --- ANTI-FLICKER & COMPOSITOR OPTIMIZATIONS FOR MODALS (MOBILE & WEBVIEW) --- */
-        #course-notes-modal,
-        #quick-note-picker-modal,
-        #course-modal,
-        #grade-modal,
-        #exam-period-modal,
-        #locked-calendar-modal,
-        #color-manager-modal,
-        #clear-modal,
-        #calendar-export-modal,
-        #app-icon-modal,
-        #cloud-sync-modal,
-        #ios-widget-modal {
-            -webkit-backdrop-filter: none !important;
-            backdrop-filter: none !important;
-            background-color: rgba(7, 11, 20, 0.95) !important;
-        }
-
-        #course-notes-modal *,
-        #quick-note-picker-modal *,
-        #course-modal * {
+        div[id$="-modal"],
+        div[id$="-modal"] * {
             -webkit-backdrop-filter: none !important;
             backdrop-filter: none !important;
         }
 
-        /* Hide heavy floating blurred orbs when any modal is active to prevent multi-layer GPU repaint thrashing */
-        body.modal-active .liquid-orb,
-        body:has(#course-notes-modal:not(.hidden)) .liquid-orb,
-        body:has(#quick-note-picker-modal:not(.hidden)) .liquid-orb,
-        body:has(#course-modal:not(.hidden)) .liquid-orb,
-        body:has(#grade-modal:not(.hidden)) .liquid-orb,
-        body:has(#exam-period-modal:not(.hidden)) .liquid-orb {
+        div[id$="-modal"] {
+            background-color: rgba(7, 11, 20, 0.92) !important;
+        }
+
+        body.modal-active .liquid-orb {
             display: none !important;
         }
     </style>
@@ -578,7 +535,7 @@
                     <button onclick="openCalendarExportModal()" title="เลือกลง Google Calendar หรือส่งออกปฏิทิน (.ics)" class="px-2 sm:px-3 py-2.5 bg-slate-900 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl text-xs font-medium transition-all flex items-center justify-center gap-1.5 whitespace-nowrap">
                         <i class="fa-solid fa-calendar-plus text-amber-400"></i> <span>ลงปฏิทิน</span>
                     </button>
-                    <button onclick="openIosWidgetModal()" title="วิธีติดตั้ง Widget บน iPhone / iPad (Scriptable & Apple Calendar)" class="px-2 sm:px-3 py-2.5 bg-slate-900 hover:bg-slate-700 border border-sky-500/40 hover:border-sky-400 text-sky-300 rounded-xl text-xs font-medium transition-all flex items-center justify-center gap-1.5 whitespace-nowrap shadow-sm active:scale-95">
+                    <button onclick="openIosWidgetModal()" title="วิธีติดตั้ง Widget บน iPhone / iPad ผ่าน Scriptable" class="px-2 sm:px-3 py-2.5 bg-slate-900 hover:bg-slate-700 border border-sky-500/40 hover:border-sky-400 text-sky-300 rounded-xl text-xs font-medium transition-all flex items-center justify-center gap-1.5 whitespace-nowrap shadow-sm active:scale-95">
                         <i class="fa-brands fa-apple text-sky-400"></i> <span>วิดเจ็ต iOS</span>
                     </button>
                     <label title="นำเข้าข้อมูลจากไฟล์ JSON" class="px-2 sm:px-3 py-2.5 bg-slate-900 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl text-xs font-medium transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap">
@@ -1368,6 +1325,10 @@
         let lastRenderedMinuteKey = '';
         let lastActiveCurrentSessionKey = '';
         let lastActiveNextSessionKey = '';
+        let lastCurrentCardRenderKey = '';
+        let lastNextCardRenderKey = '';
+        let lastLiveDateText = '';
+        let lastCardHeaderMode = '';
 
         // Modal Temp State
         let tempLabWeeks = [];
@@ -1646,6 +1607,9 @@
             checkUrlForGoogleOAuthToken();
             initFirebaseCloudSync();
             initWaterDropletLighting();
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) updateTick(false);
+            });
             setInterval(() => updateTick(false), 1000);
         };
 
@@ -1755,7 +1719,6 @@
                 lastNativeWidgetSyncMinute = minuteKey;
                 const payload = JSON.stringify(buildNativeWidgetPayload());
                 if (window.WidgetBridge && typeof window.WidgetBridge.updateWidgetData === 'function') window.WidgetBridge.updateWidgetData(payload);
-                if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.widgetData) window.webkit.messageHandlers.widgetData.postMessage(payload);
             } catch (err) { console.warn('Native widget sync failed:', err); }
         }
 
@@ -2535,24 +2498,40 @@
 
         // --- MAIN UPDATE LOOP ---
         function updateTick(forceTableRender = false) {
+            if (!forceTableRender && document.hidden) return;
             const ctx = getCurrentContextTime();
             const pad = (n) => String(n).padStart(2, '0');
             const timeFormatted = `${pad(ctx.hours)}:${pad(ctx.minutes)}:${pad(ctx.seconds)}`;
 
             // 1. Update Clock Header
             document.getElementById('live-time').innerText = timeFormatted;
+            const liveDateEl = document.getElementById('live-date');
             if (isSimulated) {
-                document.getElementById('live-date').innerHTML = `<span class="text-indigo-300 font-semibold">[จำลอง] ${getDayName(ctx.day)} ${formatThaiShortDate(ctx.isoDate)}</span>`;
+                const simHtml = `<span class="text-indigo-300 font-semibold">[จำลอง] ${getDayName(ctx.day)} ${formatThaiShortDate(ctx.isoDate)}</span>`;
+                const simKey = 'H:' + simHtml;
+                if (liveDateEl && simKey !== lastLiveDateText) {
+                    lastLiveDateText = simKey;
+                    liveDateEl.innerHTML = simHtml;
+                }
             } else {
                 const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                document.getElementById('live-date').innerText = ctx.dateObj.toLocaleDateString('th-TH', options);
+                const realDateStr = ctx.dateObj.toLocaleDateString('th-TH', options);
+                const realKey = 'T:' + realDateStr;
+                if (liveDateEl && realKey !== lastLiveDateText) {
+                    lastLiveDateText = realKey;
+                    liveDateEl.innerText = realDateStr;
+                }
             }
 
             // 2. Exam week check
             currentExamWeek = getExamWeekInfo(ctx.isoDate);
             examMode = !!currentExamWeek;
-            document.getElementById('current-card-title').innerText = examMode ? 'กำลังสอบอยู่ในขณะนี้' : 'กำลังเรียนอยู่ในขณะนี้';
-            document.getElementById('next-card-title').innerText = examMode ? 'วิชาสอบถัดไป' : 'คาบเรียนถัดไป';
+            const modeFlag = examMode ? 'exam' : 'class';
+            if (modeFlag !== lastCardHeaderMode) {
+                lastCardHeaderMode = modeFlag;
+                document.getElementById('current-card-title').innerText = examMode ? 'กำลังสอบอยู่ในขณะนี้' : 'กำลังเรียนอยู่ในขณะนี้';
+                document.getElementById('next-card-title').innerText = examMode ? 'วิชาสอบถัดไป' : 'คาบเรียนถัดไป';
+            }
 
             const allSessions = currentExamWeek ? [] : getExpandedSessions(ctx.isoDate);
             // Active today sessions EXCLUDE inactive labs AND cancelled classes so live cards reflect real attendance
@@ -2593,6 +2572,11 @@
                 nextSession = upcomingSessions[0];
             }
 
+            if (forceTableRender) {
+                lastCurrentCardRenderKey = '';
+                lastNextCardRenderKey = '';
+            }
+
             // 3. Update Live Status Cards
             renderCurrentClassCard(currentSession, nextSession, todaySessions, todayCancelledSessions, nowTotalSecs);
             renderNextClassCard(nextSession, upcomingSessions.length, todaySessions.length, todayCancelledSessions);
@@ -2631,7 +2615,11 @@
             const content = document.getElementById('current-class-content');
 
             if (scheduleData.length === 0) {
-                card.className = "bg-slate-800/80 border border-slate-700/80 rounded-2xl p-5 shadow-lg flex flex-col justify-between transition-all duration-300";
+                const curRenderKey = 'empty';
+                if (curRenderKey === lastCurrentCardRenderKey) return;
+                lastCurrentCardRenderKey = curRenderKey;
+
+                card.className = "bg-slate-800/80 border border-slate-700/80 rounded-2xl p-5 shadow-lg flex flex-col justify-between transition-colors duration-200";
                 badge.className = "text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-700 text-slate-300";
                 badge.innerText = "ยังไม่มีข้อมูล";
                 content.innerHTML = `
@@ -2644,20 +2632,36 @@
                 return;
             }
 
-            const cancelledNoticeHTML = (todayCancelledSessions && todayCancelledSessions.length > 0)
-                ? `<div class="mt-2.5 bg-rose-950/40 border border-rose-500/40 rounded-xl px-3 py-2 text-xs text-rose-200 flex items-center justify-between gap-2">
-                    <span class="truncate"><i class="fa-solid fa-calendar-xmark text-rose-400 mr-1.5"></i>งดคลาสวันนี้: <strong>${todayCancelledSessions.map(s => escapeHTML(s.name)).join(', ')}</strong></span>
-                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 shrink-0">${todayCancelledSessions.length} คาบ</span>
-                   </div>`
+            const cancelledKey = (todayCancelledSessions && todayCancelledSessions.length > 0)
+                ? todayCancelledSessions.map(s => `${s.sessionKey}:${s.cancelNote ? s.cancelNote.text : ''}`).join('|')
                 : '';
 
             if (currentSession) {
-                const colObj = getColorObj(currentSession.colorId);
-                card.className = "bg-slate-800/90 border-2 border-emerald-500/60 rounded-2xl p-5 shadow-lg flex flex-col justify-between transition-all duration-300 pulse-glow";
-                badge.className = "text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1.5";
-                badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> ${L('กำลังเรียน','กำลังสอบ')}`;
-
                 const progressPercent = Math.min(100, Math.max(0, Math.round((currentSession.elapsedSecs / currentSession.totalDurationSecs) * 100)));
+                const curRenderKey = `active|${currentSession.sessionKey}|${currentSession.name}|${currentSession.room}|${currentSession.teacher}|${currentSession.colorId}|${currentSession.code}|${currentSession.section}|${currentSession.labBadgeText}|${examMode}|${cancelledKey}`;
+
+                if (curRenderKey === lastCurrentCardRenderKey) {
+                    const pctEl = document.getElementById('cur-progress-pct');
+                    const remEl = document.getElementById('cur-remaining-text');
+                    const barEl = document.getElementById('cur-progress-bar');
+                    if (pctEl) pctEl.textContent = `${L('ความคืบหน้าคาบเรียน','ความคืบหน้าการสอบ')} (${progressPercent}%)`;
+                    if (remEl) remEl.textContent = `เหลืออีก ${formatDuration(currentSession.remainingSecs)}`;
+                    if (barEl) barEl.style.width = `${progressPercent}%`;
+                    return;
+                }
+                lastCurrentCardRenderKey = curRenderKey;
+
+                const cancelledNoticeHTML = (todayCancelledSessions && todayCancelledSessions.length > 0)
+                    ? `<div class="mt-2.5 bg-rose-950/40 border border-rose-500/40 rounded-xl px-3 py-2 text-xs text-rose-200 flex items-center justify-between gap-2">
+                        <span class="truncate"><i class="fa-solid fa-calendar-xmark text-rose-400 mr-1.5"></i>งดคลาสวันนี้: <strong>${todayCancelledSessions.map(s => escapeHTML(s.name)).join(', ')}</strong></span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 shrink-0">${todayCancelledSessions.length} คาบ</span>
+                       </div>`
+                    : '';
+
+                const colObj = getColorObj(currentSession.colorId);
+                card.className = "bg-slate-800/90 border-2 border-emerald-500/60 rounded-2xl p-5 shadow-lg flex flex-col justify-between transition-colors duration-200 pulse-glow";
+                badge.className = "text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1.5";
+                badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> ${L('กำลังเรียน','กำลังสอบ')}`;
 
                 content.innerHTML = `
                     <div class="space-y-3.5">
@@ -2688,80 +2692,111 @@
 
                         <div class="space-y-1.5">
                             <div class="flex justify-between text-xs">
-                                <span class="text-slate-400">${L('ความคืบหน้าคาบเรียน','ความคืบหน้าการสอบ')} (${progressPercent}%)</span>
-                                <span class="text-emerald-300 font-semibold font-mono">เหลืออีก ${formatDuration(currentSession.remainingSecs)}</span>
+                                <span id="cur-progress-pct" class="text-slate-400">${L('ความคืบหน้าคาบเรียน','ความคืบหน้าการสอบ')} (${progressPercent}%)</span>
+                                <span id="cur-remaining-text" class="text-emerald-300 font-semibold font-mono">เหลืออีก ${formatDuration(currentSession.remainingSecs)}</span>
                             </div>
                             <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-700">
-                                <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500" style="width: ${progressPercent}%"></div>
+                                <div id="cur-progress-bar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-[width] duration-300" style="width: ${progressPercent}%"></div>
                             </div>
                         </div>
                         ${cancelledNoticeHTML}
                     </div>
                 `;
+                return;
+            }
+
+            // Compute structural cache key for all non-active card states
+            const ctxDay = getCurrentContextTime().day;
+            let curRenderKey = '';
+            if (todaySessions.length === 0) {
+                curRenderKey = (todayCancelledSessions && todayCancelledSessions.length > 0)
+                    ? `all_cancelled|${cancelledKey}`
+                    : `free_day|${ctxDay}|${examMode}`;
             } else {
-                card.className = "bg-slate-800/80 border border-slate-700/80 rounded-2xl p-5 shadow-lg flex flex-col justify-between transition-all duration-300";
-
-                if (todaySessions.length === 0) {
-                    if (todayCancelledSessions && todayCancelledSessions.length > 0) {
-                        badge.className = "text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40";
-                        badge.innerText = "งดคลาสทั้งหมดวันนี้";
-                        content.innerHTML = `
-                            <div class="py-5 px-3 text-center bg-rose-950/20 rounded-xl border border-rose-500/40 space-y-1.5">
-                                <i class="fa-solid fa-calendar-xmark text-rose-400 text-2xl"></i>
-                                <p class="text-sm font-semibold text-white">คาบเรียนของวันนี้ถูกประกาศงดคลาส</p>
-                                <p class="text-xs text-rose-200">${todayCancelledSessions.map(s => `${escapeHTML(s.name)} (${escapeHTML(s.cancelNote.text)})`).join(' • ')}</p>
-                            </div>
-                        `;
-                    } else {
-                        badge.className = "text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-700 text-slate-300";
-                        badge.innerText = L("วันว่าง / ไม่มีเรียน","ไม่มีสอบวันนี้");
-                        content.innerHTML = `
-                            <div class="py-5 text-center bg-slate-900/40 rounded-xl border border-slate-700/50 space-y-1.5">
-                                <i class="fa-solid fa-mug-hot text-sky-400 text-2xl"></i>
-                                <p class="text-sm font-semibold text-slate-200">${L('ไม่มีตารางเรียนใน','ไม่มีตารางสอบใน')}${getDayName(getCurrentContextTime().day)}</p>
-                                <p class="text-xs text-slate-400">พักผ่อนให้เต็มที่ หรือกดเพิ่มวิชาเรียนได้เลย</p>
-                            </div>
-                        `;
-                    }
+                const firstStartSecs = timeToMinutes(todaySessions[0].start) * 60;
+                const lastEndSecs = timeToMinutes(todaySessions[todaySessions.length - 1].end) * 60;
+                if (nowTotalSecs < firstStartSecs) {
+                    curRenderKey = `before_first|${todaySessions[0].start}|${examMode}|${cancelledKey}`;
+                } else if (nowTotalSecs >= lastEndSecs) {
+                    curRenderKey = `after_last|${todaySessions.length}|${examMode}|${cancelledKey}`;
                 } else {
-                    const firstStartSecs = timeToMinutes(todaySessions[0].start) * 60;
-                    const lastEndSecs = timeToMinutes(todaySessions[todaySessions.length - 1].end) * 60;
+                    const isLunch = (nowTotalSecs >= 11.5 * 3600 && nowTotalSecs <= 13.5 * 3600);
+                    curRenderKey = `break|${isLunch}|${nextSession ? nextSession.start : ''}|${cancelledKey}`;
+                }
+            }
 
-                    if (nowTotalSecs < firstStartSecs) {
-                        badge.className = "text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30";
-                        badge.innerText = L("เตรียมตัวก่อนเรียน","เตรียมตัวก่อนสอบ");
-                        content.innerHTML = `
-                            <div class="py-5 text-center bg-slate-900/40 rounded-xl border border-slate-700/50 space-y-1.5">
-                                <i class="fa-solid fa-sun text-amber-400 text-2xl"></i>
-                                <p class="text-sm font-semibold text-slate-200">${L('ยังไม่ถึงเวลาเรียนคาบแรก','ยังไม่ถึงเวลาสอบวิชาแรก')}</p>
-                                <p class="text-xs text-slate-400">${L('คาบแรกของวันนี้เริ่มเวลา','วิชาแรกของวันนี้เริ่มสอบเวลา')} <span class="text-amber-300 font-mono font-bold">${todaySessions[0].start} น.</span></p>
-                            </div>
-                            ${cancelledNoticeHTML}
-                        `;
-                    } else if (nowTotalSecs >= lastEndSecs) {
-                        badge.className = "text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30";
-                        badge.innerText = L("เลิกเรียนแล้ว","สอบเสร็จแล้ว");
-                        content.innerHTML = `
-                            <div class="py-5 text-center bg-slate-900/40 rounded-xl border border-slate-700/50 space-y-1.5">
-                                <i class="fa-solid fa-moon text-indigo-400 text-2xl"></i>
-                                <p class="text-sm font-semibold text-slate-200">${L('หมดเวลาเรียนสำหรับวันนี้แล้ว','สอบครบทุกวิชาของวันนี้แล้ว')}</p>
-                                <p class="text-xs text-slate-400">${L('เรียนครบทั้ง ' + todaySessions.length + ' คาบเรียบร้อย','สอบครบทั้ง ' + todaySessions.length + ' วิชาเรียบร้อย')}</p>
-                            </div>
-                            ${cancelledNoticeHTML}
-                        `;
-                    } else {
-                        const isLunch = (nowTotalSecs >= 11.5 * 3600 && nowTotalSecs <= 13.5 * 3600);
-                        badge.className = "text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30";
-                        badge.innerText = isLunch ? "ช่วงพักกลางวัน" : "ช่วงพักเปลี่ยนคาบ";
-                        content.innerHTML = `
-                            <div class="py-5 text-center bg-slate-900/40 rounded-xl border border-slate-700/50 space-y-1.5">
-                                <i class="fa-solid ${isLunch ? 'fa-utensils text-amber-400' : 'fa-hourglass-half text-sky-400'} text-2xl"></i>
-                                <p class="text-sm font-semibold text-slate-200">${isLunch ? 'ขณะนี้เป็นช่วงพักกลางวัน' : 'ช่วงพักระหว่างคาบเรียน'}</p>
-                                <p class="text-xs text-slate-400">${nextSession ? `เตรียมตัวเข้าเรียนวิชาถัดไปเวลา <span class="text-amber-300 font-mono font-bold">${nextSession.start} น.</span>` : ''}</p>
-                            </div>
-                            ${cancelledNoticeHTML}
-                        `;
-                    }
+            if (curRenderKey === lastCurrentCardRenderKey) return;
+            lastCurrentCardRenderKey = curRenderKey;
+
+            const cancelledNoticeHTML = (todayCancelledSessions && todayCancelledSessions.length > 0)
+                ? `<div class="mt-2.5 bg-rose-950/40 border border-rose-500/40 rounded-xl px-3 py-2 text-xs text-rose-200 flex items-center justify-between gap-2">
+                    <span class="truncate"><i class="fa-solid fa-calendar-xmark text-rose-400 mr-1.5"></i>งดคลาสวันนี้: <strong>${todayCancelledSessions.map(s => escapeHTML(s.name)).join(', ')}</strong></span>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 shrink-0">${todayCancelledSessions.length} คาบ</span>
+                   </div>`
+                : '';
+
+            card.className = "bg-slate-800/80 border border-slate-700/80 rounded-2xl p-5 shadow-lg flex flex-col justify-between transition-colors duration-200";
+
+            if (todaySessions.length === 0) {
+                if (todayCancelledSessions && todayCancelledSessions.length > 0) {
+                    badge.className = "text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40";
+                    badge.innerText = "งดคลาสทั้งหมดวันนี้";
+                    content.innerHTML = `
+                        <div class="py-5 px-3 text-center bg-rose-950/20 rounded-xl border border-rose-500/40 space-y-1.5">
+                            <i class="fa-solid fa-calendar-xmark text-rose-400 text-2xl"></i>
+                            <p class="text-sm font-semibold text-white">คาบเรียนของวันนี้ถูกประกาศงดคลาส</p>
+                            <p class="text-xs text-rose-200">${todayCancelledSessions.map(s => `${escapeHTML(s.name)} (${escapeHTML(s.cancelNote.text)})`).join(' • ')}</p>
+                        </div>
+                    `;
+                } else {
+                    badge.className = "text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-700 text-slate-300";
+                    badge.innerText = L("วันว่าง / ไม่มีเรียน","ไม่มีสอบวันนี้");
+                    content.innerHTML = `
+                        <div class="py-5 text-center bg-slate-900/40 rounded-xl border border-slate-700/50 space-y-1.5">
+                            <i class="fa-solid fa-mug-hot text-sky-400 text-2xl"></i>
+                            <p class="text-sm font-semibold text-slate-200">${L('ไม่มีตารางเรียนใน','ไม่มีตารางสอบใน')}${getDayName(ctxDay)}</p>
+                            <p class="text-xs text-slate-400">พักผ่อนให้เต็มที่ หรือกดเพิ่มวิชาเรียนได้เลย</p>
+                        </div>
+                    `;
+                }
+            } else {
+                const firstStartSecs = timeToMinutes(todaySessions[0].start) * 60;
+                const lastEndSecs = timeToMinutes(todaySessions[todaySessions.length - 1].end) * 60;
+
+                if (nowTotalSecs < firstStartSecs) {
+                    badge.className = "text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30";
+                    badge.innerText = L("เตรียมตัวก่อนเรียน","เตรียมตัวก่อนสอบ");
+                    content.innerHTML = `
+                        <div class="py-5 text-center bg-slate-900/40 rounded-xl border border-slate-700/50 space-y-1.5">
+                            <i class="fa-solid fa-sun text-amber-400 text-2xl"></i>
+                            <p class="text-sm font-semibold text-slate-200">${L('ยังไม่ถึงเวลาเรียนคาบแรก','ยังไม่ถึงเวลาสอบวิชาแรก')}</p>
+                            <p class="text-xs text-slate-400">${L('คาบแรกของวันนี้เริ่มเวลา','วิชาแรกของวันนี้เริ่มสอบเวลา')} <span class="text-amber-300 font-mono font-bold">${todaySessions[0].start} น.</span></p>
+                        </div>
+                        ${cancelledNoticeHTML}
+                    `;
+                } else if (nowTotalSecs >= lastEndSecs) {
+                    badge.className = "text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30";
+                    badge.innerText = L("เลิกเรียนแล้ว","สอบเสร็จแล้ว");
+                    content.innerHTML = `
+                        <div class="py-5 text-center bg-slate-900/40 rounded-xl border border-slate-700/50 space-y-1.5">
+                            <i class="fa-solid fa-moon text-indigo-400 text-2xl"></i>
+                            <p class="text-sm font-semibold text-slate-200">${L('หมดเวลาเรียนสำหรับวันนี้แล้ว','สอบครบทุกวิชาของวันนี้แล้ว')}</p>
+                            <p class="text-xs text-slate-400">${L('เรียนครบทั้ง ' + todaySessions.length + ' คาบเรียบร้อย','สอบครบทั้ง ' + todaySessions.length + ' วิชาเรียบร้อย')}</p>
+                        </div>
+                        ${cancelledNoticeHTML}
+                    `;
+                } else {
+                    const isLunch = (nowTotalSecs >= 11.5 * 3600 && nowTotalSecs <= 13.5 * 3600);
+                    badge.className = "text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30";
+                    badge.innerText = isLunch ? "ช่วงพักกลางวัน" : "ช่วงพักเปลี่ยนคาบ";
+                    content.innerHTML = `
+                        <div class="py-5 text-center bg-slate-900/40 rounded-xl border border-slate-700/50 space-y-1.5">
+                            <i class="fa-solid ${isLunch ? 'fa-utensils text-amber-400' : 'fa-hourglass-half text-sky-400'} text-2xl"></i>
+                            <p class="text-sm font-semibold text-slate-200">${isLunch ? 'ขณะนี้เป็นช่วงพักกลางวัน' : 'ช่วงพักระหว่างคาบเรียน'}</p>
+                            <p class="text-xs text-slate-400">${nextSession ? `เตรียมตัวเข้าเรียนวิชาถัดไปเวลา <span class="text-amber-300 font-mono font-bold">${nextSession.start} น.</span>` : ''}</p>
+                        </div>
+                        ${cancelledNoticeHTML}
+                    `;
                 }
             }
         }
@@ -2770,6 +2805,19 @@
         function renderNextClassCard(nextSession, remainingCount, totalTodayCount) {
             const badge = document.getElementById('remaining-classes-badge');
             const content = document.getElementById('next-class-content');
+
+            const nextRenderKey = nextSession
+                ? `next|${nextSession.sessionKey}|${nextSession.name}|${nextSession.room}|${nextSession.colorId}|${nextSession.code}|${nextSession.section}|${nextSession.labBadgeText}|${nextSession.start}|${nextSession.end}|${remainingCount}|${examMode}`
+                : `none|${remainingCount}|${totalTodayCount}|${examMode}`;
+
+            if (nextRenderKey === lastNextCardRenderKey) {
+                if (nextSession) {
+                    const countdownEl = document.getElementById('next-countdown-text');
+                    if (countdownEl) countdownEl.textContent = formatDuration(nextSession.secsUntilStart);
+                }
+                return;
+            }
+            lastNextCardRenderKey = nextRenderKey;
 
             badge.innerText = `เหลืออีก ${remainingCount} ${L('คาบ','วิชา')}วันนี้`;
 
@@ -2811,7 +2859,7 @@
                     <div class="bg-slate-900/90 p-3 rounded-xl border border-amber-500/30 flex items-center justify-between gap-2">
                         <div class="flex items-center gap-2 text-xs sm:text-sm text-amber-300 font-semibold">
                             <i class="fa-solid fa-stopwatch text-amber-400 text-base"></i>
-                            <span>จะเริ่มในอีก <strong class="text-sm sm:text-base text-white font-mono">${formatDuration(nextSession.secsUntilStart)}</strong></span>
+                            <span>จะเริ่มในอีก <strong id="next-countdown-text" class="text-sm sm:text-base text-white font-mono">${formatDuration(nextSession.secsUntilStart)}</strong></span>
                         </div>
                         <span class="text-[11px] text-slate-400 font-mono hidden sm:inline">ถึง ${nextSession.end} น.</span>
                     </div>
@@ -4127,7 +4175,7 @@
                 info:    'fa-circle-info text-amber-400'
             };
 
-            toast.className = `pointer-events-auto px-4 py-3 rounded-xl border shadow-xl text-xs sm:text-sm font-medium flex items-center gap-2.5 backdrop-blur-md transition-all duration-300 ${styles[type] || styles.info}`;
+            toast.className = `pointer-events-auto px-4 py-3 rounded-xl border shadow-xl text-xs sm:text-sm font-medium flex items-center gap-2.5 bg-slate-900/95 transition-opacity transition-transform duration-200 ${styles[type] || styles.info}`;
             toast.innerHTML = `<i class="fa-solid ${icons[type] || icons.info} text-base"></i><span>${escapeHTML(message)}</span>`;
 
             container.appendChild(toast);
@@ -4515,25 +4563,46 @@
             const dock = document.getElementById('liquid-bottom-dock');
             if (!dock) return;
 
-            const updateLight = (clientX, clientY) => {
-                const rect = dock.getBoundingClientRect();
-                const rawX = ((clientX - rect.left) / rect.width) * 100;
-                const rawY = ((clientY - rect.top) / rect.height) * 100;
-                const clampedX = Math.max(15, Math.min(85, rawX));
-                const clampedY = Math.max(10, Math.min(50, rawY));
-                dock.style.setProperty('--drop-light-x', `${clampedX.toFixed(1)}%`);
-                dock.style.setProperty('--drop-light-y', `${clampedY.toFixed(1)}%`);
+            let dockRect = null;
+            let dockMoveRaf = 0;
+            let pendingX = 0;
+            let pendingY = 0;
+
+            window.addEventListener('resize', () => {
+                dockRect = null;
+            }, { passive: true });
+
+            const scheduleLightUpdate = (clientX, clientY) => {
+                pendingX = clientX;
+                pendingY = clientY;
+                if (dockMoveRaf) return;
+                dockMoveRaf = requestAnimationFrame(() => {
+                    dockMoveRaf = 0;
+                    if (!dockRect) dockRect = dock.getBoundingClientRect();
+                    if (!dockRect.width || !dockRect.height) return;
+                    const rawX = ((pendingX - dockRect.left) / dockRect.width) * 100;
+                    const rawY = ((pendingY - dockRect.top) / dockRect.height) * 100;
+                    const clampedX = Math.max(15, Math.min(85, rawX));
+                    const clampedY = Math.max(10, Math.min(50, rawY));
+                    dock.style.setProperty('--drop-light-x', `${clampedX.toFixed(1)}%`);
+                    dock.style.setProperty('--drop-light-y', `${clampedY.toFixed(1)}%`);
+                });
             };
 
             dock.addEventListener('pointermove', (e) => {
-                updateLight(e.clientX, e.clientY);
-            });
+                scheduleLightUpdate(e.clientX, e.clientY);
+            }, { passive: true });
             dock.addEventListener('touchmove', (e) => {
                 if (e.touches && e.touches[0]) {
-                    updateLight(e.touches[0].clientX, e.touches[0].clientY);
+                    scheduleLightUpdate(e.touches[0].clientX, e.touches[0].clientY);
                 }
             }, { passive: true });
             dock.addEventListener('pointerleave', () => {
+                if (dockMoveRaf) {
+                    cancelAnimationFrame(dockMoveRaf);
+                    dockMoveRaf = 0;
+                }
+                dockRect = null;
                 dock.style.setProperty('--drop-light-x', '42%');
                 dock.style.setProperty('--drop-light-y', '20%');
             });
@@ -4551,9 +4620,14 @@
             initWaterDropletLighting();
         }
 
+        let lastBottomNavKey = '';
         function renderBottomNav() {
-            const ind = document.getElementById('liquid-nav-indicator');
             const targetIdx = pageMode === 'class' ? 0 : (pageMode === 'exam' ? 1 : 2);
+            const navKey = `${targetIdx}_${!!currentExamWeek}`;
+            if (navKey === lastBottomNavKey) return;
+            lastBottomNavKey = navKey;
+
+            const ind = document.getElementById('liquid-nav-indicator');
             if (ind) {
                 animateWaterDroplet(ind, targetIdx, currentBottomNavIdx);
                 currentBottomNavIdx = targetIdx;
@@ -4562,9 +4636,9 @@
                 const btn = document.getElementById(id);
                 if (!btn) return;
                 if (isActive) {
-                    btn.className = `flex-1 py-2.5 rounded-full font-bold text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-1.5 ${activeColor} scale-[1.03] drop-shadow-sm overflow-hidden`;
+                    btn.className = `flex-1 py-2.5 rounded-full font-bold text-xs sm:text-sm relative z-10 transition-colors duration-200 flex items-center justify-center gap-1.5 ${activeColor} scale-[1.03] drop-shadow-sm overflow-hidden`;
                 } else {
-                    btn.className = 'flex-1 py-2.5 rounded-full font-medium text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 scale-100 overflow-hidden';
+                    btn.className = 'flex-1 py-2.5 rounded-full font-medium text-xs sm:text-sm relative z-10 transition-colors duration-200 flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 scale-100 overflow-hidden';
                 }
             };
             setBtn('nav-class', pageMode === 'class', 'text-amber-400');
@@ -4686,6 +4760,200 @@
         const FIREBASE_COLLECTION_USERS = 'users';
         const FIREBASE_SUB_COLLECTION = 'data';
         const FIREBASE_DOC_SCHEDULE = 'schedule';
+        const FIREBASE_COLLECTION_WIDGET_FEEDS = 'widgetFeeds';
+        const STORAGE_WIDGET_SYNC_TOKEN_KEY = 'smart_schedule_widget_sync_token';
+        let widgetSyncToken = '';
+        let widgetFeedSyncState = 'idle'; // 'idle' | 'ready' | 'permission_denied' | 'error'
+        let widgetFeedSyncError = '';
+
+        try {
+            const savedWidgetTok = localStorage.getItem(STORAGE_WIDGET_SYNC_TOKEN_KEY);
+            if (savedWidgetTok && savedWidgetTok.length >= 24) widgetSyncToken = savedWidgetTok;
+        } catch (e) {}
+
+        function generateWidgetSyncToken() {
+            const bytes = new Uint8Array(24);
+            if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
+                window.crypto.getRandomValues(bytes);
+            } else {
+                for (let i = 0; i < bytes.length; i++) {
+                    bytes[i] = Math.floor(Math.random() * 256);
+                }
+            }
+            return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function setWidgetSyncToken(token) {
+            const clean = typeof token === 'string' ? token.trim() : '';
+            if (clean.length < 24) return '';
+            widgetSyncToken = clean;
+            try {
+                localStorage.setItem(STORAGE_WIDGET_SYNC_TOKEN_KEY, clean);
+            } catch (e) {}
+            return clean;
+        }
+
+        function ensureWidgetSyncToken() {
+            if (widgetSyncToken && widgetSyncToken.length >= 24) return widgetSyncToken;
+            return setWidgetSyncToken(generateWidgetSyncToken());
+        }
+
+        function getWidgetFeedUrl(token = widgetSyncToken) {
+            const cleanTok = typeof token === 'string' ? token.trim() : '';
+            if (cleanTok.length < 24) return '';
+            const cfg = (typeof getActiveFirebaseConfig === 'function')
+                ? getActiveFirebaseConfig()
+                : (window.DEFAULT_FIREBASE_CONFIG || null);
+            if (!cfg || !cfg.projectId || !cfg.apiKey) return '';
+            return `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(cfg.projectId)}/databases/(default)/documents/${FIREBASE_COLLECTION_WIDGET_FEEDS}/${encodeURIComponent(cleanTok)}?key=${encodeURIComponent(cfg.apiKey)}`;
+        }
+
+        function getRecommendedFirestoreRules() {
+            return [
+                "rules_version = '2';",
+                "service cloud.firestore {",
+                "  match /databases/{database}/documents {",
+                "    match /users/{userId}/{document=**} {",
+                "      allow read, write: if request.auth != null && request.auth.uid == userId;",
+                "    }",
+                "    match /widgetFeeds/{token} {",
+                "      allow get: if token.size() >= 24;",
+                "      allow list: if false;",
+                "      allow create: if request.auth != null",
+                "                    && token.size() >= 24",
+                "                    && request.resource.data.ownerUid == request.auth.uid;",
+                "      allow update: if request.auth != null",
+                "                    && resource.data.ownerUid == request.auth.uid",
+                "                    && request.resource.data.ownerUid == request.auth.uid;",
+                "      allow delete: if request.auth != null",
+                "                    && resource.data.ownerUid == request.auth.uid;",
+                "    }",
+                "  }",
+                "}"
+            ].join('\n');
+        }
+
+        function copyPlainTextWithToast(text, successMsg, fallbackMsg) {
+            if (!text) return false;
+            let copied = false;
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.setAttribute('readonly', '');
+            ta.style.position = 'fixed';
+            ta.style.top = '-9999px';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            try {
+                ta.focus();
+                ta.select();
+                ta.setSelectionRange(0, text.length);
+                copied = document.execCommand('copy');
+            } catch (e) {}
+            document.body.removeChild(ta);
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    if (!copied) showToast(successMsg, 'success');
+                }).catch(() => {});
+            }
+            if (copied) {
+                showToast(successMsg, 'success');
+            } else if (!navigator.clipboard || !navigator.clipboard.writeText) {
+                showToast(fallbackMsg || 'ไม่สามารถคัดลอกได้ กรุณาคัดลอกด้วยตนเอง', 'warning');
+            }
+            return copied;
+        }
+
+        async function syncWidgetFeedToCloud(isManual = false) {
+            if (!firebaseDb || !firebaseAuthUser) {
+                widgetFeedSyncState = 'idle';
+                widgetFeedSyncError = '';
+                if (typeof renderIosWidgetCloudSyncBox === 'function') renderIosWidgetCloudSyncBox();
+                return false;
+            }
+            try {
+                const token = ensureWidgetSyncToken();
+                const payload = buildScriptableWidgetPayload();
+                const feedRef = firebaseDb.collection(FIREBASE_COLLECTION_WIDGET_FEEDS).doc(token);
+                await feedRef.set({
+                    ownerUid: firebaseAuthUser.uid,
+                    payloadJson: JSON.stringify(payload),
+                    clientUpdatedAt: payload.updatedAt,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+
+                widgetFeedSyncState = 'ready';
+                widgetFeedSyncError = '';
+                if (typeof renderIosWidgetCloudSyncBox === 'function') renderIosWidgetCloudSyncBox();
+                const iosModal = document.getElementById('ios-widget-modal');
+                const ta = document.getElementById('ios-widget-code-textarea');
+                if (iosModal && !iosModal.classList.contains('hidden') && ta) {
+                    ta.value = buildScriptableWidgetCodeSync();
+                }
+                if (isManual) {
+                    showToast('อัปเดตข้อมูลไปยัง Widget Feed สำเร็จ! วิดเจ็ต iOS จะดึงข้อมูลล่าสุดอัตโนมัติ', 'success');
+                }
+                return true;
+            } catch (err) {
+                const errCode = (err && err.code) ? String(err.code) : '';
+                const errMsg = (err && err.message) ? String(err.message) : String(err || '');
+                widgetFeedSyncState = (errCode === 'permission-denied' || errMsg.toLowerCase().includes('permission'))
+                    ? 'permission_denied'
+                    : 'error';
+                widgetFeedSyncError = errMsg;
+                console.warn('[Firebase] widgetFeed sync notice:', errCode, errMsg);
+                if (typeof renderIosWidgetCloudSyncBox === 'function') renderIosWidgetCloudSyncBox();
+                if (isManual) {
+                    if (widgetFeedSyncState === 'permission_denied') {
+                        showToast('กรุณาอัปเดต Firestore Rules สำหรับ widgetFeeds ก่อนจึงจะซิงก์วิดเจ็ต iOS ได้', 'warning');
+                    } else {
+                        showToast(`ซิงก์ Widget Feed ไม่สำเร็จ: ${errMsg}`, 'error');
+                    }
+                }
+                return false;
+            }
+        }
+
+        async function rotateWidgetSyncToken() {
+            if (!firebaseDb || !firebaseAuthUser) {
+                showToast('กรุณาเข้าสู่ระบบ Cloud Sync ก่อนรีเซ็ตลิงก์', 'info');
+                return;
+            }
+            const oldToken = widgetSyncToken;
+            const newToken = setWidgetSyncToken(generateWidgetSyncToken());
+            if (oldToken && oldToken !== newToken && oldToken.length >= 24) {
+                try {
+                    await firebaseDb.collection(FIREBASE_COLLECTION_WIDGET_FEEDS).doc(oldToken).delete();
+                } catch (e) {}
+            }
+            await uploadScheduleToCloud(false);
+            if (typeof updateIosWidgetDataSummary === 'function') updateIosWidgetDataSummary();
+            if (typeof renderIosWidgetCloudSyncBox === 'function') renderIosWidgetCloudSyncBox();
+            const ta = document.getElementById('ios-widget-code-textarea');
+            if (ta) ta.value = buildScriptableWidgetCodeSync();
+            showToast('สร้างลิงก์ Feed ใหม่แล้ว! กรุณากด "อัปเดตสคริปต์เดิม" ใน Scriptable 1 ครั้ง', 'success');
+        }
+
+        function copyWidgetFeedUrl() {
+            if (!firebaseAuthUser) {
+                showToast('กรุณาเข้าสู่ระบบ Cloud Sync ก่อน', 'info');
+                return;
+            }
+            const token = ensureWidgetSyncToken();
+            const url = getWidgetFeedUrl(token);
+            copyPlainTextWithToast(
+                url,
+                'คัดลอกลิงก์ iOS Widget Feed แล้ว! สามารถนำไปวางใน Parameter ของ Scriptable ได้เลย',
+                'ไม่พบ Firebase Config สำหรับสร้างลิงก์ Feed'
+            );
+        }
+
+        function copyFirestoreWidgetRules() {
+            copyPlainTextWithToast(
+                getRecommendedFirestoreRules(),
+                'คัดลอก Firestore Security Rules แล้ว! นำไปวางใน Firebase Console > Firestore > Rules แล้วกด Publish',
+                'คัดลอก Rules ไม่สำเร็จ'
+            );
+        }
 
         /**
          * ตรวจสอบว่า Firebase Config มีค่าที่ใช้งานได้จริงหรือไม่
@@ -4813,14 +5081,21 @@
                     .doc(FIREBASE_DOC_SCHEDULE);
 
                 const docSnap = await docRef.get();
+                let syncedFeedInBranch = false;
 
                 if (!docSnap.exists) {
                     // กรณีที่ 1: บน Cloud ยังไม่มีข้อมูลเลย (ผู้ใช้ใหม่) -> อัปโหลดข้อมูลในเครื่องปัจจุบันขึ้น Cloud ทันที!
                     console.log('[Firebase] Cloud data is empty. Uploading current local schedule to cloud...');
                     await uploadScheduleToCloud(false);
+                    syncedFeedInBranch = true;
                     showToast('เชื่อมต่อบัญชีแล้ว! สำรองข้อมูลตารางเรียนปัจจุบันขึ้น Cloud เรียบร้อย', 'success');
                 } else {
                     const cloudData = docSnap.data() || {};
+                    let hadCloudToken = false;
+                    if (cloudData.widgetSyncToken && typeof cloudData.widgetSyncToken === 'string' && cloudData.widgetSyncToken.length >= 24) {
+                        setWidgetSyncToken(cloudData.widgetSyncToken);
+                        hadCloudToken = true;
+                    }
                     const cloudCourses = Array.isArray(cloudData.scheduleData) ? cloudData.scheduleData : [];
 
                     if (scheduleData.length === 0 && cloudCourses.length > 0) {
@@ -4838,9 +5113,19 @@
                             showToast(`อัปเดตตารางเรียนล่าสุดจาก Cloud แล้ว (${cloudCourses.length} รายวิชา)`, 'success');
                         } else {
                             await uploadScheduleToCloud(false);
+                            syncedFeedInBranch = true;
                         }
                     } else {
                         await uploadScheduleToCloud(false);
+                        syncedFeedInBranch = true;
+                    }
+
+                    if (!syncedFeedInBranch) {
+                        const tok = ensureWidgetSyncToken();
+                        if (!hadCloudToken) {
+                            docRef.set({ widgetSyncToken: tok }, { merge: true }).catch(() => {});
+                        }
+                        await syncWidgetFeedToCloud(false);
                     }
                 }
 
@@ -4923,10 +5208,20 @@
                     localStorage.setItem(STORAGE_PREFS_KEY, JSON.stringify({ weeklyLayoutMode, showWeekend }));
                 }
 
+                if (data.widgetSyncToken && typeof data.widgetSyncToken === 'string' && data.widgetSyncToken.length >= 24) {
+                    setWidgetSyncToken(data.widgetSyncToken);
+                }
                 postLoadSanitize();
                 syncPreferenceControls();
                 updateTick(true);
                 syncNativeWidgetData(true);
+                const iosModal = document.getElementById('ios-widget-modal');
+                if (iosModal && !iosModal.classList.contains('hidden')) {
+                    if (typeof updateIosWidgetDataSummary === 'function') updateIosWidgetDataSummary();
+                    if (typeof renderIosWidgetCloudSyncBox === 'function') renderIosWidgetCloudSyncBox();
+                    const ta = document.getElementById('ios-widget-code-textarea');
+                    if (ta) ta.value = buildScriptableWidgetCodeSync();
+                }
             } catch (err) {
                 console.error('[Firebase] applyCloudDataToLocal error:', err);
             } finally {
@@ -4956,9 +5251,10 @@
                         weeklyLayoutMode: weeklyLayoutMode,
                         showWeekend: showWeekend
                     },
+                    widgetSyncToken: ensureWidgetSyncToken(),
                     clientUpdatedAt: nowIso,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    appVersion: "1.2.0"
+                    appVersion: "1.3.2"
                 };
 
                 const docRef = firebaseDb.collection(FIREBASE_COLLECTION_USERS)
@@ -4967,6 +5263,7 @@
                     .doc(FIREBASE_DOC_SCHEDULE);
 
                 await docRef.set(payload, { merge: true });
+                await syncWidgetFeedToCloud(false);
 
                 cloudSyncStatus = 'synced';
                 lastCloudSyncTimestamp = Date.now();
@@ -5201,10 +5498,18 @@
                 firestoreUnsubscribe();
                 firestoreUnsubscribe = null;
             }
+            const resetWidgetTokenState = () => {
+                widgetSyncToken = '';
+                widgetFeedSyncState = 'idle';
+                widgetFeedSyncError = '';
+                try { localStorage.removeItem(STORAGE_WIDGET_SYNC_TOKEN_KEY); } catch (e) {}
+                if (typeof renderIosWidgetCloudSyncBox === 'function') renderIosWidgetCloudSyncBox();
+            };
             if (firebaseAuth) {
                 firebaseAuth.signOut().then(() => {
                     firebaseAuthUser = null;
                     cloudSyncStatus = 'offline';
+                    resetWidgetTokenState();
                     updateCloudSyncUI();
                     showToast('ออกจากระบบคลาวด์แล้ว ข้อมูลในเครื่องยังคงปลอดภัย', 'info');
                 }).catch(err => {
@@ -5213,6 +5518,7 @@
             } else {
                 firebaseAuthUser = null;
                 cloudSyncStatus = 'offline';
+                resetWidgetTokenState();
                 updateCloudSyncUI();
             }
         }
@@ -6439,17 +6745,106 @@
             return '';
         }
 
+        function renderIosWidgetCloudSyncBox() {
+            const box = document.getElementById('ios-widget-cloud-sync-box');
+            if (!box) return;
+
+            if (!firebaseAuthUser) {
+                box.className = 'bg-slate-800/80 border border-amber-500/40 rounded-xl p-3.5 text-xs space-y-2.5';
+                box.innerHTML = `
+                    <div class="flex items-center justify-between gap-2 flex-wrap">
+                        <div class="flex items-center gap-2 text-amber-300 font-bold">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <span>ซิงก์อัตโนมัติจาก Cloud (ยังไม่ได้เข้าสู่ระบบ)</span>
+                        </div>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-900 text-slate-400 border border-slate-700">โหมดวางโค้ดแบบแมนนวล</span>
+                    </div>
+                    <p class="text-slate-300 leading-relaxed">หากต้องการให้วิดเจ็ต iPhone / iPad ดึงตารางเรียนและ Task ล่าสุดอัตโนมัติเมื่อแก้ข้อมูลบนเว็บโดยไม่ต้องวางโค้ดใหม่ กรุณาเข้าสู่ระบบ Cloud Sync ก่อนครับ</p>
+                    <button type="button" onclick="closeIosWidgetModal(); openCloudSyncModal();" class="px-3.5 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-colors flex items-center gap-1.5">
+                        <i class="fa-brands fa-google"></i>
+                        <span>เข้าสู่ระบบ Cloud Sync</span>
+                    </button>
+                `;
+                return;
+            }
+
+            if (widgetFeedSyncState === 'permission_denied') {
+                const rulesStr = escapeHTML(getRecommendedFirestoreRules());
+                box.className = 'bg-amber-950/35 border border-amber-500/50 rounded-xl p-3.5 text-xs space-y-2.5';
+                box.innerHTML = `
+                    <div class="flex items-center justify-between gap-2 flex-wrap">
+                        <div class="flex items-center gap-2 text-amber-300 font-bold">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <span>ต้องอัปเดต Firestore Rules (ทำครั้งเดียว)</span>
+                        </div>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">Permission Denied</span>
+                    </div>
+                    <p class="text-slate-200 leading-relaxed">ระบบสร้างลิงก์ซิงก์ให้บัญชีของคุณแล้ว แต่ต้องอนุญาตคอลเลกชัน <code class="text-amber-300">widgetFeeds</code> ใน Firebase Console &gt; Firestore Database &gt; <strong>Rules</strong> แล้วกด Publish ก่อนครับ:</p>
+                    <pre class="bg-slate-950/90 border border-slate-700 rounded-lg p-2.5 text-[10px] font-mono text-slate-200 overflow-x-auto max-h-36 custom-scrollbar select-all">${rulesStr}</pre>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button type="button" onclick="copyFirestoreWidgetRules()" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-colors flex items-center gap-1.5">
+                            <i class="fa-solid fa-copy"></i>
+                            <span>คัดลอก Firestore Rules</span>
+                        </button>
+                        <button type="button" onclick="syncWidgetFeedToCloud(true)" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-700 border border-emerald-500/40 text-emerald-300 font-medium text-xs transition-colors flex items-center gap-1.5">
+                            <i class="fa-solid fa-rotate"></i>
+                            <span>ทดสอบซิงก์อีกครั้ง</span>
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            const isReady = widgetFeedSyncState === 'ready';
+            const isError = widgetFeedSyncState === 'error';
+            box.className = isReady
+                ? 'bg-sky-950/35 border border-sky-500/40 rounded-xl p-3.5 text-xs space-y-2.5'
+                : 'bg-slate-800/80 border border-slate-700 rounded-xl p-3.5 text-xs space-y-2.5';
+            box.innerHTML = `
+                <div class="flex items-center justify-between gap-2 flex-wrap">
+                    <div class="flex items-center gap-2 font-bold ${isReady ? 'text-sky-300' : (isError ? 'text-rose-300' : 'text-slate-200')}">
+                        <i class="fa-solid ${isReady ? 'fa-satellite-dish' : (isError ? 'fa-triangle-exclamation' : 'fa-spinner fa-spin')}"></i>
+                        <span>${isReady ? 'ซิงก์ Cloud → วิดเจ็ต iOS อัตโนมัติพร้อมใช้งาน' : (isError ? 'ซิงก์ Widget Feed ขัดข้องชั่วคราว' : 'กำลังเตรียมลิงก์ซิงก์ Cloud...')}</span>
+                    </div>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full ${isReady ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-slate-900 text-slate-300 border border-slate-700'}">${isReady ? 'Auto Cloud Sync' : (isError ? 'Retry Needed' : 'Syncing...')}</span>
+                </div>
+                <p class="text-slate-300 leading-relaxed">${isError
+                    ? `เกิดข้อผิดพลาด: ${escapeHTML(widgetFeedSyncError || 'กรุณาลองกดซิงก์ใหม่อีกครั้ง')}`
+                    : 'เมื่อวางสคริปต์ที่มีลิงก์ซิงก์ของบัญชีนี้ใน Scriptable แล้ว ทุกครั้งที่คุณแก้ไขตารางเรียนหรือ Task บนเว็บ/มือถือ วิดเจ็ต iOS จะดึงข้อมูลล่าสุดมาแสดงอัตโนมัติ (ตามรอบรีเฟรชของ iOS)'}</p>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button type="button" onclick="syncWidgetFeedToCloud(true)" class="px-3 py-1.5 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 border border-sky-400/40 text-sky-200 font-semibold text-xs transition-colors flex items-center gap-1.5">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span>ซิงก์ Feed ทันที</span>
+                    </button>
+                    <button type="button" onclick="copyWidgetFeedUrl()" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium text-xs transition-colors flex items-center gap-1.5">
+                        <i class="fa-solid fa-link text-sky-400"></i>
+                        <span>คัดลอกลิงก์ Feed</span>
+                    </button>
+                    <button type="button" onclick="rotateWidgetSyncToken()" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-rose-950/60 border border-slate-700 hover:border-rose-500/40 text-slate-300 hover:text-rose-200 font-medium text-xs transition-colors flex items-center gap-1.5" title="สร้าง URL ใหม่และยกเลิกลิงก์เก่า">
+                        <i class="fa-solid fa-key text-amber-400"></i>
+                        <span>รีเซ็ตลิงก์ใหม่</span>
+                    </button>
+                </div>
+            `;
+        }
+
         function openIosWidgetModal() {
+            if (firebaseAuthUser) {
+                ensureWidgetSyncToken();
+            }
             updateIosWidgetDataSummary();
+            renderIosWidgetCloudSyncBox();
             const modal = document.getElementById('ios-widget-modal');
             if (modal) {
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
             }
-            // Populate textarea immediately with user's fresh schedule code
             const textarea = document.getElementById('ios-widget-code-textarea');
             if (textarea) {
                 textarea.value = buildScriptableWidgetCodeSync();
+            }
+            if (firebaseAuthUser) {
+                syncWidgetFeedToCloud(false);
             }
         }
 
@@ -6461,7 +6856,7 @@
             }
         }
 
-        function buildScriptableWidgetCodeSync() {
+        function buildScriptableWidgetPayload() {
             const currentPayload = {
                 updatedAt: new Date().toISOString(),
                 sessions: [],
@@ -6471,6 +6866,13 @@
 
             const now = new Date();
             const todayIso = formatISODate(now);
+            currentPayload.examWeekDates = [];
+            for (let offset = 0; offset < 30; offset++) {
+                const dayIso = formatISODate(addDays(now, offset));
+                if (typeof getExamWeekInfo === 'function' && getExamWeekInfo(dayIso)) {
+                    currentPayload.examWeekDates.push(dayIso);
+                }
+            }
 
             if (Array.isArray(scheduleData) && scheduleData.length > 0) {
                 scheduleData.forEach(c => {
@@ -6482,6 +6884,7 @@
                             code: c.code || '',
                             name: c.name || '',
                             room: c.room || '',
+                            kind: c.specialType === 'lab' ? 'lab' : 'class',
                             color: c.color || '#38bdf8'
                         });
                     }
@@ -6495,17 +6898,19 @@
                                     code: c.code || '',
                                     name: c.name || '',
                                     room: ex.room || c.room || '',
+                                    kind: c.specialType === 'lab' ? 'lab' : 'class',
                                     color: c.color || '#38bdf8'
                                 });
                             }
                         });
                     }
                     getCourseNotes(c).forEach(n => {
-                        if (!n.done && n.date) {
+                        if (!n.done && n.date && n.type !== 'permanent' && n.type !== 'cancel') {
                             currentPayload.tasks.push({
                                 title: n.text || ('งาน ' + (c.code || c.name)),
                                 date: n.date,
-                                badge: n.type === 'homework' ? 'ส่งงาน' : (n.type === 'cancel' ? 'งดคลาส' : 'ประกาศ'),
+                                type: n.type || 'homework',
+                                badge: n.type === 'homework' ? 'ส่งงาน' : 'ประกาศ',
                                 color: n.type === 'homework' ? '#f59e0b' : '#38bdf8'
                             });
                         }
@@ -6528,6 +6933,7 @@
                                 currentPayload.tasks.push({
                                     title: `สอบ ${c.code || c.name} (${t === 'midterm' ? 'กลางภาค' : 'ปลายภาค'})`,
                                     date: ex.date,
+                                    type: 'exam',
                                     badge: exLabel,
                                     color: '#f43f5e'
                                 });
@@ -6537,22 +6943,31 @@
                 });
             }
 
-            // กรองงานและสอบที่ยังไม่หมดอายุ
-            currentPayload.tasks = currentPayload.tasks.filter(t => !t.date || t.date >= todayIso);
+            // เก็บงานค้างทั้งหมด (รวมงานเลยกำหนดเพื่อให้เรียงขึ้นบนสุด) และกรองเฉพาะวันสอบที่ผ่านไปแล้วออก
+            currentPayload.tasks = currentPayload.tasks.filter(t => t.type !== 'exam' || !t.date || t.date >= todayIso);
             currentPayload.tasks.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+            return currentPayload;
+        }
 
+        function buildScriptableWidgetCodeSync() {
+            const currentPayload = buildScriptableWidgetPayload();
             let baseCode = initScriptableBaseCode();
             const cleanAppUrl = window.location.href.split('#')[0].split('?')[0];
+            const syncUrl = (firebaseAuthUser && widgetSyncToken) ? getWidgetFeedUrl(widgetSyncToken) : '';
 
             let scriptCode = baseCode;
             if (scriptCode && scriptCode.includes('const DEFAULT_PAYLOAD =')) {
                 scriptCode = scriptCode.replace(
                     /const APP_URL = .*?;/,
-                    `const APP_URL = "${cleanAppUrl}";`
+                    () => `const APP_URL = ${JSON.stringify(cleanAppUrl)};`
+                );
+                scriptCode = scriptCode.replace(
+                    /const SYNC_URL = .*?;/,
+                    () => `const SYNC_URL = ${JSON.stringify(syncUrl)};`
                 );
                 scriptCode = scriptCode.replace(
                     /const DEFAULT_PAYLOAD = [\s\S]*?;\r?\n\r?\n\/\/ --- DATA FETCHING/,
-                    `const DEFAULT_PAYLOAD = ${JSON.stringify(currentPayload, null, 2)};\r\n\r\n// --- DATA FETCHING`
+                    () => `const DEFAULT_PAYLOAD = ${JSON.stringify(currentPayload, null, 2)};\r\n\r\n// --- DATA FETCHING`
                 );
             }
             return scriptCode;
@@ -6566,9 +6981,7 @@
             const textarea = document.getElementById('ios-widget-code-textarea');
             if (!textarea) return false;
 
-            if (!textarea.value) {
-                textarea.value = buildScriptableWidgetCodeSync();
-            }
+            textarea.value = buildScriptableWidgetCodeSync();
 
             let success = false;
 
@@ -7112,26 +7525,25 @@
 
 /**
  * Smart Schedule iOS Widget (Scriptable)
- * สำหรับ iPhone และ iPad
- * รองรับ Widget ขนาด Medium (4x2 แนวนอน), Small (2x2), และ Large (4x4)
- * 
- * รูปแบบการจัดวางขนาด Medium (4x2 แนวนอน):
- * - CURRENT CLASS: แถบแนวนอนด้านบน (กว้าง 3/4 หรือเต็มพื้นที่)
- * - NEXT CLASS: แถบแนวนอนด้านล่าง (กว้าง 3/4 หรือเต็มพื้นที่)
- * - TASKS: แถบแนวตั้งด้านขวา (กว้าง 1/4 ของ Widget แบ่ง 1 กล่องต่อนึง task)
- * - ซ่อนแถบ TASKS อัตโนมัติเมื่อไม่มีงานค้าง เพื่อให้ CURRENT และ NEXT ขยายเต็มความกว้าง
+ * รองรับหลายขนาดอัตโนมัติ (Small 2×2 / Medium 4×2 / Large 4×4 / Lock Screen)
+ * รูปแบบและตรรกะตรงกับ Android Widget:
+ * - Exam Mode (สัปดาห์สอบโทนส้ม) + Progress Bar + นับถอยหลังเข้า/เลิกเรียน
+ * - เรียงลำดับงานตามความเร่งด่วน (เลยกำหนด -> วันนี้ -> พรุ่งนี้ -> วันถัดไป) + ความสำคัญ
+ * - แสดงตารางวันนี้ (ในขนาด Large) และไฮไลต์งานด่วนสีแดงชมพู
  */
 
 // --- CONFIGURATION ---
 const APP_URL = "https://flyingtoasts.github.io/my-uni-schedule/"; // URL ของเว็บแอปเพื่อเปิดเมื่อแตะ Widget
-const REMOTE_DATA_URL = (args.widgetParameter || "").trim(); // ใส่ URL JSON ตารางเรียนของคุณ หรือใส่ในช่อง Parameter ของ Widget
+const SYNC_URL = ""; // URL ซิงก์อัตโนมัติจาก Firebase Cloud Sync (เว็บแอปจะเติมให้อัตโนมัติเมื่อเข้าสู่ระบบ)
+const REMOTE_DATA_URL = (args.widgetParameter || SYNC_URL || "").trim(); // รองรับทั้งซิงก์คลาวด์อัตโนมัติ หรือ URL ในช่อง Parameter
 
 // ข้อมูลเริ่มต้น (จะถูกแทนที่ด้วยข้อมูลจริงของผู้ใช้เมื่อกดจากในเว็บแอป)
 const DEFAULT_PAYLOAD = {
   "updatedAt": new Date().toISOString(),
+  "examWeekDates": [],
   "sessions": [
     {
-      "day": 1, // จันทร์
+      "day": 1,
       "start": "09:00",
       "end": "12:00",
       "code": "01208112-65",
@@ -7149,7 +7561,7 @@ const DEFAULT_PAYLOAD = {
       "color": "#34d399"
     },
     {
-      "day": 2, // อังคาร
+      "day": 2,
       "start": "10:00",
       "end": "12:00",
       "code": "2304104",
@@ -7159,8 +7571,8 @@ const DEFAULT_PAYLOAD = {
     }
   ],
   "tasks": [
-    { "title": "ส่งแบบฝึกหัดเขียนแบบ", "date": "2026-11-26", "badge": "ส่งงาน", "color": "#f59e0b" },
-    { "title": "อ่านสอบกลางภาค Phys II", "date": "2026-11-28", "badge": "สอบกลางภาค", "color": "#f43f5e" }
+    { "title": "ส่งแบบฝึกหัดเขียนแบบ", "date": "2026-11-26", "type": "homework", "badge": "ส่งงาน", "color": "#f59e0b" },
+    { "title": "อ่านสอบกลางภาค Phys II", "date": "2026-11-28", "type": "exam", "badge": "สอบกลางภาค", "color": "#f43f5e" }
   ],
   "exams": []
 };
@@ -7170,51 +7582,107 @@ const fm = FileManager.local();
 const cacheDir = fm.documentsDirectory();
 const cacheFile = fm.joinPath(cacheDir, "smart_schedule_ios_cache.json");
 
+function extractWidgetPayload(data) {
+  if (!data || typeof data !== "object" || data.error) return null;
+  if (data.fields && data.fields.payloadJson && typeof data.fields.payloadJson.stringValue === "string") {
+    try {
+      let parsed = JSON.parse(data.fields.payloadJson.stringValue);
+      if (parsed && (Array.isArray(parsed.sessions) || Array.isArray(parsed.scheduleData))) {
+        return parsed;
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
+  }
+  if (Array.isArray(data.sessions) || Array.isArray(data.scheduleData)) {
+    return data;
+  }
+  return null;
+}
+
+function parseUpdatedAtMs(obj) {
+  if (!obj || typeof obj !== "object") return 0;
+  let iso = obj.updatedAt || obj.generatedAt || "";
+  if (!iso) return 0;
+  let ms = Date.parse(iso);
+  return Number.isFinite(ms) ? ms : 0;
+}
+
 async function loadSchedulePayload() {
   let url = REMOTE_DATA_URL;
   if (url) {
     try {
       let req = new Request(url);
       req.timeoutInterval = 8;
-      let data = await req.loadJSON();
-      if (data && (data.sessions || data.scheduleData)) {
-        fm.writeString(cacheFile, JSON.stringify(data));
-        return data;
+      req.headers = { "Cache-Control": "no-cache" };
+      let raw = await req.loadJSON();
+      let parsed = extractWidgetPayload(raw);
+      if (parsed) {
+        try {
+          fm.writeString(cacheFile, JSON.stringify(parsed));
+        } catch (writeErr) {}
+        return parsed;
       }
     } catch (e) {
       console.warn("Could not load from remote URL, trying local cache: " + e);
     }
   }
 
-  // อ่านจาก Cache ถ้ามี
+  let cached = null;
   if (fm.fileExists(cacheFile)) {
     try {
-      let cached = JSON.parse(fm.readString(cacheFile));
-      if (cached && (cached.sessions || cached.scheduleData)) return cached;
+      let rawCache = JSON.parse(fm.readString(cacheFile));
+      let parsedCache = extractWidgetPayload(rawCache);
+      if (parsedCache) cached = parsedCache;
     } catch (e) {}
+  }
+
+  if (cached) {
+    let cachedMs = parseUpdatedAtMs(cached);
+    let defaultMs = parseUpdatedAtMs(DEFAULT_PAYLOAD);
+    if (cachedMs > defaultMs || (url && cachedMs === defaultMs)) {
+      return cached;
+    }
   }
 
   return DEFAULT_PAYLOAD;
 }
 
 // --- TIME & SCHEDULE HELPERS ---
-const THAI_DAYS = ["อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์"];
 const THAI_DAYS_SHORT = ["อา.", "จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส."];
 const THAI_MONTHS = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+const MAX_DAY_ROWS = 5;
 
 function getBangkokNow() {
   return new Date();
 }
 
-function parseTimeToMinutes(tStr) {
-  if (!tStr) return 0;
-  let p = tStr.split(":");
-  return parseInt(p[0], 10) * 60 + parseInt(p[1], 10);
+function toIsoDate(d) {
+  let y = d.getFullYear();
+  let m = String(d.getMonth() + 1).padStart(2, "0");
+  let day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
 }
 
-function formatTaskDate(dStr) {
-  if (!dStr) return "";
-  let parts = dStr.split("-");
+function addDaysToDate(d, offset) {
+  let copy = new Date(d.getTime());
+  copy.setDate(copy.getDate() + offset);
+  return copy;
+}
+
+function formatThaiDisplayDate(dateStr) {
+  if (!dateStr) return "";
+  let parts = dateStr.split("-");
+  if (parts.length < 3) return dateStr;
+  let d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  if (isNaN(d.getTime())) return dateStr;
+  return `${THAI_DAYS_SHORT[d.getDay()]} ${d.getDate()} ${THAI_MONTHS[d.getMonth()]}`;
+}
+
+function formatThaiShortDate(dateStr) {
+  if (!dateStr) return "";
+  let parts = dateStr.split("-");
   if (parts.length >= 3) {
     let day = parseInt(parts[2], 10);
     let month = parseInt(parts[1], 10);
@@ -7222,97 +7690,179 @@ function formatTaskDate(dStr) {
       return `${day} ${THAI_MONTHS[month - 1]}`;
     }
   }
-  return dStr.slice(5);
+  return dateStr.slice(5);
 }
 
-function formatTaskBadge(badge) {
-  if (!badge) return "";
-  if (badge === "สอบกลางภาค") return "สอบกลาง";
-  if (badge === "สอบปลายภาค") return "สอบปลาย";
-  return badge;
+function toMinutes(hhmm) {
+  if (!hhmm) return -1;
+  let p = String(hhmm).split(":");
+  if (p.length < 2) return -1;
+  let h = parseInt(p[0].trim(), 10);
+  let m = parseInt(p[1].trim().slice(0, 2), 10);
+  if (isNaN(h) || isNaN(m)) return -1;
+  return h * 60 + m;
 }
 
-function normalizePayload(raw) {
-  let sessions = [];
+function minutesBetween(fromStr, toStr) {
+  let a = toMinutes(fromStr);
+  let b = toMinutes(toStr);
+  if (a < 0 || b < 0) return -1;
+  return b - a;
+}
+
+function formatDuration(minutes) {
+  if (minutes < 60) return `${minutes} นาที`;
+  let h = Math.floor(minutes / 60);
+  let m = minutes % 60;
+  return m === 0 ? `${h} ชม.` : `${h} ชม. ${m} น.`;
+}
+
+function taskImportanceRank(type, title) {
+  let ty = String(type || "").trim().toLowerCase();
+  let ti = String(title || "").trim().toLowerCase();
+  if (
+    ty === "exam" || ty === "midterm" || ty === "final" ||
+    ti.includes("สอบ") || ti.includes("exam") || ti.includes("midterm") ||
+    ti.includes("final") || ti.includes("พรีเซนต์") || ti.includes("present")
+  ) return 0;
+  if (
+    ty === "quiz" ||
+    ti.includes("quiz") || ti.includes("ควิซ") || ti.includes("test") || ti.includes("ทดสอบ")
+  ) return 1;
+  if (
+    ty === "project" || ty === "lab" || ty === "report" ||
+    ti.includes("โปรเจกต์") || ti.includes("project") ||
+    ti.includes("รายงาน") || ti.includes("report") ||
+    ti.includes("แลป") || ti.includes("lab")
+  ) return 2;
+  if (
+    ty === "homework" || ty === "assignment" ||
+    ti.includes("การบ้าน") || ti.includes("homework") ||
+    ti.includes("ส่งงาน") || ti.includes("งาน")
+  ) return 3;
+  return 4;
+}
+
+function normalizePayload(raw, now) {
+  let datedSessions = [];
+  let recurringSessions = [];
   let tasks = [];
-  let exams = [];
+  let examWeekDates = Array.isArray(raw && raw.examWeekDates)
+    ? raw.examWeekDates.filter(s => typeof s === "string" && s.length > 0)
+    : [];
 
-  let now = getBangkokNow();
-  let todayIso = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  if (raw && Array.isArray(raw.sessions)) {
+    raw.sessions.forEach(s => {
+      if (!s || !s.start || !s.end) return;
+      if (s.date) {
+        datedSessions.push({
+          date: s.date,
+          start: s.start,
+          end: s.end,
+          code: s.code || "",
+          name: s.name || "",
+          room: s.room || "",
+          kind: s.kind || "class",
+          label: s.label || ""
+        });
+      } else if (s.day !== undefined) {
+        recurringSessions.push({
+          day: Number(s.day),
+          start: s.start,
+          end: s.end,
+          code: s.code || "",
+          name: s.name || "",
+          room: s.room || "",
+          kind: s.kind || "class"
+        });
+      }
+    });
+  }
 
-  if (Array.isArray(raw.sessions)) {
-    sessions = raw.sessions;
-  }
-  if (Array.isArray(raw.tasks)) {
-    tasks = raw.tasks;
-  }
-  if (Array.isArray(raw.exams)) {
-    exams = raw.exams;
+  if (raw && Array.isArray(raw.tasks)) {
+    raw.tasks.forEach(t => {
+      if (!t) return;
+      tasks.push({
+        title: t.title || "งาน",
+        date: t.date || "",
+        type: t.type || (t.badge && String(t.badge).includes("สอบ") ? "exam" : "homework")
+      });
+    });
   }
 
-  // หากเป็นก้อน scheduleData ดั้งเดิมจากเว็บแอป
-  if (Array.isArray(raw.scheduleData)) {
+  if (raw && Array.isArray(raw.exams)) {
+    raw.exams.forEach(ex => {
+      if (ex && ex.date && ex.start) {
+        datedSessions.push({
+          date: ex.date,
+          start: ex.start,
+          end: ex.end || ex.start,
+          code: ex.code || "",
+          name: ex.name || "",
+          room: ex.room || "",
+          kind: "exam"
+        });
+      }
+    });
+  }
+
+  // รองรับ payload ดั้งเดิมจาก scheduleData โดยตรง
+  if (raw && Array.isArray(raw.scheduleData)) {
     raw.scheduleData.forEach(c => {
       if (c.day !== undefined && c.start && c.end) {
-        sessions.push({
+        recurringSessions.push({
           day: Number(c.day),
           start: c.start,
           end: c.end,
           code: c.code || "",
           name: c.name || "",
           room: c.room || "",
-          color: c.color || "#38bdf8"
+          kind: c.specialType === "lab" ? "lab" : "class"
         });
       }
       if (Array.isArray(c.extraSessions)) {
         c.extraSessions.forEach(ex => {
           if (ex.day !== undefined && ex.start && ex.end) {
-            sessions.push({
+            recurringSessions.push({
               day: Number(ex.day),
               start: ex.start,
               end: ex.end,
               code: c.code || "",
               name: c.name || "",
               room: ex.room || c.room || "",
-              color: c.color || "#38bdf8"
+              kind: c.specialType === "lab" ? "lab" : "class"
             });
           }
         });
       }
-      // ดึงการบ้าน/งาน
       if (Array.isArray(c.notes)) {
         c.notes.forEach(n => {
-          if (!n.done && n.date) {
+          if (n && !n.done && n.date && n.type !== "permanent" && n.type !== "cancel") {
             tasks.push({
               title: n.text || ("งาน " + (c.code || c.name)),
               date: n.date,
-              badge: n.type === "homework" ? "ส่งงาน" : (n.type === "cancel" ? "งดคลาส" : "ประกาศ"),
-              color: n.type === "homework" ? "#f59e0b" : "#38bdf8"
+              type: n.type || "homework"
             });
           }
         });
       }
-      // ดึงตารางสอบ
       if (c.exams) {
-        ['midterm', 'final'].forEach(t => {
+        ["midterm", "final"].forEach(t => {
           let ex = c.exams[t];
           if (ex && ex.date && ex.start) {
-            let exLabel = t === 'midterm' ? "สอบกลางภาค" : "สอบปลายภาค";
-            exams.push({
+            datedSessions.push({
+              date: ex.date,
+              start: ex.start,
+              end: ex.end || ex.start,
               code: c.code || "",
               name: c.name || "",
               room: ex.room || "",
-              start: ex.start,
-              end: ex.end || ex.start,
-              date: ex.date,
-              badge: exLabel,
-              color: "#f43f5e"
+              kind: "exam"
             });
             tasks.push({
-              title: `สอบ ${c.code || c.name} (${t === 'midterm' ? 'กลางภาค' : 'ปลายภาค'})`,
+              title: `สอบ ${c.code || c.name} (${t === "midterm" ? "กลางภาค" : "ปลายภาค"})`,
               date: ex.date,
-              badge: exLabel,
-              color: "#f43f5e"
+              type: "exam"
             });
           }
         });
@@ -7320,523 +7870,872 @@ function normalizePayload(raw) {
     });
   }
 
-  // กรองงานและสอบที่ยังไม่หมดอายุ (วันนี้เป็นต้นไป)
-  tasks = tasks.filter(t => !t.date || t.date >= todayIso);
-  tasks.sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+  // แปลงคาบประจำสัปดาห์ (day) เป็นวันที่ล่วงหน้า 14 วัน เพื่อให้คำนวณสอดคล้องกับ Android
+  if (recurringSessions.length > 0) {
+    for (let offset = 0; offset < 14; offset++) {
+      let d = addDaysToDate(now, offset);
+      let dIso = toIsoDate(d);
+      let dow = d.getDay();
+      recurringSessions.forEach(rs => {
+        if (rs.day === dow) {
+          datedSessions.push({
+            date: dIso,
+            start: rs.start,
+            end: rs.end,
+            code: rs.code,
+            name: rs.name,
+            room: rs.room,
+            kind: rs.kind || "class"
+          });
+        }
+      });
+    }
+  }
 
-  return { sessions, tasks, exams };
+  datedSessions.sort((a, b) => (a.date + a.start).localeCompare(b.date + b.start));
+  return { sessions: datedSessions, tasks, examWeekDates };
 }
 
-function findCurrentAndNextSession(sessions, exams = []) {
-  let now = getBangkokNow();
-  let currentDay = now.getDay();
-  let currentMinutes = now.getHours() * 60 + now.getMinutes();
+function examRoomPart(room) {
+  let r = room ? (room.startsWith("ห้อง") || room === "ยังไม่ระบุห้องสอบ" ? room : `ห้อง ${room}`) : "ยังไม่ระบุห้องสอบ";
+  return room && room !== "ยังไม่ระบุห้องสอบ" ? `📍 ${r}` : "⚠️ ยังไม่ระบุห้องสอบ";
+}
 
+function buildWidgetState(raw, now) {
+  let { sessions, tasks, examWeekDates } = normalizePayload(raw, now);
+  let today = toIsoDate(now);
+  let tomorrow = toIsoDate(addDaysToDate(now, 1));
+  let currentTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+
+  let examDatesSet = new Set(examWeekDates);
+  let hasExamToday = sessions.some(s => s.kind === "exam" && s.date === today);
+  let examMode = examDatesSet.has(today) || hasExamToday;
+
+  let pool = examMode ? sessions.filter(s => s.kind === "exam") : sessions;
   let current = null;
   let next = null;
 
-  // 1. ค้นหาคาบเรียนที่กำลังเรียนอยู่ตอนนี้
-  for (let s of sessions) {
-    if (s.day === currentDay) {
-      let sMin = parseTimeToMinutes(s.start);
-      let eMin = parseTimeToMinutes(s.end);
-      if (currentMinutes >= sMin && currentMinutes < eMin) {
-        current = Object.assign({}, s);
-        current.isExam = false;
-        break;
+  for (let item of pool) {
+    if (item.date === today && currentTime >= item.start && currentTime < item.end) {
+      current = item;
+    }
+    if (!next && (item.date > today || (item.date === today && item.start > currentTime))) {
+      next = item;
+    }
+  }
+
+  let todayPool = pool.filter(s => s.date === today);
+
+  function dateLabelOf(date) {
+    return date === today ? "วันนี้" : formatThaiDisplayDate(date);
+  }
+
+  function whenLabelOf(date, start) {
+    if (date === today && start) {
+      let m = minutesBetween(currentTime, start);
+      return m > 0 ? `อีก ${formatDuration(m)}` : "วันนี้";
+    }
+    if (date === tomorrow) return "พรุ่งนี้";
+    return dateLabelOf(date);
+  }
+
+  let ui = {
+    examMode,
+    dateText: formatThaiDisplayDate(today),
+    curLabel: examMode ? "CURRENT EXAM" : "CURRENT CLASS",
+    curLabelColor: examMode ? "#FB923C" : "#67E8F9",
+    nextLabel: examMode ? "NEXT EXAM" : "NEXT CLASS",
+    nextLabelColor: examMode ? "#FB923C" : "#93C5FD",
+    hasCurrent: Boolean(current),
+    hasNext: Boolean(next),
+    curStatus: "",
+    curStatusColor: "",
+    curCode: "",
+    curCodeColor: examMode ? "#FDBA74" : "#67E8F9",
+    curName: "",
+    curNameColor: examMode ? "#FFF7ED" : "#F8FAFC",
+    curMeta: "",
+    curMetaColor: "",
+    curAccent: "#475569",
+    curProgress: -1,
+    curCountdown: "",
+    nextCode: "",
+    nextStart: "",
+    nextWhen: "",
+    nextName: "",
+    nextNameColor: examMode ? "#FFF7ED" : "#F1F5F9",
+    nextMeta: "",
+    nextMetaColor: "",
+    nextAccent: examMode ? "#FDBA74" : "#60A5FA",
+    todayTitle: examMode ? "ตารางสอบวันนี้" : "ตารางวันนี้",
+    todayEmpty: examMode ? "ไม่มีการสอบวันนี้ 📚" : "ไม่มีคาบเรียนวันนี้ 🎉",
+    todayTotal: todayPool.length,
+    todayRows: [],
+    tasks: []
+  };
+
+  if (examMode) {
+    if (current) {
+      ui.curStatus = "● EXAM";
+      ui.curStatusColor = "#F97316";
+      ui.curCode = current.code || "EXAM";
+      ui.curName = current.name || "วิชาสอบ";
+      ui.curMeta = `⏰ ${current.start} - ${current.end} • ${examRoomPart(current.room)}`;
+      ui.curMetaColor = "#FDE047";
+      ui.curAccent = "#F97316";
+    } else {
+      ui.curStatus = "○ EXAM";
+      ui.curStatusColor = "#FDBA74";
+      ui.curAccent = "#9A3412";
+      let firstStart = todayPool.length > 0 ? todayPool[0].start : "";
+      let lastEnd = todayPool.length > 0 ? todayPool[todayPool.length - 1].end : "";
+      if (todayPool.length === 0) {
+        ui.curName = "ไม่มีการสอบในวันนี้";
+        ui.curMeta = "อยู่ในช่วงสอบ • พักผ่อนหรืออ่านหนังสือสอบ 📚";
+      } else if (currentTime < firstStart) {
+        ui.curName = "ยังไม่ถึงเวลาสอบ";
+        ui.curMeta = "เตรียมตัวก่อนเข้าห้องสอบ ✍️";
+      } else if (currentTime >= lastEnd) {
+        ui.curName = "การสอบวันนี้เสร็จสิ้นแล้ว";
+        ui.curMeta = "สอบเสร็จแล้ว • พักผ่อนได้เต็มที่ 🎉";
+      } else {
+        ui.curName = "ไม่มีการสอบในขณะนี้";
+        ui.curMeta = "ช่วงพักระหว่างวิชาสอบ • ทบทวนหนังสือ 📚";
       }
+      ui.curMetaColor = "#FDBA74";
     }
-  }
 
-  // 2. ค้นหาคาบถัดไปที่ใกล้ที่สุด (วิชาเรียน + วันสอบ)
-  let candidates = [];
-
-  for (let s of sessions) {
-    let diffDays = (s.day - currentDay + 7) % 7;
-    let sMin = parseTimeToMinutes(s.start);
-    if (diffDays === 0 && sMin <= currentMinutes) {
-      diffDays = 7; // ผ่านไปแล้วในวันนี้ ให้เป็นสัปดาห์หน้า
+    if (next) {
+      ui.nextCode = next.code || "";
+      ui.nextStart = next.start || "";
+      ui.nextWhen = whenLabelOf(next.date, next.start);
+      let nName = next.name || "วิชาสอบถัดไป";
+      ui.nextName = next.code ? `${next.code}  ${nName}` : nName;
+      let timeStr = next.end ? `${next.start} - ${next.end}` : next.start;
+      let timePart = next.start ? `⏰ ${timeStr} • ` : "";
+      ui.nextMeta = `${timePart}${examRoomPart(next.room)} • ${dateLabelOf(next.date)}`;
+      ui.nextMetaColor = "#FED7AA";
+    } else {
+      ui.nextName = "ไม่มีวิชาสอบถัดไป";
+      ui.nextNameColor = "#FED7AA";
+      ui.nextMeta = "ไม่มีตารางสอบที่เหลืออยู่";
+      ui.nextMetaColor = "#FED7AA";
     }
-    let totalScore = diffDays * 1440 + sMin;
-    candidates.push({
-      session: {
-        code: s.code,
-        name: s.name,
-        room: s.room,
-        start: s.start,
-        end: s.end,
-        day: s.day,
-        isExam: false
-      },
-      diffDays,
-      score: totalScore
-    });
-  }
-
-  // รวมวันสอบที่ใกล้จะถึง
-  if (Array.isArray(exams)) {
-    for (let ex of exams) {
-      if (ex.date && ex.start) {
-        let exDate = new Date(ex.date + "T" + ex.start + ":00");
-        let diffMs = exDate.getTime() - now.getTime();
-        if (diffMs > 0) {
-          let diffDays = Math.floor(diffMs / (24 * 3600 * 1000));
-          let sMin = parseTimeToMinutes(ex.start);
-          let totalScore = diffDays * 1440 + sMin;
-          candidates.push({
-            session: {
-              code: ex.code,
-              name: `[${ex.badge || 'สอบ'}] ${ex.name}`,
-              room: ex.room || 'ยังไม่ระบุห้องสอบ',
-              start: ex.start,
-              end: ex.end || ex.start,
-              date: ex.date,
-              day: exDate.getDay(),
-              isExam: true
-            },
-            diffDays,
-            score: totalScore
-          });
-        }
+  } else {
+    if (current) {
+      let rText = current.room ? (current.room.startsWith("ห้อง") ? current.room : `ห้อง ${current.room}`) : "ยังไม่ระบุห้อง";
+      ui.curStatus = "● LIVE";
+      ui.curStatusColor = "#4ADE80";
+      ui.curCode = current.code || "CLASS";
+      ui.curName = current.name || "ไม่ระบุชื่อวิชา";
+      ui.curMeta = `⏰ ${current.start} - ${current.end} • 📍 ${rText}`;
+      ui.curMetaColor = "#BAE6FD";
+      ui.curAccent = "#22D3EE";
+    } else {
+      ui.curStatus = "○ FREE";
+      ui.curStatusColor = "#67E8F9";
+      ui.curAccent = "#475569";
+      let firstStart = todayPool.length > 0 ? todayPool[0].start : "";
+      let lastEnd = todayPool.length > 0 ? todayPool[todayPool.length - 1].end : "";
+      if (todayPool.length === 0) {
+        ui.curName = "ไม่มีคาบเรียนในวันนี้";
+        ui.curMeta = "วันว่าง • พักผ่อนได้เต็มที่ 🎉";
+      } else if (currentTime < firstStart) {
+        ui.curName = "ยังไม่ถึงเวลาเรียน";
+        ui.curMeta = "ช่วงเวลาว่าง • มีเวลาเตรียมตัว 🎒";
+      } else if (currentTime >= lastEnd) {
+        ui.curName = "การเรียนวันนี้เสร็จสิ้นแล้ว";
+        ui.curMeta = "เลิกเรียนแล้ว • พักผ่อนได้เต็มที่ 🎉";
+      } else {
+        ui.curName = "ไม่มีคาบเรียนในขณะนี้";
+        ui.curMeta = "ช่วงเวลาพัก • พักผ่อนได้เต็มที่ 🎉";
       }
+      ui.curMetaColor = "#BAE6FD";
+    }
+
+    if (next) {
+      ui.nextCode = next.code || "";
+      ui.nextStart = next.start || "";
+      ui.nextWhen = whenLabelOf(next.date, next.start);
+      let nName = next.name || "ไม่ระบุชื่อวิชา";
+      ui.nextName = next.code ? `${next.code}  ${nName}` : nName;
+      let timeStr = next.end ? `${next.start} - ${next.end}` : next.start;
+      let rText = next.room ? (next.room.startsWith("ห้อง") ? next.room : `ห้อง ${next.room}`) : "";
+      let roomPart = rText ? ` • 📍 ${rText}` : "";
+      ui.nextMeta = `⏰ ${timeStr}${roomPart} • ${dateLabelOf(next.date)}`;
+      ui.nextMetaColor = "#93C5FD";
+    } else {
+      ui.nextName = "ไม่มีคาบเรียนถัดไป";
+      ui.nextNameColor = "#93C5FD";
+      ui.nextMeta = "ไม่มีคาบเรียนแล้วในสัปดาห์นี้ • พักผ่อนได้เต็มที่ 🎉";
+      ui.nextMetaColor = "#94A3B8";
     }
   }
 
-  candidates.sort((a, b) => a.score - b.score);
-  if (candidates.length > 0) {
-    next = candidates[0].session;
-    next.diffDays = candidates[0].diffDays;
+  // Progress และเวลานับถอยหลังของคาบปัจจุบัน
+  if (current) {
+    let s = toMinutes(current.start);
+    let e = toMinutes(current.end);
+    let n = toMinutes(currentTime);
+    if (s >= 0 && e > s && n >= 0) {
+      ui.curProgress = Math.max(0, Math.min(100, Math.floor(((n - s) * 100) / (e - s))));
+      let left = e - n;
+      if (left > 0) ui.curCountdown = `เหลือ ${formatDuration(left)}`;
+    }
   }
 
-  return { current, next };
+  // ตารางวันนี้ (เลื่อนหน้าต่างให้เห็นคาบปัจจุบัน/ถัดไปเสมอ)
+  let rows = todayPool.map(item => {
+    let state = (item.end && currentTime >= item.end)
+      ? "past"
+      : (currentTime >= item.start && (!item.end || currentTime < item.end) ? "active" : "upcoming");
+    let titleText = [item.code, item.name].filter(Boolean).join(" ") || "ไม่ระบุชื่อวิชา";
+    return {
+      time: item.end ? `${item.start}-${item.end}` : item.start,
+      title: titleText,
+      room: item.room || "",
+      state
+    };
+  });
+  let focusIdx = rows.findIndex(r => r.state !== "past");
+  if (focusIdx < 0) focusIdx = rows.length;
+  let startIdx = Math.max(0, Math.min(focusIdx - 1, Math.max(0, rows.length - MAX_DAY_ROWS)));
+  ui.todayRows = rows.slice(startIdx, startIdx + MAX_DAY_ROWS);
+
+  // เรียงลำดับงาน: ความเร่งด่วน -> กำหนดส่งใกล้สุด -> ความสำคัญ -> ชื่อ
+  function urgencyRank(d) {
+    if (!d) return 4;
+    if (d < today) return 0;
+    if (d === today) return 1;
+    if (d === tomorrow) return 2;
+    return 3;
+  }
+
+  let sortedTasks = tasks.slice().sort((a, b) => {
+    let ua = urgencyRank(a.date);
+    let ub = urgencyRank(b.date);
+    if (ua !== ub) return ua - ub;
+    let da = a.date || "9999-99-99";
+    let db = b.date || "9999-99-99";
+    if (da !== db) return da.localeCompare(db);
+    let ia = taskImportanceRank(a.type, a.title);
+    let ib = taskImportanceRank(b.type, b.title);
+    if (ia !== ib) return ia - ib;
+    return String(a.title || "").localeCompare(String(b.title || ""));
+  });
+
+  ui.tasks = sortedTasks.map(t => {
+    let due = "";
+    if (t.date) {
+      if (t.date < today) due = "เลยกำหนด";
+      else if (t.date === today) due = "วันนี้";
+      else if (t.date === tomorrow) due = "พรุ่งนี้";
+      else due = formatThaiShortDate(t.date);
+    }
+    return {
+      title: t.title || "งาน",
+      due,
+      urgent: Boolean(t.date && t.date <= tomorrow)
+    };
+  });
+
+  return ui;
 }
 
-// --- WIDGET BUILDER ---
-async function createWidget() {
-  let raw = await loadSchedulePayload();
-  let { sessions, tasks, exams } = normalizePayload(raw);
-  let { current, next } = findCurrentAndNextSession(sessions, exams);
+// --- DRAWING HELPERS ---
+function drawProgressBar(percent, isExam) {
+  if (typeof DrawContext === "undefined") return null;
+  let w = 220;
+  let h = 6;
+  let ctx = new DrawContext();
+  ctx.size = new Size(w, h);
+  ctx.opaque = false;
+  ctx.respectScreenScale = true;
 
-  let now = getBangkokNow();
-  let dateThai = `${THAI_DAYS_SHORT[now.getDay()]} ${now.getDate()} ${THAI_MONTHS[now.getMonth()]}`;
+  let bgPath = new Path();
+  bgPath.addRoundedRect(new Rect(0, 0, w, h), 3, 3);
+  ctx.addPath(bgPath);
+  ctx.setFillColor(new Color("#FFFFFF", 0.16));
+  ctx.fillPath();
 
-  let widget = new ListWidget();
-  widget.backgroundColor = new Color("#090d16");
-  widget.url = APP_URL;
-  widget.setPadding(8, 11, 8, 11);
+  let fillW = Math.max(6, Math.round((w * Math.max(0, Math.min(100, percent))) / 100));
+  let fgPath = new Path();
+  fgPath.addRoundedRect(new Rect(0, 0, fillW, h), 3, 3);
+  ctx.addPath(fgPath);
+  ctx.setFillColor(new Color(isExam ? "#FB923C" : "#22D3EE"));
+  ctx.fillPath();
 
-  let family = config.widgetFamily || "medium";
+  return ctx.getImage();
+}
 
-  // --- HEADER ROW ---
+function addHeaderBar(widget, ui, compact = false) {
   let headerRow = widget.addStack();
   headerRow.layoutHorizontally();
   headerRow.centerAlignContent();
 
   let dot = headerRow.addText("● ");
-  dot.font = Font.systemFont(9);
-  dot.textColor = new Color("#38bdf8");
+  dot.font = Font.systemFont(compact ? 8 : 9);
+  dot.textColor = new Color("#38BDF8");
 
   let appTitle = headerRow.addText("Smart Schedule");
-  appTitle.font = Font.boldSystemFont(10.5);
-  appTitle.textColor = new Color("#e2e8f0");
+  appTitle.font = Font.boldSystemFont(compact ? 9.5 : 10.5);
+  appTitle.textColor = new Color("#E2E8F0");
+
+  if (ui.examMode) {
+    headerRow.addSpacer(5);
+    let chip = headerRow.addStack();
+    chip.backgroundColor = new Color("#FFFFFF", 0.12);
+    chip.cornerRadius = 6;
+    chip.setPadding(1, 5, 1, 5);
+    let chipTxt = chip.addText("สัปดาห์สอบ");
+    chipTxt.font = Font.boldSystemFont(7.5);
+    chipTxt.textColor = new Color("#FDBA74");
+  }
 
   headerRow.addSpacer();
 
-  let dateText = headerRow.addText(dateThai);
-  dateText.font = Font.mediumSystemFont(10.5);
-  dateText.textColor = new Color("#94a3b8");
+  let dateText = headerRow.addText(ui.dateText);
+  dateText.font = Font.mediumSystemFont(compact ? 9.5 : 10);
+  dateText.textColor = new Color("#94A3B8");
+}
 
-  widget.addSpacer(5);
+function addCurrentCard(container, ui, compact = true) {
+  let card = container.addStack();
+  card.layoutHorizontally();
+  card.backgroundColor = new Color(ui.examMode ? "#4A2310" : "#153A52", 0.9);
+  card.cornerRadius = 11;
+  card.borderWidth = 1;
+  card.borderColor = new Color(ui.examMode ? "#FDBA74" : "#7DD3FC", ui.examMode ? 0.55 : 0.4);
+  card.setPadding(compact ? 5 : 7, 7, compact ? 5 : 7, 8);
 
-  // --- BODY LAYOUT BY WIDGET SIZE ---
-  if (family === "small") {
-    renderSmallWidget(widget, current, next);
+  let accent = card.addStack();
+  accent.size = new Size(3, 0);
+  accent.backgroundColor = new Color(ui.curAccent);
+  accent.cornerRadius = 1.5;
+
+  card.addSpacer(6);
+
+  let body = card.addStack();
+  body.layoutVertically();
+
+  let top = body.addStack();
+  top.layoutHorizontally();
+  top.centerAlignContent();
+
+  let lbl = top.addText(ui.curLabel);
+  lbl.font = Font.boldSystemFont(8);
+  lbl.textColor = new Color(ui.curLabelColor);
+
+  top.addSpacer();
+
+  if (ui.curCountdown) {
+    let cd = top.addText(ui.curCountdown);
+    cd.font = Font.systemFont(8);
+    cd.textColor = new Color("#CBD5E1");
+    top.addSpacer(4);
+  }
+
+  let pill = top.addStack();
+  pill.backgroundColor = new Color("#FFFFFF", 0.10);
+  pill.cornerRadius = 6;
+  pill.setPadding(1, 5, 1, 5);
+  let badge = pill.addText(ui.curStatus);
+  badge.font = Font.boldSystemFont(7.5);
+  badge.textColor = new Color(ui.curStatusColor);
+
+  body.addSpacer();
+
+  let titleRow = body.addStack();
+  titleRow.layoutHorizontally();
+  titleRow.centerAlignContent();
+  if (ui.curCode) {
+    let codeTxt = titleRow.addText(ui.curCode + " ");
+    codeTxt.font = Font.boldSystemFont(compact ? 10.5 : 11.5);
+    codeTxt.textColor = new Color(ui.curCodeColor);
+  }
+  let nameTxt = titleRow.addText(ui.curName);
+  nameTxt.font = Font.boldSystemFont(compact ? 11.5 : 12.5);
+  nameTxt.textColor = new Color(ui.curNameColor);
+  nameTxt.lineLimit = 1;
+
+  body.addSpacer(2);
+
+  let metaTxt = body.addText(ui.curMeta);
+  metaTxt.font = Font.mediumSystemFont(compact ? 9 : 10);
+  metaTxt.textColor = new Color(ui.curMetaColor);
+  metaTxt.lineLimit = 1;
+
+  body.addSpacer();
+
+  if (ui.curProgress >= 0) {
+    let barImg = drawProgressBar(ui.curProgress, ui.examMode);
+    if (barImg) {
+      let img = body.addImage(barImg);
+      img.imageSize = new Size(compact ? 175 : 290, 3.5);
+    }
+  }
+}
+
+function addNextCard(container, ui, compact = true) {
+  let card = container.addStack();
+  card.layoutHorizontally();
+  card.backgroundColor = new Color(ui.examMode ? "#401A0C" : "#1E2F4A", 0.9);
+  card.cornerRadius = 11;
+  card.borderWidth = 1;
+  card.borderColor = new Color(ui.examMode ? "#FDBA74" : "#93C5FD", ui.examMode ? 0.55 : 0.35);
+  card.setPadding(compact ? 5 : 6, 7, compact ? 5 : 6, 8);
+
+  let accent = card.addStack();
+  accent.size = new Size(3, 0);
+  accent.backgroundColor = new Color(ui.nextAccent);
+  accent.cornerRadius = 1.5;
+
+  card.addSpacer(6);
+
+  let body = card.addStack();
+  body.layoutVertically();
+
+  let top = body.addStack();
+  top.layoutHorizontally();
+  top.centerAlignContent();
+
+  let lbl = top.addText(ui.nextLabel);
+  lbl.font = Font.boldSystemFont(8);
+  lbl.textColor = new Color(ui.nextLabelColor);
+
+  top.addSpacer();
+
+  if (ui.nextWhen) {
+    let whenTxt = top.addText(ui.nextWhen);
+    whenTxt.font = Font.boldSystemFont(8);
+    whenTxt.textColor = new Color("#BFDBFE");
+  }
+
+  body.addSpacer();
+
+  let nameTxt = body.addText(ui.nextName);
+  nameTxt.font = Font.boldSystemFont(compact ? 11.5 : 12);
+  nameTxt.textColor = new Color(ui.nextNameColor);
+  nameTxt.lineLimit = 1;
+
+  body.addSpacer(2);
+
+  let metaTxt = body.addText(ui.nextMeta);
+  metaTxt.font = Font.mediumSystemFont(compact ? 9 : 9.5);
+  metaTxt.textColor = new Color(ui.nextMetaColor);
+  metaTxt.lineLimit = 1;
+
+  body.addSpacer();
+}
+
+function addTasksColumn(parent, ui, options) {
+  let { slots, width, horizontalRows, hideEmpty } = options;
+  let tasks = ui.tasks;
+  if (tasks.length === 0 && hideEmpty) return;
+
+  let taskBox = parent.addStack();
+  taskBox.layoutVertically();
+  taskBox.backgroundColor = new Color("#2A1A44", 0.9);
+  taskBox.cornerRadius = 11;
+  taskBox.borderWidth = 1;
+  taskBox.borderColor = new Color("#D8B4FE", 0.4);
+  taskBox.setPadding(6, 6, 6, 6);
+  if (width > 0) taskBox.size = new Size(width, 0);
+
+  let taskHeader = taskBox.addStack();
+  taskHeader.layoutHorizontally();
+  taskHeader.centerAlignContent();
+
+  let taskTitle = taskHeader.addText("TASKS");
+  taskTitle.font = Font.boldSystemFont(8);
+  taskTitle.textColor = new Color("#C084FC");
+
+  taskHeader.addSpacer();
+
+  let taskCount = taskHeader.addText(`${tasks.length} งาน`);
+  taskCount.font = Font.boldSystemFont(8);
+  taskCount.textColor = new Color("#E9D5FF");
+
+  if (tasks.length === 0) {
+    taskBox.addSpacer();
+    let emptyTxt = taskBox.addText("ไม่มีงานค้าง 🎉");
+    emptyTxt.font = Font.systemFont(9.5);
+    emptyTxt.textColor = new Color("#C4B5FD");
+    emptyTxt.centerAlignText();
+    taskBox.addSpacer();
+    return;
+  }
+
+  let countToRender = Math.min(tasks.length, slots);
+  let compactSingleLine = !horizontalRows && tasks.length >= slots;
+
+  taskBox.addSpacer(3);
+
+  for (let i = 0; i < countToRender; i++) {
+    let isOverflow = i === slots - 1 && tasks.length > slots;
+    let itemCard = taskBox.addStack();
+    itemCard.cornerRadius = 6;
+    itemCard.borderWidth = 1;
+
+    if (isOverflow) {
+      itemCard.layoutHorizontally();
+      itemCard.centerAlignContent();
+      itemCard.backgroundColor = new Color("#241C38");
+      itemCard.borderColor = new Color("#403260");
+      itemCard.setPadding(horizontalRows ? 4 : 3, 5, horizontalRows ? 4 : 3, 5);
+      let rem = tasks.length - (slots - 1);
+      let moreTxt = itemCard.addText(`+ อีก ${rem} งาน...`);
+      moreTxt.font = Font.mediumSystemFont(8);
+      moreTxt.textColor = new Color("#E9D5FF");
+      moreTxt.lineLimit = 1;
+      itemCard.addSpacer();
+    } else {
+      let t = tasks[i];
+      itemCard.backgroundColor = new Color(t.urgent ? "#3A1A2A" : "#241C38");
+      itemCard.borderColor = new Color(t.urgent ? "#F43F5E" : "#403260", t.urgent ? 0.6 : 1.0);
+
+      if (horizontalRows) {
+        itemCard.layoutHorizontally();
+        itemCard.centerAlignContent();
+        itemCard.setPadding(4, 5, 4, 5);
+
+        let titleTxt = itemCard.addText(t.title);
+        titleTxt.font = Font.mediumSystemFont(8.5);
+        titleTxt.textColor = new Color("#F1F5F9");
+        titleTxt.lineLimit = 1;
+
+        itemCard.addSpacer();
+
+        if (t.due) {
+          let dueTxt = itemCard.addText(t.due);
+          dueTxt.font = Font.boldSystemFont(7.5);
+          dueTxt.textColor = new Color(t.urgent ? "#FDA4AF" : "#C4B5FD");
+          dueTxt.lineLimit = 1;
+        }
+      } else if (compactSingleLine) {
+        itemCard.layoutHorizontally();
+        itemCard.centerAlignContent();
+        itemCard.setPadding(3, 5, 3, 5);
+        let line = t.due ? `${t.title} · ${t.due}` : t.title;
+        let lineTxt = itemCard.addText(line);
+        lineTxt.font = Font.mediumSystemFont(7.5);
+        lineTxt.textColor = new Color(t.urgent ? "#FDA4AF" : "#F1F5F9");
+        lineTxt.lineLimit = 1;
+        itemCard.addSpacer();
+      } else {
+        itemCard.layoutVertically();
+        itemCard.setPadding(4, 5, 4, 5);
+        itemCard.addSpacer();
+
+        let titleTxt = itemCard.addText(t.title);
+        titleTxt.font = Font.mediumSystemFont(8);
+        titleTxt.textColor = new Color("#F1F5F9");
+        titleTxt.lineLimit = 2;
+
+        if (t.due) {
+          itemCard.addSpacer(1);
+          let dueTxt = itemCard.addText(t.due);
+          dueTxt.font = Font.boldSystemFont(7.5);
+          dueTxt.textColor = new Color(t.urgent ? "#FDA4AF" : "#C4B5FD");
+          dueTxt.lineLimit = 1;
+        }
+        itemCard.addSpacer();
+      }
+    }
+
+    if (i < countToRender - 1) taskBox.addSpacer(3);
+  }
+  taskBox.addSpacer();
+}
+
+// --- WIDGET BUILDER ---
+async function createWidget() {
+  let raw = await loadSchedulePayload();
+  let now = getBangkokNow();
+  let ui = buildWidgetState(raw, now);
+
+  let widget = new ListWidget();
+  widget.backgroundColor = new Color("#0B1220");
+  widget.url = APP_URL;
+  widget.refreshAfterDate = new Date(Date.now() + 5 * 60 * 1000);
+
+  let family = config.widgetFamily || "medium";
+
+  if (family === "accessoryRectangular") {
+    renderAccessoryRectangular(widget, ui);
+  } else if (family === "accessoryInline") {
+    renderAccessoryInline(widget, ui);
+  } else if (family === "small") {
+    widget.setPadding(10, 11, 10, 11);
+    renderSmallWidget(widget, ui);
   } else if (family === "large") {
-    renderLargeWidget(widget, current, next, tasks, sessions, now);
+    widget.setPadding(10, 10, 10, 10);
+    addHeaderBar(widget, ui, false);
+    widget.addSpacer(5);
+    renderLargeWidget(widget, ui);
   } else {
-    // 4x2 แนวนอน: CURRENT CLASS (แถบบน) | NEXT CLASS (แถบล่าง) | TASKS (แถบขวา)
-    renderMediumWidget(widget, current, next, tasks);
+    widget.setPadding(8, 10, 8, 10);
+    addHeaderBar(widget, ui, false);
+    widget.addSpacer(5);
+    renderMediumWidget(widget, ui);
   }
 
   return widget;
 }
 
-// ขนาดกลาง (4x2 แนวนอน)
-function renderMediumWidget(widget, current, next, tasks) {
+// Small Widget (2×2)
+function renderSmallWidget(widget, ui) {
+  let top = widget.addStack();
+  top.layoutHorizontally();
+  top.centerAlignContent();
+
+  let dot = top.addText("● ");
+  dot.font = Font.systemFont(8);
+  dot.textColor = new Color("#38BDF8");
+
+  let dateTxt = top.addText(ui.dateText);
+  dateTxt.font = Font.boldSystemFont(9);
+  dateTxt.textColor = new Color("#CBD5E1");
+  dateTxt.lineLimit = 1;
+
+  top.addSpacer();
+
+  let pill = top.addStack();
+  pill.backgroundColor = new Color("#FFFFFF", 0.10);
+  pill.cornerRadius = 6;
+  pill.setPadding(1, 5, 1, 5);
+  let statusTxt = pill.addText(ui.curStatus);
+  statusTxt.font = Font.boldSystemFont(7.5);
+  statusTxt.textColor = new Color(ui.curStatusColor);
+
+  widget.addSpacer();
+
+  let focusNext = !ui.hasCurrent && ui.hasNext;
+  let main = widget.addStack();
+  main.layoutHorizontally();
+
+  let accent = main.addStack();
+  accent.size = new Size(3, 0);
+  accent.backgroundColor = new Color(focusNext ? ui.nextAccent : ui.curAccent);
+  accent.cornerRadius = 1.5;
+
+  main.addSpacer(6);
+
+  let col = main.addStack();
+  col.layoutVertically();
+
+  let labelText = focusNext
+    ? (ui.nextWhen ? `${ui.nextLabel} · ${ui.nextWhen}` : ui.nextLabel)
+    : (ui.curCountdown ? `${ui.curLabel} · ${ui.curCountdown}` : ui.curLabel);
+  let lbl = col.addText(labelText);
+  lbl.font = Font.boldSystemFont(8);
+  lbl.textColor = new Color(focusNext ? ui.nextLabelColor : ui.curLabelColor);
+  lbl.lineLimit = 1;
+
+  if (!focusNext && ui.curCode) {
+    col.addSpacer(2);
+    let code = col.addText(ui.curCode);
+    code.font = Font.boldSystemFont(10);
+    code.textColor = new Color(ui.curCodeColor);
+    code.lineLimit = 1;
+  }
+
+  col.addSpacer(2);
+
+  let title = col.addText(focusNext ? ui.nextName : ui.curName);
+  title.font = Font.boldSystemFont(12.5);
+  title.textColor = new Color(focusNext ? ui.nextNameColor : ui.curNameColor);
+  title.lineLimit = 2;
+
+  col.addSpacer(2);
+
+  let meta = col.addText(focusNext ? ui.nextMeta : ui.curMeta);
+  meta.font = Font.systemFont(9);
+  meta.textColor = new Color(focusNext ? ui.nextMetaColor : ui.curMetaColor);
+  meta.lineLimit = 2;
+
+  if (!focusNext && ui.curProgress >= 0) {
+    let barImg = drawProgressBar(ui.curProgress, ui.examMode);
+    if (barImg) {
+      col.addSpacer(4);
+      let img = col.addImage(barImg);
+      img.imageSize = new Size(110, 3.5);
+    }
+  }
+
+  widget.addSpacer();
+
+  let footerText = "";
+  if (ui.hasCurrent && ui.hasNext) {
+    footerText = `ต่อไป ${ui.nextStart} • ${ui.nextCode || ui.nextName}`;
+  } else if (ui.tasks.length > 0) {
+    footerText = `📝 ${ui.tasks.length} งาน • ${ui.tasks[0].title}`;
+  } else if (focusNext) {
+    footerText = ui.curName;
+  }
+
+  if (footerText) {
+    let footer = widget.addStack();
+    footer.backgroundColor = new Color("#FFFFFF", 0.07);
+    footer.cornerRadius = 7;
+    footer.setPadding(3, 6, 3, 6);
+    let fTxt = footer.addText(footerText);
+    fTxt.font = Font.systemFont(8.5);
+    fTxt.textColor = new Color("#CBD5E1");
+    fTxt.lineLimit = 1;
+    footer.addSpacer();
+  }
+}
+
+// Medium Widget (4×2)
+function renderMediumWidget(widget, ui) {
   let bodyRow = widget.addStack();
   bodyRow.layoutHorizontally();
   bodyRow.spacing = 6;
 
-  let hasTasks = tasks && tasks.length > 0;
-
-  // ฝั่งซ้าย: CURRENT CLASS (บน) + NEXT CLASS (ล่าง)
   let leftCol = bodyRow.addStack();
   leftCol.layoutVertically();
-  leftCol.spacing = 5;
+  leftCol.spacing = 4;
 
-  // ----------------------------------------------------
-  // กล่อง 1: CURRENT CLASS (แถบแนวนอนด้านบน)
-  // ----------------------------------------------------
-  let curBox = leftCol.addStack();
-  curBox.layoutVertically();
-  curBox.backgroundColor = new Color("#131d2e");
-  curBox.cornerRadius = 10;
-  curBox.borderWidth = 1;
-  curBox.borderColor = new Color("#1e2e4a");
-  curBox.setPadding(6, 9, 6, 9);
+  addCurrentCard(leftCol, ui, true);
+  addNextCard(leftCol, ui, true);
 
-  let curHeader = curBox.addStack();
-  curHeader.layoutHorizontally();
-  curHeader.centerAlignContent();
-
-  let curTitle = curHeader.addText(current && current.isExam ? "CURRENT EXAM" : "CURRENT CLASS");
-  curTitle.font = Font.boldSystemFont(8.5);
-  curTitle.textColor = new Color("#38bdf8");
-
-  curHeader.addSpacer();
-
-  let curBadge = curHeader.addText(current ? (current.isExam ? "● IN EXAM" : "● IN CLASS") : "○ FREE");
-  curBadge.font = Font.boldSystemFont(8);
-  curBadge.textColor = current ? new Color("#34d399") : new Color("#94a3b8");
-
-  curBox.addSpacer();
-
-  if (current) {
-    let curNameLine = curBox.addText(`${current.code ? current.code + ' ' : ''}${current.name}`);
-    curNameLine.font = Font.boldSystemFont(11);
-    curNameLine.textColor = Color.white();
-    curNameLine.lineLimit = 1;
-
-    curBox.addSpacer(2);
-
-    let curDetailLine = curBox.addStack();
-    curDetailLine.layoutHorizontally();
-    curDetailLine.centerAlignContent();
-
-    let curTime = curDetailLine.addText(`⏰ ${current.start} - ${current.end}`);
-    curTime.font = Font.mediumSystemFont(9);
-    curTime.textColor = new Color("#fbbf24");
-
-    if (current.room) {
-      let sep = curDetailLine.addText("  •  ");
-      sep.font = Font.systemFont(9);
-      sep.textColor = new Color("#64748b");
-
-      let curRoom = curDetailLine.addText(`📍 ห้อง ${current.room}`);
-      curRoom.font = Font.systemFont(9);
-      curRoom.textColor = new Color("#94a3b8");
-      curRoom.lineLimit = 1;
-    }
-  } else {
-    let freeTitle = curBox.addText("ไม่มีคาบเรียนในขณะนี้");
-    freeTitle.font = Font.boldSystemFont(11);
-    freeTitle.textColor = new Color("#f1f5f9");
-
-    curBox.addSpacer(2);
-
-    let freeSub = curBox.addText("มีเวลาพักผ่อนแล้ว ✨");
-    freeSub.font = Font.systemFont(9.5);
-    freeSub.textColor = new Color("#94a3b8");
-  }
-
-  curBox.addSpacer();
-
-  // ----------------------------------------------------
-  // กล่อง 2: NEXT CLASS (แถบแนวนอนด้านล่าง)
-  // ----------------------------------------------------
-  let nextBox = leftCol.addStack();
-  nextBox.layoutVertically();
-  nextBox.backgroundColor = new Color("#131d2e");
-  nextBox.cornerRadius = 10;
-  nextBox.borderWidth = 1;
-  nextBox.borderColor = new Color("#1e2e4a");
-  nextBox.setPadding(6, 9, 6, 9);
-
-  let nextHeader = nextBox.addStack();
-  nextHeader.layoutHorizontally();
-  nextHeader.centerAlignContent();
-
-  let nextLabel = nextHeader.addText(next && next.isExam ? "NEXT EXAM" : "NEXT CLASS");
-  nextLabel.font = Font.boldSystemFont(8.5);
-  nextLabel.textColor = new Color("#94a3b8");
-
-  nextHeader.addSpacer();
-
-  if (next) {
-    let dayStr = "";
-    if (next.diffDays === 0) dayStr = "วันนี้";
-    else if (next.diffDays === 1) dayStr = "พรุ่งนี้";
-    else if (next.day !== undefined) {
-      dayStr = THAI_DAYS[next.day];
-      if (next.diffDays !== undefined && next.diffDays > 0) {
-        let targetDate = new Date();
-        targetDate.setDate(targetDate.getDate() + next.diffDays);
-        dayStr += ` ${targetDate.getDate()} ${THAI_MONTHS[targetDate.getMonth()]}`;
-      }
-    } else if (next.date) {
-      dayStr = formatTaskDate(next.date);
-    }
-
-    let nextDayText = nextHeader.addText(dayStr);
-    nextDayText.font = Font.mediumSystemFont(8);
-    nextDayText.textColor = new Color("#cbd5e1");
-  }
-
-  nextBox.addSpacer();
-
-  if (next) {
-    let nextNameLine = nextBox.addText(`${next.code ? next.code + ' ' : ''}${next.name}`);
-    nextNameLine.font = Font.boldSystemFont(11);
-    nextNameLine.textColor = Color.white();
-    nextNameLine.lineLimit = 1;
-
-    nextBox.addSpacer(2);
-
-    let nextDetailLine = nextBox.addStack();
-    nextDetailLine.layoutHorizontally();
-    nextDetailLine.centerAlignContent();
-
-    let nextTime = nextDetailLine.addText(`⏰ ${next.start} - ${next.end}`);
-    nextTime.font = Font.mediumSystemFont(9);
-    nextTime.textColor = new Color("#fbbf24");
-
-    if (next.room) {
-      let sep = nextDetailLine.addText("  •  ");
-      sep.font = Font.systemFont(9);
-      sep.textColor = new Color("#64748b");
-
-      let nextRoom = nextDetailLine.addText(`📍 ห้อง ${next.room}`);
-      nextRoom.font = Font.systemFont(9);
-      nextRoom.textColor = new Color("#94a3b8");
-      nextRoom.lineLimit = 1;
-    }
-  } else {
-    let noNext = nextBox.addText("ไม่มีข้อมูลคาบถัดไป");
-    noNext.font = Font.boldSystemFont(11);
-    noNext.textColor = new Color("#94a3b8");
-
-    nextBox.addSpacer(2);
-
-    let noNextSub = nextBox.addText("พักผ่อนได้เต็มที่ 🎉");
-    noNextSub.font = Font.systemFont(9.5);
-    noNextSub.textColor = new Color("#64748b");
-  }
-
-  nextBox.addSpacer();
-
-  // ----------------------------------------------------
-  // กล่อง 3: TASKS (แถบแนวตั้งด้านขวา)
-  // ซ่อนอัตโนมัติหากไม่มีงานค้าง
-  // ----------------------------------------------------
-  if (hasTasks) {
-    let taskBox = bodyRow.addStack();
-    taskBox.layoutVertically();
-    taskBox.backgroundColor = new Color("#131d2e");
-    taskBox.cornerRadius = 10;
-    taskBox.borderWidth = 1;
-    taskBox.borderColor = new Color("#1e2e4a");
-    taskBox.setPadding(6, 7, 6, 7);
-    taskBox.size = new Size(106, 0); // ขยายความกว้างเป็น 106pt เพื่อให้แสดงชื่องานและวันที่ได้ครบถ้วน ไม่ถูกตัดขอบ
-
-    let taskHeader = taskBox.addStack();
-    taskHeader.layoutHorizontally();
-    taskHeader.centerAlignContent();
-
-    let taskTitle = taskHeader.addText("TASKS");
-    taskTitle.font = Font.boldSystemFont(8.5);
-    taskTitle.textColor = new Color("#f59e0b");
-
-    taskHeader.addSpacer();
-
-    let taskCount = taskHeader.addText(String(tasks.length));
-    taskCount.font = Font.boldSystemFont(8);
-    taskCount.textColor = new Color("#fbbf24");
-
-    let displayTasks = tasks.slice(0, 3); // แสดงสูงสุด 3 รายการ
-
-    if (displayTasks.length === 1) {
-      taskBox.addSpacer();
-      let t = displayTasks[0];
-      let itemCard = taskBox.addStack();
-      itemCard.layoutVertically();
-      itemCard.backgroundColor = new Color("#1a263c");
-      itemCard.cornerRadius = 6;
-      itemCard.setPadding(5, 6, 5, 6);
-
-      let tText = itemCard.addText(t.title || "งาน");
-      tText.font = Font.mediumSystemFont(8.5);
-      tText.textColor = Color.white();
-      tText.lineLimit = 2;
-
-      if (t.date || t.badge) {
-        itemCard.addSpacer(3);
-        let b = formatTaskBadge(t.badge);
-        let d = formatTaskDate(t.date);
-        let dateLabel = b && d ? `[${b}] ${d}` : (b ? `[${b}]` : d);
-        let tDate = itemCard.addText(dateLabel);
-        tDate.font = Font.systemFont(7.5);
-        tDate.textColor = new Color(t.color || "#38bdf8");
-        tDate.lineLimit = 1;
-      }
-      taskBox.addSpacer();
-    } else if (displayTasks.length === 2) {
-      taskBox.addSpacer();
-      for (let i = 0; i < displayTasks.length; i++) {
-        let t = displayTasks[i];
-        let itemCard = taskBox.addStack();
-        itemCard.layoutVertically();
-        itemCard.backgroundColor = new Color("#1a263c");
-        itemCard.cornerRadius = 6;
-        itemCard.setPadding(4, 5, 4, 5);
-
-        let tText = itemCard.addText(t.title || "งาน");
-        tText.font = Font.mediumSystemFont(8);
-        tText.textColor = Color.white();
-        tText.lineLimit = 2; // อนุญาตให้ตัด 2 บรรทัดได้ เพื่อให้ชื่องานไม่ถูกตัดขาดด้วย ...
-
-        if (t.date || t.badge) {
-          itemCard.addSpacer(2);
-          let b = formatTaskBadge(t.badge);
-          let d = formatTaskDate(t.date);
-          let dateLabel = b && d ? `[${b}] ${d}` : (b ? `[${b}]` : d);
-          let tDate = itemCard.addText(dateLabel);
-          tDate.font = Font.systemFont(7.5);
-          tDate.textColor = new Color(t.color || "#38bdf8");
-          tDate.lineLimit = 1;
-        }
-
-        if (i === 0) taskBox.addSpacer(4);
-      }
-      taskBox.addSpacer();
-    } else {
-      taskBox.addSpacer(2);
-      for (let i = 0; i < displayTasks.length; i++) {
-        let t = displayTasks[i];
-        let itemCard = taskBox.addStack();
-        itemCard.layoutVertically();
-        itemCard.backgroundColor = new Color("#1a263c");
-        itemCard.cornerRadius = 6;
-        itemCard.setPadding(3, 5, 3, 5);
-
-        let tText = itemCard.addText(t.title || "งาน");
-        tText.font = Font.mediumSystemFont(7.5);
-        tText.textColor = Color.white();
-        tText.lineLimit = 1;
-
-        if (t.date || t.badge) {
-          let b = formatTaskBadge(t.badge);
-          let d = formatTaskDate(t.date);
-          let dateLabel = b && d ? `[${b}] ${d}` : (b ? `[${b}]` : d);
-          let tDate = itemCard.addText(dateLabel);
-          tDate.font = Font.systemFont(7);
-          tDate.textColor = new Color(t.color || "#38bdf8");
-          tDate.lineLimit = 1;
-        }
-
-        if (i < displayTasks.length - 1) taskBox.addSpacer(3);
-      }
-      taskBox.addSpacer();
-    }
-  }
+  addTasksColumn(bodyRow, ui, {
+    slots: 3,
+    width: 108,
+    horizontalRows: false,
+    hideEmpty: true
+  });
 }
 
-// Small Widget (2x2)
-function renderSmallWidget(widget, current, next) {
-  let body = widget.addStack();
-  body.layoutVertically();
-  body.spacing = 3;
+// Large Widget (4×4)
+function renderLargeWidget(widget, ui) {
+  addCurrentCard(widget, ui, false);
+  widget.addSpacer(5);
+  addNextCard(widget, ui, false);
+  widget.addSpacer(6);
 
-  let curHeader = body.addText(current ? "🟢 กำลังเรียน" : "⚪ ไม่มีเรียนขณะนี้");
-  curHeader.font = Font.boldSystemFont(8.5);
-  curHeader.textColor = current ? new Color("#34d399") : new Color("#94a3b8");
+  let bottomRow = widget.addStack();
+  bottomRow.layoutHorizontally();
+  bottomRow.spacing = 6;
 
-  if (current) {
-    let curTitle = body.addText(`${current.code ? current.code + ' ' : ''}${current.name}`);
-    curTitle.font = Font.boldSystemFont(9.5);
-    curTitle.textColor = Color.white();
-    curTitle.lineLimit = 1;
+  // ซ้าย: ตารางวันนี้
+  let todayBox = bottomRow.addStack();
+  todayBox.layoutVertically();
+  todayBox.backgroundColor = new Color("#172234", 0.9);
+  todayBox.cornerRadius = 11;
+  todayBox.borderWidth = 1;
+  todayBox.borderColor = new Color("#475569", 0.4);
+  todayBox.setPadding(6, 6, 6, 6);
 
-    let curTime = body.addText(`⏰ ${current.start}-${current.end} · ${current.room || ""}`);
-    curTime.font = Font.systemFont(8);
-    curTime.textColor = new Color("#94a3b8");
-  } else {
-    let free = body.addText("มีเวลาพักผ่อน ✨");
-    free.font = Font.systemFont(8.5);
-    free.textColor = new Color("#64748b");
+  let tHeader = todayBox.addStack();
+  tHeader.layoutHorizontally();
+  tHeader.centerAlignContent();
+
+  let tTitle = tHeader.addText(ui.todayTitle);
+  tTitle.font = Font.boldSystemFont(8.5);
+  tTitle.textColor = new Color("#E2E8F0");
+
+  tHeader.addSpacer();
+
+  if (ui.todayTotal > 0) {
+    let tCount = tHeader.addText(`${ui.todayTotal} ${ui.examMode ? "วิชา" : "คาบ"}`);
+    tCount.font = Font.systemFont(8);
+    tCount.textColor = new Color("#94A3B8");
   }
 
-  body.addSpacer(3);
-
-  let nextHeader = body.addText(next && next.isExam ? "🔴 สอบถัดไป" : "🟡 คาบถัดไป");
-  nextHeader.font = Font.boldSystemFont(8.5);
-  nextHeader.textColor = next && next.isExam ? new Color("#f43f5e") : new Color("#fbbf24");
-
-  if (next) {
-    let nextTitle = body.addText(`${next.code ? next.code + ' ' : ''}${next.name}`);
-    nextTitle.font = Font.boldSystemFont(9.5);
-    nextTitle.textColor = Color.white();
-    nextTitle.lineLimit = 1;
-
-    let dayStr = next.diffDays === 0 ? "วันนี้" : (next.diffDays === 1 ? "พรุ่งนี้" : THAI_DAYS[next.day]);
-    let nextTime = body.addText(`${dayStr} ${next.start} · ${next.room || ""}`);
-    nextTime.font = Font.systemFont(8);
-    nextTime.textColor = new Color("#94a3b8");
-  } else {
-    let noNext = body.addText("ไม่มีข้อมูล");
-    noNext.font = Font.systemFont(8.5);
-    noNext.textColor = new Color("#64748b");
-  }
-}
-
-// Large Widget (4x4)
-function renderLargeWidget(widget, current, next, tasks, sessions, now) {
-  renderMediumWidget(widget, current, next, tasks);
-
-  widget.addSpacer(8);
-
-  let listHeader = widget.addText("ตารางเรียนวันนี้ทั้งหมด");
-  listHeader.font = Font.boldSystemFont(10.5);
-  listHeader.textColor = new Color("#e2e8f0");
-
-  widget.addSpacer(4);
-
-  let todaySessions = sessions.filter(s => s.day === now.getDay());
-  todaySessions.sort((a, b) => a.start.localeCompare(b.start));
-
-  if (todaySessions.length === 0) {
-    let empty = widget.addText("วันนี้ไม่มีคาบเรียน พักผ่อนได้เต็มที่ 🎉");
+  if (ui.todayRows.length === 0) {
+    todayBox.addSpacer();
+    let empty = todayBox.addText(ui.todayEmpty);
     empty.font = Font.systemFont(9.5);
-    empty.textColor = new Color("#64748b");
+    empty.textColor = new Color("#94A3B8");
+    empty.centerAlignText();
+    todayBox.addSpacer();
   } else {
-    for (let s of todaySessions.slice(0, 4)) {
-      let row = widget.addStack();
-      row.layoutHorizontally();
-      row.backgroundColor = new Color("#131d2e");
-      row.cornerRadius = 8;
-      row.setPadding(4, 7, 4, 7);
+    todayBox.addSpacer(3);
+    for (let i = 0; i < ui.todayRows.length; i++) {
+      let row = ui.todayRows[i];
+      let isAct = row.state === "active";
+      let isPast = row.state === "past";
 
-      let time = row.addText(`${s.start}-${s.end}`);
-      time.font = Font.mediumSystemFont(8.5);
-      time.textColor = new Color("#38bdf8");
-
-      row.addSpacer(6);
-
-      let title = row.addText(`${s.code} ${s.name}`);
-      title.font = Font.systemFont(8.5);
-      title.textColor = Color.white();
-      title.lineLimit = 1;
-
-      row.addSpacer();
-
-      if (s.room) {
-        let room = row.addText(s.room);
-        room.font = Font.systemFont(8);
-        room.textColor = new Color("#94a3b8");
+      let rowStack = todayBox.addStack();
+      rowStack.layoutHorizontally();
+      rowStack.centerAlignContent();
+      rowStack.cornerRadius = 6;
+      rowStack.setPadding(3, 5, 3, 5);
+      if (isAct) {
+        rowStack.backgroundColor = new Color(ui.examMode ? "#F97316" : "#22D3EE", 0.22);
+        rowStack.borderWidth = 1;
+        rowStack.borderColor = new Color(ui.examMode ? "#FB923C" : "#22D3EE", 0.55);
+      } else {
+        rowStack.backgroundColor = new Color("#FFFFFF", 0.06);
       }
 
-      widget.addSpacer(3);
+      let timeTxt = rowStack.addText(row.time);
+      timeTxt.font = Font.boldSystemFont(8);
+      timeTxt.textColor = new Color(
+        isAct ? (ui.examMode ? "#FDBA74" : "#67E8F9") : (isPast ? "#475569" : "#93C5FD")
+      );
+      timeTxt.lineLimit = 1;
+
+      rowStack.addSpacer(4);
+
+      let titleTxt = rowStack.addText(isAct ? `● ${row.title}` : row.title);
+      titleTxt.font = Font.systemFont(8.5);
+      titleTxt.textColor = isAct ? Color.white() : new Color(isPast ? "#64748B" : "#F1F5F9");
+      titleTxt.lineLimit = 1;
+
+      rowStack.addSpacer();
+
+      if (row.room) {
+        let roomTxt = rowStack.addText(row.room);
+        roomTxt.font = Font.systemFont(7.5);
+        roomTxt.textColor = new Color(isAct ? "#E2E8F0" : (isPast ? "#475569" : "#94A3B8"));
+        roomTxt.lineLimit = 1;
+      }
+
+      if (i < ui.todayRows.length - 1) todayBox.addSpacer(2);
     }
+    todayBox.addSpacer();
   }
+
+  // ขวา: TASKS
+  addTasksColumn(bottomRow, ui, {
+    slots: 4,
+    width: 132,
+    horizontalRows: true,
+    hideEmpty: false
+  });
+}
+
+// Lock Screen Rectangular
+function renderAccessoryRectangular(widget, ui) {
+  widget.setPadding(2, 4, 2, 4);
+  let focusNext = !ui.hasCurrent && ui.hasNext;
+  let head = widget.addText(
+    focusNext ? `${ui.nextLabel} · ${ui.nextWhen}` : `${ui.curLabel} ${ui.curStatus}`
+  );
+  head.font = Font.boldSystemFont(10);
+  head.lineLimit = 1;
+
+  let titleText = focusNext ? ui.nextName : (ui.curCode ? `${ui.curCode} ${ui.curName}` : ui.curName);
+  let title = widget.addText(titleText);
+  title.font = Font.boldSystemFont(12);
+  title.lineLimit = 1;
+
+  let meta = widget.addText(focusNext ? ui.nextMeta : ui.curMeta);
+  meta.font = Font.systemFont(10);
+  meta.textOpacity = 0.8;
+  meta.lineLimit = 1;
+}
+
+// Lock Screen Inline
+function renderAccessoryInline(widget, ui) {
+  let msg = ui.hasCurrent
+    ? `● ${ui.curCode || ui.curName} ${ui.curCountdown}`.trim()
+    : (ui.hasNext ? `ถัดไป ${ui.nextStart} ${ui.nextCode || ui.nextName}`.trim() : "Smart Schedule · ว่าง");
+  let t = widget.addText(msg);
+  t.lineLimit = 1;
 }
 
 // --- RUN SCRIPT ---
@@ -7846,11 +8745,9 @@ function renderLargeWidget(widget, current, next, tasks, sessions, now) {
     Script.setWidget(widget);
     Script.complete();
   } else {
-    // พรีวิวในแอป Scriptable ตามขนาดที่ต้องการ (ขนาดกลาง 4x2 แนวนอน)
     await widget.presentMedium();
   }
 })();
-
     </script>
 
     <div id="ios-widget-modal" class="fixed inset-0 z-[65] hidden items-center justify-center bg-slate-950/85 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
@@ -7865,7 +8762,7 @@ function renderLargeWidget(widget, current, next, tasks, sessions, now) {
                         <h3 class="font-bold text-base sm:text-lg text-white flex items-center gap-2">
                             วิดเจ็ตหน้าจอโฮม iOS (iPhone & iPad)
                         </h3>
-                        <p class="text-xs text-slate-400 mt-0.5">วิธีแสดงตารางเรียนบนหน้าจอโฮมสำหรับผู้ใช้ Apple iOS</p>
+                        <p class="text-xs text-slate-400 mt-0.5">แสดงตารางเรียนและงานสำคัญบนหน้าจอโฮม iPhone / iPad ผ่านแอป Scriptable</p>
                     </div>
                 </div>
                 <button onclick="closeIosWidgetModal()" class="text-slate-400 hover:text-white w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-700 transition-all">
@@ -7880,25 +8777,22 @@ function renderLargeWidget(widget, current, next, tasks, sessions, now) {
                     <!-- Filled dynamically by updateIosWidgetDataSummary() -->
                 </div>
 
-                <!-- Info Alert -->
-                <div class="bg-sky-950/40 border border-sky-500/30 rounded-xl p-3.5 text-sky-200 leading-relaxed text-xs">
-                    <div class="font-bold text-sky-300 flex items-center gap-1.5 mb-1 text-sm">
-                        <i class="fa-solid fa-circle-info text-sky-400"></i> วิธีแสดง Widget ตารางเรียนบนหน้าจอโฮม iOS
-                    </div>
-                    บน iPhone / iPad สามารถเลือกใช้งานได้ <strong>2 แนวทางที่ดีที่สุด</strong>:
+                <!-- Cloud Sync Auto-Update Status & Controls -->
+                <div id="ios-widget-cloud-sync-box">
+                    <!-- Filled dynamically by renderIosWidgetCloudSyncBox() -->
                 </div>
 
-                <!-- Option 1: Scriptable Widget (Recommended) -->
+                <!-- Scriptable Widget (iOS) -->
                 <div class="bg-slate-800/70 border border-slate-700 rounded-xl p-4 space-y-3.5">
                     <div class="flex items-center justify-between flex-wrap gap-2">
                         <div class="flex items-center gap-2.5">
-                            <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center justify-center font-bold text-xs">1</span>
+                            <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center justify-center font-bold text-xs"><i class="fa-solid fa-code"></i></span>
                             <div>
-                                <h4 class="font-bold text-white text-sm">แนวทางที่ 1: วิดเจ็ตผ่านแอป Scriptable (แนะนำ ⭐)</h4>
-                                <p class="text-[11px] text-slate-400">หน้าตาแบบเดียวกับ Android Widget 4×2 (Current Class | Next Class | Tasks)</p>
+                                <h4 class="font-bold text-white text-sm">วิดเจ็ต iOS ผ่านแอป Scriptable</h4>
+                                <p class="text-[11px] text-slate-400">รองรับหลายขนาด (Small 2×2 / Medium 4×2 / Large 4×4 / Lock Screen) พร้อมโหมดสัปดาห์สอบ &amp; เรียงลำดับงานสำคัญ</p>
                             </div>
                         </div>
-                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">ยอดนิยมในไทย</span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">iPhone &amp; iPad</span>
                     </div>
 
                     <!-- Steps Checklist -->
@@ -7962,38 +8856,6 @@ function renderLargeWidget(widget, current, next, tasks, sessions, now) {
                                 💡 เมื่อกด <strong>"เลือกทั้งหมด"</strong> แล้ว ให้แตะที่ข้อความสีฟ้าแล้วกด <strong>"คัดลอก" (Copy)</strong> จากเมนูป๊อปอัปของ iOS แล้วนำไปวางในแอป Scriptable ได้เลยครับ
                             </p>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Option 2: Apple Calendar Sync -->
-                <div class="bg-slate-800/70 border border-slate-700 rounded-xl p-4 space-y-3.5">
-                    <div class="flex items-center justify-between flex-wrap gap-2">
-                        <div class="flex items-center gap-2.5">
-                            <span class="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/40 flex items-center justify-center font-bold text-xs">2</span>
-                            <div>
-                                <h4 class="font-bold text-white text-sm">แนวทางที่ 2: ซิงก์ปฏิทิน Apple Calendar (1 คลิก)</h4>
-                                <p class="text-[11px] text-slate-400">ไม่ต้องลงแอปเพิ่ม ใช้วิดเจ็ตปฏิทินดั้งเดิมของ iPhone/iPad มีแจ้งเตือนก่อนเรียน 15 นาที</p>
-                            </div>
-                        </div>
-                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30">Native 100%</span>
-                    </div>
-
-                    <div class="bg-slate-900/80 rounded-xl p-3 space-y-2 border border-slate-800 text-xs">
-                        <div class="flex items-start gap-2 text-slate-300">
-                            <span class="text-sky-400 font-bold shrink-0">วิธีใช้งาน:</span>
-                            <span>กดปุ่ม <strong class="text-white">"เปิดหน้าต่างส่งออกปฏิทิน"</strong> ด้านล่าง แล้วเลือก <strong class="text-sky-300">"ลง Apple Calendar"</strong> จากนั้น Safari จะเปิดไฟล์ ให้แตะ <strong class="text-sky-300">"เพิ่มทั้งหมด" (Add All)</strong></span>
-                        </div>
-                        <div class="flex items-start gap-2 text-slate-300">
-                            <span class="text-sky-400 font-bold shrink-0">การตั้งค่าวิดเจ็ต:</span>
-                            <span>แตะค้างหน้าจอโฮม iOS -> กด <strong class="text-white">+</strong> -> เลือก <strong class="text-white">"ปฏิทิน (Calendar)"</strong> -> เลือกขนาดที่ชอบ และสามารถวางบนหน้าจอล็อก (Lock Screen) ได้ด้วย</span>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-wrap items-center gap-2 pt-1">
-                        <button type="button" onclick="closeIosWidgetModal(); openCalendarExportModal();" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-700 border border-sky-500/40 text-white font-bold text-xs transition-all shadow flex items-center gap-2 active:scale-95">
-                            <i class="fa-brands fa-apple text-sky-400 text-sm"></i>
-                            <span>เปิดหน้าต่างส่งออกปฏิทิน (Apple Calendar)</span>
-                        </button>
                     </div>
                 </div>
             </div>
