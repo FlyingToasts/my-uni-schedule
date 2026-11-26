@@ -12,7 +12,7 @@
     <title>ตารางเรียนอัจฉริยะ (Smart Class Schedule)</title>
     <!-- PWA Settings -->
     <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#090C11">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ตารางเรียน">
@@ -24,93 +24,70 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts (Prompt & Sarabun) -->
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Google Fonts: IBM Plex Sans Thai + IBM Plex Mono (Obsidian Academic Instrument) -->
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        prompt: ['Prompt', 'sans-serif'],
-                        sarabun: ['Sarabun', 'sans-serif'],
+                        sans: ['IBM Plex Sans Thai', 'sans-serif'],
+                        prompt: ['IBM Plex Sans Thai', 'sans-serif'],
+                        sarabun: ['IBM Plex Sans Thai', 'sans-serif'],
+                        mono: ['IBM Plex Mono', 'monospace']
                     }
                 }
             }
         }
     </script>
     <style>
+        /* Design System: Obsidian Academic Instrument (see DESIGN.md) */
+        :root {
+            --bg-canvas: #090C11;
+            --bg-header: #0E131B;
+            --bg-surface: #11161F;
+            --bg-elevated: #171E2A;
+            --bg-hover: #1E2736;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-strong: rgba(255, 255, 255, 0.14);
+            --text-primary: #F1F5F9;
+            --text-secondary: #94A3B8;
+            --text-muted: #64748B;
+            --accent: #F59E0B;
+            --state-live: #10B981;
+            --state-exam: #FB923C;
+            --state-danger: #F43F5E;
+        }
+
         body {
-            font-family: 'Prompt', sans-serif;
-            background-color: #070b14;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(30, 58, 138, 0.28) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(245, 158, 11, 0.16) 0px, transparent 40%),
-                radial-gradient(at 50% 50%, rgba(16, 185, 129, 0.1) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.22) 0px, transparent 50%);
-            color: #f8fafc;
+            font-family: 'IBM Plex Sans Thai', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-canvas);
+            color: var(--text-primary);
             padding-bottom: 5.5rem;
             position: relative;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* --- LIQUID GLASS AMBIENT LIGHTS (Static pre-feathered gradients for smooth GPU scroll) --- */
-        .liquid-orb {
-            position: absolute;
-            border-radius: 9999px;
-            pointer-events: none;
-            opacity: 0.42;
-        }
-        .orb-indigo {
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.52) 0%, rgba(59, 130, 246, 0.14) 50%, transparent 70%);
-            top: -120px;
-            left: -120px;
-        }
-        .orb-amber {
-            width: 540px;
-            height: 540px;
-            background: radial-gradient(circle, rgba(245, 158, 11, 0.4) 0%, rgba(234, 88, 12, 0.12) 50%, transparent 70%);
-            top: 25%;
-            right: -150px;
-        }
-        .orb-emerald {
-            width: 460px;
-            height: 460px;
-            background: radial-gradient(circle, rgba(16, 185, 129, 0.4) 0%, rgba(6, 182, 212, 0.12) 50%, transparent 70%);
-            bottom: 80px;
-            left: 10%;
-        }
-        .orb-cyan {
-            width: 420px;
-            height: 420px;
-            background: radial-gradient(circle, rgba(6, 182, 212, 0.35) 0%, rgba(14, 165, 233, 0.12) 50%, transparent 70%);
-            bottom: 30%;
-            left: 55%;
+        .font-mono {
+            font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+            font-variant-numeric: tabular-nums;
         }
 
-        /* --- LIQUID GLASS CORE SPECULAR EFFECT --- */
-        .liquid-glass {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.015) 100%), rgba(15, 23, 42, 0.84) !important;
-            border: 1px solid rgba(255, 255, 255, 0.14) !important;
-            box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.45), inset 0 1px 1px 0 rgba(255, 255, 255, 0.2) !important;
-        }
-
-        /* Global Theme Override for Slate cards to Liquid Glass */
+        /* Crisp tonal surface tokens overriding legacy slate opacity utilities */
         .bg-slate-800\/80, .bg-slate-800\/70, .bg-slate-800\/90, .bg-slate-800\/60, .bg-slate-850 {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.015) 100%), rgba(15, 23, 42, 0.84) !important;
-            border-color: rgba(255, 255, 255, 0.12) !important;
-            box-shadow: 0 10px 26px -8px rgba(0, 0, 0, 0.42), inset 0 1px 1px 0 rgba(255, 255, 255, 0.16) !important;
+            background-color: var(--bg-surface) !important;
+            border-color: var(--border-subtle) !important;
+            box-shadow: none !important;
         }
 
-        /* Floating Header & Navigation Glassmorphism */
         header {
-            background: linear-gradient(180deg, rgba(15, 23, 42, 0.96) 0%, rgba(10, 16, 30, 0.94) 100%) !important;
+            background-color: var(--bg-header) !important;
             -webkit-backdrop-filter: none !important;
             backdrop-filter: none !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
-            box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+            border-bottom: 1px solid var(--border-subtle) !important;
+            box-shadow: none !important;
         }
 
         #simulator-panel {
@@ -118,188 +95,67 @@
             backdrop-filter: none !important;
         }
 
-        /* --- LIQUID GLASS CAPSULE DOCK & ULTRA-CLEAR WATER DROPLET --- */
-        .liquid-dock {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 100%), rgba(12, 17, 29, 0.92) !important;
-            border: 1px solid rgba(255, 255, 255, 0.12) !important;
-            box-shadow: 0 14px 32px -8px rgba(0, 0, 0, 0.7), inset 0 1px 1px 0 rgba(255, 255, 255, 0.18) !important;
-            --drop-light-x: 42%;
-            --drop-light-y: 20%;
+        /* Calm Segmented Capsule Bottom Dock */
+        .precision-dock {
+            background-color: var(--bg-surface) !important;
+            border: 1px solid var(--border-strong) !important;
+            box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.72) !important;
         }
 
-        /* 100% Crystal Pure Transparent Water Droplet (ใสแจ๋วสมบูรณ์แบบ ไร้ฝ้าขาวขุ่น) */
-        .liquid-lens-pill {
+        .dock-indicator {
             position: absolute;
             top: 4px;
             bottom: 4px;
             left: 0;
             pointer-events: none;
             border-radius: 9999px;
-            /* Completely transparent body - zero milky fill, zero blur fog */
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
-            box-shadow: 
-                0 8px 24px -4px rgba(0, 0, 0, 0.6),
-                inset 0 2.5px 3.5px 0 rgba(0, 0, 0, 0.75),
-                inset 0 -2.5px 3.5px 0 rgba(0, 0, 0, 0.75),
-                inset 0 1px 1px 0 rgba(255, 255, 255, 0.85),
-                inset 0 -1px 1px 0 rgba(255, 255, 255, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            background-color: var(--bg-hover);
+            border: 1px solid rgba(255, 255, 255, 0.10);
             z-index: 1;
-            overflow: hidden;
-            transform-origin: center center;
             will-change: transform;
-            transition: transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        /* Iridescent chromatic rim reflection (Prism dispersion on clean water meniscus) */
-        .liquid-lens-pill::before {
-            content: '';
-            position: absolute;
-            inset: -1.5px;
-            border-radius: 9999px;
-            padding: 1.5px;
-            background: linear-gradient(100deg, 
-                rgba(245, 158, 11, 0.9) 0%, 
-                rgba(16, 185, 129, 0.85) 22%, 
-                rgba(56, 189, 248, 0.95) 45%, 
-                rgba(168, 85, 247, 0.9) 70%, 
-                rgba(244, 63, 94, 0.9) 90%,
-                rgba(245, 158, 11, 0.9) 100%);
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            pointer-events: none;
-            opacity: 0.85;
-            filter: drop-shadow(0 0 1px rgba(56, 189, 248, 0.4));
+        button, a[class*="rounded-xl"], a[class*="rounded-lg"] {
+            transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, opacity 150ms ease !important;
         }
 
-        /* Razor-thin glossy curved specular reflection on top edge (ประกายแสงเส้นโค้งสะท้อนน้ำใส) */
-        .droplet-specular {
-            position: absolute;
-            top: 2px;
-            left: 12%;
-            right: 12%;
-            height: 18%;
-            background: radial-gradient(ellipse at var(--drop-light-x, 42%) 10%, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.15) 30%, transparent 70%);
-            border-radius: 9999px 9999px 65% 65% / 9999px 9999px 40% 40%;
-            pointer-events: none;
-            transition: transform 0.1s ease-out;
-            opacity: 0.85;
-        }
-
-        /* Secondary Star Pin Highlight (ประกายแสงดวงเล็กคมชัด) */
-        .droplet-specular-pin {
-            position: absolute;
-            top: 3px;
-            left: calc(var(--drop-light-x, 42%) * 0.6 + 10%);
-            width: 3.5px;
-            height: 2px;
-            background: #ffffff;
-            border-radius: 9999px;
-            filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.9));
-            pointer-events: none;
-            opacity: 0.9;
-            transition: left 0.15s ease-out;
-        }
-
-        /* Subtle bottom focal glow (แสงรวมก้นหยดน้ำบางเบา) */
-        .droplet-caustic {
-            position: absolute;
-            bottom: 1px;
-            left: 20%;
-            right: 20%;
-            height: 12%;
-            background: radial-gradient(ellipse at center bottom, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
-            border-radius: 9999px;
-            pointer-events: none;
-            transform: translateX(calc((50% - var(--drop-light-x, 50%)) * 0.25));
-            transition: transform 0.12s ease-out;
-        }
-
-        /* Animated light gleam across clear water when sliding (แสงสะท้อนวิ่งผ่านตอนเลื่อน) */
-        .droplet-gleam {
-            position: absolute;
-            inset: 0;
-            border-radius: 9999px;
-            background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.1) 45%, rgba(255, 255, 255, 0.35) 50%, rgba(255, 255, 255, 0.1) 55%, transparent 70%);
-            background-size: 250% 100%;
-            background-position: var(--gleam-pos, -120% 0);
-            pointer-events: none;
-            opacity: 0.45;
-            mix-blend-mode: overlay;
-            transition: background-position 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-
-        /* Water Ripple Wave on Tap */
-        .water-ripple-wave {
-            position: absolute;
-            border-radius: 9999px;
-            transform: translate(-50%, -50%) scale(0.2);
-            width: 25px;
-            height: 25px;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.05) 45%, transparent 70%);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            pointer-events: none;
-            animation: waterRippleAnim 0.55s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
-            z-index: 5;
-        }
-        @keyframes waterRippleAnim {
-            0% { transform: translate(-50%, -50%) scale(0.2); opacity: 0.85; }
-            100% { transform: translate(-50%, -50%) scale(4.5); opacity: 0; }
-        }
-
-        /* Specular Liquid Buttons (compositor-friendly properties only) */
-        button, a[class*="rounded-xl"], a[class*="rounded-2xl"] {
-            transition: transform 0.16s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.16s ease, background-color 0.16s ease, border-color 0.16s ease !important;
-        }
-        button:active, a[class*="rounded-xl"]:active {
-            transform: scale(0.96) !important;
-        }
-
-        /* Live Current Class Glowing Glass Card */
-        #current-class-card {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.16) 0%, rgba(15, 23, 42, 0.75) 100%) !important;
-            border: 1px solid rgba(52, 211, 153, 0.4) !important;
-            box-shadow: 0 16px 36px -10px rgba(16, 185, 129, 0.22), inset 0 1px 1.5px 0 rgba(52, 211, 153, 0.4) !important;
-        }
-
-        /* Next Class Glowing Amber Glass Card */
+        #current-class-card,
         #next-class-card {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(15, 23, 42, 0.75) 100%) !important;
-            border: 1px solid rgba(251, 191, 36, 0.4) !important;
-            box-shadow: 0 16px 36px -10px rgba(245, 158, 11, 0.22), inset 0 1px 1.5px 0 rgba(251, 191, 36, 0.4) !important;
+            background-color: var(--bg-surface) !important;
+            box-shadow: none !important;
         }
 
-        /* Modal Backdrop & Crystal Container */
-        div[id$="-modal"] > div.bg-slate-900, div[id$="-modal"] > div.bg-slate-800 {
-            background: linear-gradient(145deg, rgba(30, 41, 59, 0.96) 0%, rgba(15, 23, 42, 0.98) 100%) !important;
-            border: 1px solid rgba(255, 255, 255, 0.18) !important;
-            box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.75), inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.26) !important;
+        .pulse-glow {
+            border-color: rgba(16, 185, 129, 0.35) !important;
+            box-shadow: none !important;
+        }
+
+        div[id$="-modal"] > div.bg-slate-900,
+        div[id$="-modal"] > div.bg-slate-800,
+        div[id$="-modal"] > div[class*="bg-\[#11161F\]"] {
+            background-color: var(--bg-surface) !important;
+            border-color: var(--border-strong) !important;
+            box-shadow: 0 20px 44px -12px rgba(0, 0, 0, 0.72) !important;
         }
 
         /* Custom Scrollbar */
         .custom-scrollbar::-webkit-scrollbar {
-            width: 7px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: 4px;
+            background: var(--bg-canvas);
+            border-radius: 3px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(148, 163, 184, 0.35);
-            border-radius: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(148, 163, 184, 0.28);
+            border-radius: 3px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: rgba(148, 163, 184, 0.55);
+            background: rgba(148, 163, 184, 0.45);
         }
-        /* Static Glow for Live Status (avoids continuous box-shadow repaint) */
-        .pulse-glow {
-            box-shadow: 0 0 18px rgba(16, 185, 129, 0.38);
-        }
+
         /* Custom Input Time, Date & Color Picker */
         input[type="time"]::-webkit-calendar-picker-indicator,
         input[type="date"]::-webkit-calendar-picker-indicator {
@@ -316,11 +172,11 @@
             padding: 0;
         }
         input[type="color"]::-webkit-color-swatch {
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 0.65rem;
+            border: 1px solid var(--border-strong);
+            border-radius: 0.5rem;
         }
 
-        /* --- ANTI-FLICKER & COMPOSITOR OPTIMIZATIONS FOR MODALS (MOBILE & WEBVIEW) --- */
+        /* Anti-flicker modal compositing lock */
         div[id$="-modal"],
         div[id$="-modal"] * {
             -webkit-backdrop-filter: none !important;
@@ -328,94 +184,79 @@
         }
 
         div[id$="-modal"] {
-            background-color: rgba(7, 11, 20, 0.92) !important;
-        }
-
-        body.modal-active .liquid-orb {
-            display: none !important;
+            background-color: rgba(6, 9, 14, 0.88) !important;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between text-slate-100 selection:bg-amber-500/30 selection:text-amber-200 relative">
-
-    <!-- Liquid Glass Ambient Background Glows -->
-    <div class="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
-        <div class="liquid-orb orb-indigo"></div>
-        <div class="liquid-orb orb-amber"></div>
-        <div class="liquid-orb orb-emerald"></div>
-        <div class="liquid-orb orb-cyan"></div>
-    </div>
+<body class="min-h-screen flex flex-col justify-between bg-[#090C11] text-slate-100 selection:bg-amber-500/25 selection:text-amber-200 relative">
 
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed bottom-20 right-5 z-[110] flex flex-col gap-2 pointer-events-none"></div>
 
     <!-- Header & Navbar -->
-    <header class="bg-slate-900/90 border-b border-slate-800 backdrop-blur-md sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-wrap items-center justify-between gap-3">
-            <!-- Brand Title -->
-            <div class="flex items-center space-x-3">
-                <div class="w-11 h-11 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xl shadow-inner">
-                    <i class="fa-solid fa-graduation-cap"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-base sm:text-xl tracking-wide text-white flex items-center gap-2">
+    <header class="bg-[#0E131B] border-b border-white/[0.08] sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+            <!-- Brand Title (Crisp typographic bar, zero decorative icon box) -->
+            <div class="flex items-center gap-3 min-w-0">
+                <span class="w-1 h-7 rounded-full bg-amber-500 shrink-0" aria-hidden="true"></span>
+                <div class="min-w-0">
+                    <h1 class="font-semibold text-base sm:text-lg tracking-tight text-slate-100 flex items-center gap-2">
                         <span>ตารางเรียนอัจฉริยะ</span>
-                        <span class="hidden sm:inline-block text-xs font-normal px-2.5 py-0.5 rounded-full bg-slate-800 text-amber-400 border border-slate-700">Smart Schedule</span>
+                        <span class="hidden sm:inline-block font-mono text-[11px] font-medium px-2 py-0.5 rounded bg-[#171E2A] text-amber-400 border border-white/[0.08]">Smart Schedule</span>
                     </h1>
-                    <p class="text-xs text-slate-400 font-light">ติดตามคาบเรียนปัจจุบัน คาบถัดไป โน้ตรายวิชา และสรุปงานรายสัปดาห์</p>
+                    <p class="text-xs text-slate-400 truncate">ติดตามคาบเรียนปัจจุบัน คาบถัดไป โน้ตรายวิชา และสรุปงานรายสัปดาห์</p>
                 </div>
             </div>
 
-            <!-- Right Controls: Simulator Toggle + Clock -->
-            <div class="flex items-center gap-2.5 ml-auto sm:ml-0">
-                <!-- Cloud Sync & Account Button -->
-                <button id="btn-cloud-sync" onclick="openCloudSyncModal()" title="ระบบซิงก์ข้อมูลคลาวด์อัตโนมัติ (Google / Firebase Sync)" class="px-2.5 sm:px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-amber-500/40 text-xs font-semibold text-slate-200 transition-all flex items-center gap-1.5 shadow-sm active:scale-95">
+            <!-- Right Controls: Cloud Sync + Simulator Toggle + Clock -->
+            <div class="flex items-center gap-2 ml-auto sm:ml-0">
+                <button id="btn-cloud-sync" onclick="openCloudSyncModal()" title="ระบบซิงก์ข้อมูลคลาวด์อัตโนมัติ (Google / Firebase Sync)" class="px-3 py-2 rounded-lg bg-[#171E2A] hover:bg-[#1E2736] border border-white/[0.08] text-xs font-medium text-slate-200 flex items-center gap-2">
                     <span id="header-sync-avatar" class="flex items-center justify-center">
                         <i class="fa-solid fa-cloud-arrow-up text-amber-400"></i>
                     </span>
-                    <span id="header-sync-name" class="font-sarabun text-[11px] sm:text-xs text-amber-300">ซิงก์คลาวด์</span>
+                    <span id="header-sync-name" class="text-xs text-slate-200">ซิงก์คลาวด์</span>
                     <span id="header-sync-status-dot" class="w-2 h-2 rounded-full bg-slate-500" title="ยังไม่ได้เชื่อมต่อ"></span>
                 </button>
 
-                <button id="btn-toggle-sim" onclick="toggleSimulatorPanel()" class="hidden sm:flex px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-slate-300 transition-all items-center gap-1.5 shadow-sm">
-                    <i class="fa-solid fa-clock-rotate-left text-amber-400"></i>
+                <button id="btn-toggle-sim" onclick="toggleSimulatorPanel()" class="hidden sm:flex px-3 py-2 rounded-lg bg-[#171E2A] hover:bg-[#1E2736] border border-white/[0.08] text-xs font-medium text-slate-300 items-center gap-1.5">
+                    <i class="fa-solid fa-clock-rotate-left text-slate-400"></i>
                     <span class="hidden md:inline">จำลองวัน/เวลา</span>
                 </button>
 
-                <button id="btn-install-app" onclick="triggerInstallPWA()" class="hidden px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white transition-all flex items-center gap-1.5 shadow-sm">
+                <button id="btn-install-app" onclick="triggerInstallPWA()" class="hidden px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white flex items-center gap-1.5">
                     <i class="fa-solid fa-mobile-screen-button"></i>
                     <span>ติดตั้งแอป</span>
                 </button>
 
                 <!-- Real-time Clock Badge -->
-                <div id="clock-badge" class="bg-slate-800/90 border border-slate-700/80 rounded-xl px-3.5 py-2 flex items-center space-x-3 shadow-inner">
+                <div id="clock-badge" class="bg-[#11161F] border border-white/10 rounded-lg px-3.5 py-2 flex items-center gap-3">
                     <div class="text-right">
-                        <div id="live-time" class="font-mono text-base sm:text-lg font-bold text-amber-400 leading-none">00:00:00</div>
-                        <div id="live-date" class="text-[10px] sm:text-[11px] text-slate-400 font-sarabun leading-tight mt-1">กำลังโหลด...</div>
+                        <div id="live-time" class="font-mono text-base sm:text-lg font-semibold text-amber-400 leading-none">00:00:00</div>
+                        <div id="live-date" class="text-[11px] text-slate-400 leading-tight mt-1">กำลังโหลด...</div>
                     </div>
-                    <div id="clock-indicator" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></div>
+                    <div id="clock-indicator" class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></div>
                 </div>
             </div>
         </div>
 
         <!-- Time & Date Simulator Bar (Collapsible) -->
-        <div id="simulator-panel" class="hidden bg-indigo-950/95 border-t border-indigo-500/30 backdrop-blur-md">
-            <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
-                <div class="flex items-center gap-2 text-indigo-200">
+        <div id="simulator-panel" class="hidden bg-[#131822] border-t border-amber-500/30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div class="flex items-center gap-2 text-slate-200">
                     <i class="fa-solid fa-flask text-amber-400 text-sm"></i>
                     <span class="font-semibold">โหมดจำลองวันที่และเวลา:</span>
-                    <span class="text-indigo-300/80 hidden lg:inline">เลือกวันที่เพื่อทดสอบการสลับห้อง Lab และดูสรุปงาน/ประกาศของสัปดาห์นั้นได้ทันที</span>
+                    <span class="text-slate-400 hidden lg:inline">เลือกวันที่เพื่อทดสอบการสลับห้อง Lab และดูสรุปงาน/ประกาศของสัปดาห์นั้นได้ทันที</span>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
-                    <div class="flex items-center gap-1.5 bg-slate-900/80 border border-indigo-500/40 rounded-lg px-2.5 py-1">
-                        <span class="text-indigo-300">วันที่:</span>
+                    <div class="flex items-center gap-1.5 bg-[#090C11] border border-white/[0.12] rounded-lg px-2.5 py-1.5">
+                        <span class="text-slate-400">วันที่:</span>
                         <input type="date" id="sim-date" onchange="applySimulatedDateTime()" class="bg-transparent text-white font-mono outline-none">
                     </div>
-                    <div class="flex items-center gap-1.5 bg-slate-900/80 border border-indigo-500/40 rounded-lg px-2.5 py-1">
-                        <span class="text-indigo-300">เวลา:</span>
+                    <div class="flex items-center gap-1.5 bg-[#090C11] border border-white/[0.12] rounded-lg px-2.5 py-1.5">
+                        <span class="text-slate-400">เวลา:</span>
                         <input type="time" id="sim-time" onchange="applySimulatedDateTime()" value="09:45" class="bg-transparent text-white font-mono outline-none">
                     </div>
-                    <button onclick="resetToRealTime()" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition-all flex items-center gap-1 shadow">
+                    <button onclick="resetToRealTime()" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold flex items-center gap-1.5">
                         <i class="fa-solid fa-rotate-right"></i> กลับสู่เวลาจริง
                     </button>
                 </div>
@@ -424,17 +265,17 @@
     </header>
 
     <!-- Main Content Container -->
-    <main class="max-w-7xl mx-auto px-4 py-6 w-full flex-grow space-y-6 relative z-10 pb-28 sm:pb-32">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 w-full flex-grow space-y-6 relative z-10 pb-28 sm:pb-32">
 
         <!-- Live Status Cards Grid (2 Columns) -->
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Left Card: Current Class -->
-            <div id="current-class-card" class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-5 shadow-lg flex flex-col justify-between transition-all duration-300">
-                <div class="flex items-center justify-between border-b border-slate-700/80 pb-3 mb-3">
-                    <span class="font-bold text-emerald-400 text-sm sm:text-base flex items-center gap-2">
-                        <i class="fa-solid fa-chalkboard-user"></i> <span id="current-card-title">กำลังเรียนอยู่ในขณะนี้</span>
+            <div id="current-class-card" class="bg-[#11161F] border border-white/[0.08] rounded-xl p-5 flex flex-col justify-between transition-colors duration-150">
+                <div class="flex items-center justify-between border-b border-white/[0.08] pb-3 mb-3.5">
+                    <span class="font-semibold text-emerald-400 text-sm sm:text-base flex items-center gap-2">
+                        <i class="fa-solid fa-chalkboard-user text-sm"></i> <span id="current-card-title">กำลังเรียนอยู่ในขณะนี้</span>
                     </span>
-                    <span id="current-status-badge" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-700 text-slate-300">
+                    <span id="current-status-badge" class="text-[11px] font-medium px-2.5 py-0.5 rounded-md bg-[#171E2A] text-slate-300 border border-white/[0.08]">
                         กำลังตรวจสอบ...
                     </span>
                 </div>
@@ -444,10 +285,10 @@
             </div>
 
             <!-- Right Card: Next Class -->
-            <div id="next-class-card" class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-5 shadow-lg flex flex-col justify-between transition-all duration-300">
-                <div class="flex items-center justify-between border-b border-slate-700/80 pb-3 mb-3">
-                    <span class="font-bold text-amber-400 text-sm sm:text-base flex items-center gap-2">
-                        <i class="fa-solid fa-forward-step"></i> <span id="next-card-title">คาบเรียนถัดไป</span>
+            <div id="next-class-card" class="bg-[#11161F] border border-white/[0.08] rounded-xl p-5 flex flex-col justify-between transition-colors duration-150">
+                <div class="flex items-center justify-between border-b border-white/[0.08] pb-3 mb-3.5">
+                    <span class="font-semibold text-amber-400 text-sm sm:text-base flex items-center gap-2">
+                        <i class="fa-solid fa-forward-step text-sm"></i> <span id="next-card-title">คาบเรียนถัดไป</span>
                     </span>
                     <span id="remaining-classes-badge" class="text-xs text-slate-400 font-mono">
                         เหลือ 0 คาบวันนี้
@@ -460,15 +301,15 @@
         </section>
 
         <!-- Weekly Task & Announcement Summary Section -->
-        <section id="weekly-summary-section" class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 sm:p-5 shadow-lg space-y-4">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-700/80 pb-3.5">
+        <section id="weekly-summary-section" class="bg-[#11161F] border border-white/[0.08] rounded-xl p-4 sm:p-5 space-y-4">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-white/[0.08] pb-3.5">
                 <div class="space-y-1">
                     <div class="flex items-center gap-2 flex-wrap">
-                        <h2 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+                        <h2 class="text-sm sm:text-base font-semibold text-white flex items-center gap-2">
                             <i class="fa-solid fa-list-check text-amber-400"></i>
                             <span>สรุปงาน การบ้าน และประกาศประจำสัปดาห์</span>
                         </h2>
-                        <span id="weekly-summary-range" class="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-slate-900 text-amber-300 border border-slate-700">
+                        <span id="weekly-summary-range" class="text-[11px] font-mono px-2.5 py-0.5 rounded-md bg-[#171E2A] text-amber-300 border border-white/[0.08]">
                             กำลังโหลด...
                         </span>
                     </div>
@@ -478,16 +319,16 @@
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2">
-                    <div class="inline-flex bg-slate-900 p-1 rounded-xl border border-slate-700 text-xs">
-                        <button id="btn-sum-week" onclick="setSummaryFilter('week')" class="px-3 py-1.5 rounded-lg font-semibold transition-all bg-amber-500 text-slate-950 shadow">
+                    <div class="inline-flex bg-[#090C11] p-1 rounded-lg border border-white/[0.08] text-xs">
+                        <button id="btn-sum-week" onclick="setSummaryFilter('week')" class="px-3 py-1.5 rounded-md font-semibold bg-amber-500 text-slate-950">
                             สัปดาห์นี้
                         </button>
-                        <button id="btn-sum-pending" onclick="setSummaryFilter('pending')" class="px-3 py-1.5 rounded-lg font-medium text-slate-400 hover:text-slate-200 transition-all">
+                        <button id="btn-sum-pending" onclick="setSummaryFilter('pending')" class="px-3 py-1.5 rounded-md font-medium text-slate-400 hover:text-slate-200">
                             ค้างทำทั้งหมด
                         </button>
                     </div>
-                    <button onclick="openQuickAddNotePicker()" class="px-3 py-2 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 font-semibold text-xs transition-all flex items-center gap-1.5">
-                        <i class="fa-solid fa-note-sticky"></i>
+                    <button onclick="openQuickAddNotePicker()" class="px-3 py-2 rounded-lg bg-[#171E2A] hover:bg-[#1E2736] border border-white/[0.1] text-slate-200 font-medium text-xs flex items-center gap-1.5">
+                        <i class="fa-solid fa-note-sticky text-amber-400"></i>
                         <span>เพิ่มโน้ต / งาน</span>
                     </button>
                 </div>
@@ -498,66 +339,65 @@
             </div>
         </section>
 
-        <!-- Action Bar & Schedule Tools -->
-        <section class="bg-slate-800/70 rounded-2xl p-4 sm:p-5 border border-slate-700/60 shadow-lg flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+        <!-- Action Bar & Schedule Tools (Single Primary Amber CTA + Quiet Secondary Surface) -->
+        <section class="bg-[#11161F] rounded-xl p-4 sm:p-5 border border-white/[0.08] flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
             <div>
-                <h2 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-sky-400"></i> จัดการตารางเรียนและหมวดสีวิชา
+                <h2 class="text-sm sm:text-base font-semibold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-slate-400"></i> จัดการตารางเรียนและหมวดสีวิชา
                 </h2>
                 <p class="text-xs text-slate-400 mt-0.5">รองรับวิชาปกติ วิชาปฏิบัติการ (Lab เปลี่ยนห้องรายสัปดาห์) และวิชาเรียนหลายครั้งต่อสัปดาห์</p>
             </div>
 
             <div class="w-full lg:w-auto flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2">
-                <!-- แถวบน: ปุ่มหลัก -->
+                <!-- แถวบน: 1 Primary CTA + 2 Utility -->
                 <div class="grid grid-cols-3 sm:flex gap-2">
-                    <button onclick="openCourseModal()" class="px-2 sm:px-4 py-3 sm:py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs sm:text-sm transition-all shadow-md active:scale-95 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 whitespace-nowrap">
+                    <button onclick="openCourseModal()" class="px-3 sm:px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-[#090C11] font-semibold rounded-lg text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 whitespace-nowrap">
                         <i class="fa-solid fa-plus"></i>
                         <span><span class="sm:hidden">เพิ่มวิชา</span><span class="hidden sm:inline">เพิ่มรายวิชา</span></span>
                     </button>
-                    <button onclick="openExamPeriodModal()" class="px-2 sm:px-3.5 py-3 sm:py-2.5 bg-orange-600/90 hover:bg-orange-500 text-white font-semibold rounded-xl text-xs sm:text-sm transition-all shadow-md active:scale-95 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 whitespace-nowrap">
-                        <i class="fa-solid fa-calendar-check"></i>
+                    <button onclick="openExamPeriodModal()" class="px-2.5 sm:px-3.5 py-2.5 bg-[#171E2A] hover:bg-[#1E2736] border border-white/[0.08] text-slate-200 font-medium rounded-lg text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 whitespace-nowrap">
+                        <i class="fa-solid fa-calendar-check text-orange-400"></i>
                         <span>ตั้งช่วงสอบ</span>
                     </button>
-                    <button onclick="openColorManagerModal()" class="px-2 sm:px-3.5 py-3 sm:py-2.5 bg-indigo-600/90 hover:bg-indigo-500 text-white font-semibold rounded-xl text-xs sm:text-sm transition-all shadow-md active:scale-95 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 whitespace-nowrap">
-                        <i class="fa-solid fa-palette"></i>
+                    <button onclick="openColorManagerModal()" class="px-2.5 sm:px-3.5 py-2.5 bg-[#171E2A] hover:bg-[#1E2736] border border-white/[0.08] text-slate-200 font-medium rounded-lg text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 whitespace-nowrap">
+                        <i class="fa-solid fa-palette text-slate-400"></i>
                         <span><span class="sm:hidden">จัดการสี</span><span class="hidden sm:inline">จัดการสี / หมวดวิชา</span></span>
                     </button>
                 </div>
 
-                <!-- แถวล่าง: ซิงก์คลาวด์ / ส่งออก / ลงปฏิทิน / นำเข้า / ล้างข้อมูล -->
+                <!-- แถวล่าง: ซิงก์คลาวด์ / ส่งออก / ลงปฏิทิน / วิดเจ็ต iOS / นำเข้า / ล้างข้อมูล -->
                 <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
-                    <button onclick="openCloudSyncModal()" title="ซิงก์ตารางเรียนอัตโนมัติผ่านคลาวด์ (Google Account)" class="px-2 sm:px-3 py-2.5 bg-slate-900 hover:bg-slate-700 border border-amber-500/30 hover:border-amber-400/60 text-amber-300 rounded-xl text-xs font-medium transition-all flex items-center justify-center gap-1.5 whitespace-nowrap shadow-sm active:scale-95">
+                    <button onclick="openCloudSyncModal()" title="ซิงก์ตารางเรียนอัตโนมัติผ่านคลาวด์ (Google Account)" class="px-3 py-2 bg-[#171E2A] hover:bg-[#1E2736] border border-white/[0.08] text-slate-200 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 whitespace-nowrap">
                         <i class="fa-solid fa-cloud-arrow-up text-amber-400"></i> <span>ซิงก์คลาวด์</span>
                     </button>
-                    <button onclick="exportScheduleJSON()" title="ส่งออกไฟล์สำรองข้อมูล (JSON)" class="px-2 sm:px-3 py-2.5 bg-slate-900 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl text-xs font-medium transition-all flex items-center justify-center gap-1.5 whitespace-nowrap">
-                        <i class="fa-solid fa-download text-sky-400"></i> <span>ส่งออก</span>
+                    <button onclick="exportScheduleJSON()" title="ส่งออกไฟล์สำรองข้อมูล (JSON)" class="px-3 py-2 bg-[#171E2A] hover:bg-[#1E2736] border border-white/[0.08] text-slate-300 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 whitespace-nowrap">
+                        <i class="fa-solid fa-download text-slate-400"></i> <span>ส่งออก</span>
                     </button>
-                    <button onclick="openCalendarExportModal()" title="เลือกลง Google Calendar หรือส่งออกปฏิทิน (.ics)" class="px-2 sm:px-3 py-2.5 bg-slate-900 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl text-xs font-medium transition-all flex items-center justify-center gap-1.5 whitespace-nowrap">
-                        <i class="fa-solid fa-calendar-plus text-amber-400"></i> <span>ลงปฏิทิน</span>
+                    <button onclick="openCalendarExportModal()" title="เลือกลง Google Calendar หรือส่งออกปฏิทิน (.ics)" class="px-3 py-2 bg-[#171E2A] hover:bg-[#1E2736] border border-white/[0.08] text-slate-300 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 whitespace-nowrap">
+                        <i class="fa-solid fa-calendar-plus text-slate-400"></i> <span>ลงปฏิทิน</span>
                     </button>
-                    <button onclick="openIosWidgetModal()" title="วิธีติดตั้ง Widget บน iPhone / iPad ผ่าน Scriptable" class="px-2 sm:px-3 py-2.5 bg-slate-900 hover:bg-slate-700 border border-sky-500/40 hover:border-sky-400 text-sky-300 rounded-xl text-xs font-medium transition-all flex items-center justify-center gap-1.5 whitespace-nowrap shadow-sm active:scale-95">
-                        <i class="fa-brands fa-apple text-sky-400"></i> <span>วิดเจ็ต iOS</span>
+                    <button onclick="openIosWidgetModal()" title="วิธีติดตั้ง Widget บน iPhone / iPad ผ่าน Scriptable" class="px-3 py-2 bg-[#171E2A] hover:bg-[#1E2736] border border-white/[0.08] text-slate-200 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 whitespace-nowrap">
+                        <i class="fa-brands fa-apple text-slate-300"></i> <span>วิดเจ็ต iOS</span>
                     </button>
-                    <label title="นำเข้าข้อมูลจากไฟล์ JSON" class="px-2 sm:px-3 py-2.5 bg-slate-900 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-xl text-xs font-medium transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap">
-                        <i class="fa-solid fa-upload text-emerald-400"></i> <span>นำเข้า</span>
+                    <label title="นำเข้าข้อมูลจากไฟล์ JSON" class="px-3 py-2 bg-[#171E2A] hover:bg-[#1E2736] border border-white/[0.08] text-slate-300 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap">
+                        <i class="fa-solid fa-upload text-slate-400"></i> <span>นำเข้า</span>
                         <input type="file" id="import-json-input" accept=".json" onchange="importScheduleJSON(event)" class="hidden">
                     </label>
-                    <button onclick="openConfirmClearModal()" title="ล้างข้อมูลรายวิชาทั้งหมด" class="px-2 sm:px-3 py-2.5 bg-slate-900 hover:bg-rose-950/60 border border-slate-700 hover:border-rose-500/40 text-slate-300 hover:text-rose-300 rounded-xl text-xs font-medium transition-all flex items-center justify-center gap-1.5 whitespace-nowrap">
-                        <i class="fa-solid fa-trash-can text-rose-400"></i> <span>ล้างข้อมูล</span>
+                    <button onclick="openConfirmClearModal()" title="ล้างข้อมูลรายวิชาทั้งหมด" class="px-3 py-2 bg-[#171E2A] hover:bg-rose-950/60 border border-white/[0.08] hover:border-rose-500/40 text-slate-400 hover:text-rose-300 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 whitespace-nowrap">
+                        <i class="fa-solid fa-trash-can"></i> <span>ล้างข้อมูล</span>
                     </button>
                 </div>
             </div>
         </section>
 
         <!-- Timetable Section -->
-        <section id="page-class" class="bg-slate-800/80 rounded-2xl border border-slate-700/80 overflow-hidden shadow-lg">
-            <!-- View Mode Tabs -->
+        <section id="page-class" class="bg-[#11161F] rounded-xl border border-white/[0.08] overflow-hidden">
             <!-- Mode Switcher: Daily Timeline vs Weekly Matrix -->
-            <div class="bg-slate-900/90 p-2 flex border-b border-slate-700/80">
-                <button id="tab-daily" onclick="switchViewMode('daily')" class="flex-1 py-3 px-4 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 bg-slate-800 text-amber-400 shadow-sm border border-slate-700">
+            <div class="bg-[#0E131B] p-1.5 flex gap-1.5 border-b border-white/[0.08]">
+                <button id="tab-daily" onclick="switchViewMode('daily')" class="flex-1 py-2.5 px-4 rounded-lg font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 bg-[#1E2736] text-amber-400 border border-white/10">
                     <i class="fa-solid fa-calendar-day"></i> มุมมองรายวัน (Daily Timeline)
                 </button>
-                <button id="tab-weekly" onclick="switchViewMode('weekly')" class="flex-1 py-3 px-4 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 text-slate-400 hover:text-slate-200">
+                <button id="tab-weekly" onclick="switchViewMode('weekly')" class="flex-1 py-2.5 px-4 rounded-lg font-medium text-xs sm:text-sm flex items-center justify-center gap-2 text-slate-400 hover:text-slate-200">
                     <i class="fa-solid fa-table-cells"></i> ตารางรวมทั้งสัปดาห์ (รายชั่วโมง)
                 </button>
             </div>
@@ -573,17 +413,17 @@
 
                     <!-- Left Control: Weekly Display Options (Weekly Mode) -->
                     <div id="weekly-controls" class="hidden flex flex-wrap items-center gap-2">
-                        <span class="text-xs text-slate-400 font-medium"><i class="fa-solid fa-display text-sky-400 mr-1"></i> รูปแบบตาราง:</span>
-                        <div class="inline-flex bg-slate-900 p-1 rounded-xl border border-slate-700 text-xs">
-                            <button id="btn-weekly-fit" onclick="setWeeklyLayoutMode('fit')" class="px-3 py-1.5 rounded-lg font-semibold transition-all bg-sky-500 text-slate-950 shadow flex items-center gap-1.5">
+                        <span class="text-xs text-slate-400 font-medium"><i class="fa-solid fa-display text-slate-400 mr-1"></i> รูปแบบตาราง:</span>
+                        <div class="inline-flex bg-[#090C11] p-1 rounded-lg border border-white/[0.08] text-xs">
+                            <button id="btn-weekly-fit" onclick="setWeeklyLayoutMode('fit')" class="px-3 py-1.5 rounded-md font-semibold bg-amber-500 text-slate-950 flex items-center gap-1.5">
                                 <i class="fa-solid fa-compress"></i> พอดีหน้าจอ
                             </button>
-                            <button id="btn-weekly-scroll" onclick="setWeeklyLayoutMode('scroll')" class="px-3 py-1.5 rounded-lg font-medium text-slate-400 hover:text-slate-200 transition-all flex items-center gap-1.5">
+                            <button id="btn-weekly-scroll" onclick="setWeeklyLayoutMode('scroll')" class="px-3 py-1.5 rounded-md font-medium text-slate-400 hover:text-slate-200 flex items-center gap-1.5">
                                 <i class="fa-solid fa-arrows-left-right"></i> อ่านสบายตา (เลื่อนซ้าย-ขวา)
                             </button>
                         </div>
 
-                        <label class="inline-flex items-center gap-1.5 text-xs text-slate-300 bg-slate-900/80 border border-slate-700/80 px-3 py-1.5 rounded-xl cursor-pointer select-none ml-1">
+                        <label class="inline-flex items-center gap-1.5 text-xs text-slate-300 bg-[#090C11] border border-white/[0.08] px-3 py-1.5 rounded-lg cursor-pointer select-none ml-1">
                             <input type="checkbox" id="toggle-weekend" onchange="toggleShowWeekend()" class="rounded accent-amber-500 cursor-pointer">
                             <span>แสดงเสาร์-อาทิตย์</span>
                         </label>
@@ -591,10 +431,10 @@
 
                     <!-- Right Control: Status Color Legend -->
                     <div class="flex flex-wrap items-center gap-3 text-xs text-slate-400 font-medium">
-                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block shadow-[0_0_6px_rgba(52,211,153,0.8)]"></span> กำลังเรียน</span>
-                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span> คาบถัดไป</span>
-                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-400 inline-block"></span> งดคลาส</span>
-                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-slate-600 inline-block"></span> เรียนจบแล้ว</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span> กำลังเรียน</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span> คาบถัดไป</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-rose-400 inline-block"></span> งดคลาส</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-slate-600 inline-block"></span> เรียนจบแล้ว</span>
                     </div>
                 </div>
 
@@ -612,8 +452,8 @@
         </section>
 
         <!-- Exam Schedule Page -->
-        <section id="page-exam" class="hidden bg-slate-800/80 rounded-2xl border border-slate-700/80 overflow-hidden shadow-lg">
-            <div class="bg-slate-900/90 p-2 flex gap-2 border-b border-slate-700/80">
+        <section id="page-exam" class="hidden bg-[#11161F] rounded-xl border border-white/[0.08] overflow-hidden">
+            <div class="bg-[#0E131B] p-1.5 flex gap-1.5 border-b border-white/[0.08]">
                 <button id="exam-tab-midterm" onclick="selectExamType('midterm')"><i class="fa-solid fa-pen-to-square"></i> สอบกลางภาค (Midterm)</button>
                 <button id="exam-tab-final" onclick="selectExamType('final')"><i class="fa-solid fa-file-signature"></i> สอบปลายภาค (Final)</button>
             </div>
@@ -624,44 +464,39 @@
         </section>
 
         <!-- Grade Page -->
-        <section id="page-grade" class="hidden bg-slate-800/80 rounded-2xl border border-slate-700/80 overflow-hidden shadow-lg">
+        <section id="page-grade" class="hidden bg-[#11161F] rounded-xl border border-white/[0.08] overflow-hidden">
             <div id="grade-page-body" class="p-4 sm:p-5 space-y-4"></div>
         </section>
 
     </main>
 
-    <!-- Bottom Navigation: Floating Liquid Capsule Dock (Class / Exam / Grade) -->
+    <!-- Bottom Navigation: Quiet Obsidian Segmented Capsule Dock -->
     <nav class="fixed bottom-3 sm:bottom-5 inset-x-0 z-40 px-3 sm:px-4 pointer-events-none pb-[env(safe-area-inset-bottom)]">
-        <div id="liquid-bottom-dock" class="max-w-md mx-auto pointer-events-auto liquid-dock p-1.5 rounded-full relative flex items-center shadow-[0_16px_40px_-8px_rgba(0,0,0,0.8),0_0_1px_1px_rgba(255,255,255,0.08)] overflow-hidden">
-            <!-- Liquid Glass Water Droplet Pill (Sliding Indicator) -->
-            <div id="liquid-nav-indicator" class="liquid-lens-pill water-droplet" style="width: calc(100% / 3); transform: translateX(0%);">
-                <div class="droplet-caustic"></div>
-                <div class="droplet-specular"></div>
-                <div class="droplet-specular-pin"></div>
-                <div class="droplet-gleam"></div>
-            </div>
+        <div id="liquid-bottom-dock" class="max-w-md mx-auto pointer-events-auto precision-dock p-1 rounded-full relative flex items-center overflow-hidden">
+            <!-- Sliding Active Segment Indicator -->
+            <div id="liquid-nav-indicator" class="dock-indicator" style="width: calc(100% / 3); transform: translateX(0%);"></div>
 
-            <button id="nav-class" onclick="setPageMode('class')" class="flex-1 py-2.5 rounded-full font-bold text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-1.5 text-amber-400 scale-[1.03] overflow-hidden">
+            <button id="nav-class" onclick="setPageMode('class')" class="flex-1 py-2.5 rounded-full font-semibold text-xs sm:text-sm relative z-10 flex items-center justify-center gap-1.5 text-amber-400 overflow-hidden">
                 <i class="fa-solid fa-table-cells-large"></i> <span>ตารางเรียน</span>
             </button>
-            <button id="nav-exam" onclick="setPageMode('exam')" class="flex-1 py-2.5 rounded-full font-medium text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 scale-100 overflow-hidden">
-                <i class="fa-solid fa-file-pen"></i> <span>ตารางสอบ</span> <span id="nav-exam-dot" class="hidden w-2 h-2 rounded-full bg-orange-400 animate-pulse"></span>
+            <button id="nav-exam" onclick="setPageMode('exam')" class="flex-1 py-2.5 rounded-full font-medium text-xs sm:text-sm relative z-10 flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 overflow-hidden">
+                <i class="fa-solid fa-file-pen"></i> <span>ตารางสอบ</span> <span id="nav-exam-dot" class="hidden w-2 h-2 rounded-full bg-orange-400"></span>
             </button>
-            <button id="nav-grade" onclick="setPageMode('grade')" class="flex-1 py-2.5 rounded-full font-medium text-xs sm:text-sm relative z-10 transition-all duration-300 flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 scale-100 overflow-hidden">
+            <button id="nav-grade" onclick="setPageMode('grade')" class="flex-1 py-2.5 rounded-full font-medium text-xs sm:text-sm relative z-10 flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 overflow-hidden">
                 <i class="fa-solid fa-chart-line"></i> <span>เกรด</span>
             </button>
         </div>
     </nav>
 
     <!-- Footer -->
-    <footer class="bg-slate-950 text-slate-400 text-xs py-4 border-t border-slate-800 mt-8">
-        <div class="max-w-7xl mx-auto px-4 text-center space-y-1">
+    <footer class="bg-[#090C11] text-slate-400 text-xs py-4 border-t border-white/[0.08] mt-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 text-center space-y-1">
             <p>ตารางเรียนอัจฉริยะ (Smart Class Schedule) • ระบบจัดตารางเรียนรายชั่วโมง โน้ตรายวิชา สรุปงานรายสัปดาห์ และแจ้งเตือนคาบเรียนเรียลไทม์</p>
             <div class="flex items-center justify-center gap-2 pt-1 flex-wrap">
                 <span id="app-version-text" class="text-[11px] text-slate-500 tracking-wide">
                     © Smart Schedule · Website Version <span class="font-mono text-slate-400">...</span>
                 </span>
-                <button type="button" onclick="forceCheckAppUpdate()" title="โหลดหน้าเว็บใหม่และล้าง Cache" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-400 hover:text-amber-400 text-[10px] font-medium transition-all flex items-center gap-1 active:scale-95">
+                <button type="button" onclick="forceCheckAppUpdate()" title="โหลดหน้าเว็บใหม่และล้าง Cache" class="px-2.5 py-0.5 rounded-md bg-[#171E2A] hover:bg-[#1E2736] border border-white/[0.08] text-slate-300 hover:text-amber-400 text-[10px] font-medium flex items-center gap-1">
                     <i class="fa-solid fa-rotate text-amber-400"></i> โหลดหน้าล่าสุด
                 </button>
             </div>
@@ -762,13 +597,11 @@
                 </div>
             </div>
 
-            <div class="px-5 py-3 bg-slate-800/60 border-t border-slate-700 flex justify-end shrink-0">
-                <button onclick="closeCourseNotesModal()" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold">
+            <div class="px-5 py-3 bg-[#0E131B] border-t border-white/[0.08] flex justify-end shrink-0">
+                <button onclick="closeCourseNotesModal()" class="px-4 py-2 rounded-lg bg-[#171E2A] hover:bg-[#1E2736] border border-white/[0.08] text-white text-xs font-semibold">
                     เสร็จสิ้น
                 </button>
             </div>
-        </div>
-    </div>
         </div>
     </div>
 
@@ -789,8 +622,6 @@
             </div>
         </div>
     </div>
-        </div>
-    </div>
 
 
     <!-- Modal: Grade scheme -->
@@ -801,12 +632,10 @@
                 <button onclick="closeGradeModal()" class="text-slate-400 hover:text-white w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-700 shrink-0"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div id="grade-modal-body" class="p-5 space-y-4 overflow-y-auto custom-scrollbar text-sm"></div>
-            <div class="px-5 py-3 bg-slate-800/60 border-t border-slate-700 flex justify-end gap-2">
-                <button type="button" onclick="closeGradeModal()" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold">ยกเลิก</button>
-                <button type="button" onclick="saveGradeModal()" class="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold">บันทึก</button>
+            <div class="px-5 py-3 bg-[#0E131B] border-t border-white/[0.08] flex justify-end gap-2">
+                <button type="button" onclick="closeGradeModal()" class="px-4 py-2 rounded-lg bg-[#171E2A] hover:bg-[#1E2736] border border-white/[0.08] text-slate-200 text-xs font-medium">ยกเลิก</button>
+                <button type="button" onclick="saveGradeModal()" class="px-5 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-semibold">บันทึก</button>
             </div>
-        </div>
-    </div>
         </div>
     </div>
 
@@ -844,11 +673,9 @@
                 </form>
                 <div id="exam-periods-list" class="space-y-2"></div>
             </div>
-            <div class="px-5 py-3 bg-slate-800/60 border-t border-slate-700 flex justify-end">
-                <button onclick="closeExamPeriodModal()" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold">เสร็จสิ้น</button>
+            <div class="px-5 py-3 bg-[#0E131B] border-t border-white/[0.08] flex justify-end">
+                <button onclick="closeExamPeriodModal()" class="px-4 py-2 rounded-lg bg-[#171E2A] hover:bg-[#1E2736] border border-white/[0.08] text-white text-xs font-semibold">เสร็จสิ้น</button>
             </div>
-        </div>
-    </div>
         </div>
     </div>
 
@@ -1026,14 +853,12 @@
                         <button type="button" onclick="closeCourseModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition-all">
                             ยกเลิก
                         </button>
-                        <button type="button" onclick="saveCourseForm(event)" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-md transition-all">
+                        <button type="button" onclick="saveCourseForm(event)" class="px-5 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-xs">
                             บันทึกข้อมูล
                         </button>
                     </div>
                 </div>
             </form>
-        </div>
-    </div>
         </div>
     </div>
 
@@ -1081,8 +906,6 @@
                     <button type="button" onclick="clearSelectedLabDate()" class="text-rose-400 hover:underline">ล้างวันที่เลือก</button>
                 </div>
             </div>
-        </div>
-    </div>
         </div>
     </div>
 
@@ -1143,35 +966,29 @@
                 </div>
             </div>
 
-            <div class="px-5 py-3 bg-slate-800/60 border-t border-slate-700 flex justify-end">
-                <button onclick="closeColorManagerModal()" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold">
+            <div class="px-5 py-3 bg-[#0E131B] border-t border-white/[0.08] flex justify-end">
+                <button onclick="closeColorManagerModal()" class="px-4 py-2 rounded-lg bg-[#171E2A] hover:bg-[#1E2736] border border-white/[0.08] text-white text-xs font-semibold">
                     เสร็จสิ้น
                 </button>
             </div>
         </div>
     </div>
-        </div>
-    </div>
 
 
     <!-- Modal 3: Confirm Clear All Data -->
-    <div id="clear-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
-        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-sm p-5 shadow-2xl space-y-4">
-            <div class="flex items-center gap-3 text-rose-400">
-                <div class="w-10 h-10 rounded-xl bg-rose-500/20 flex items-center justify-center text-lg">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                </div>
-                <h3 class="font-bold text-base text-white">ล้างข้อมูลรายวิชาทั้งหมด?</h3>
-            </div>
-            <p class="text-xs text-slate-300 leading-relaxed font-sarabun">
+    <div id="clear-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="bg-[#11161F] border border-white/[0.12] rounded-xl w-full max-w-sm p-5 space-y-4">
+            <h3 class="font-semibold text-base text-white flex items-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation text-rose-400"></i>
+                <span>ล้างข้อมูลรายวิชาทั้งหมด?</span>
+            </h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
                 รายวิชา โน้ต และงานทั้งหมดในตารางเรียนของคุณจะถูกลบออกจนว่างเปล่า (หมวดสีที่คุณตั้งไว้จะยังคงอยู่) คุณแน่ใจหรือไม่?
             </p>
             <div class="flex items-center justify-end gap-2 pt-2">
-                <button onclick="closeConfirmClearModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium">ยกเลิก</button>
-                <button onclick="confirmClearAllSchedule()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow">ยืนยันล้างข้อมูล</button>
+                <button onclick="closeConfirmClearModal()" class="px-4 py-2 rounded-lg bg-[#171E2A] hover:bg-[#1E2736] border border-white/[0.08] text-slate-300 text-xs font-medium">ยกเลิก</button>
+                <button onclick="confirmClearAllSchedule()" class="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold">ยืนยันล้างข้อมูล</button>
             </div>
-        </div>
-    </div>
         </div>
     </div>
 
@@ -1181,16 +998,12 @@
         <div class="bg-slate-900 border border-slate-700 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
             <!-- Header -->
             <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-850">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center text-orange-400 text-lg">
-                        <i class="fa-solid fa-calendar-check"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-                            ลงปฏิทินตารางสอบ & การบ้าน/งาน
-                        </h3>
-                        <p class="text-xs text-slate-400 mt-0.5">ตรวจเช็คสถานะการลง Google Calendar จริง ป้องกันการเพิ่มซ้ำซ้อน และลบออกได้อัตโนมัติ</p>
-                    </div>
+                <div>
+                    <h3 class="text-base sm:text-lg font-semibold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-check text-amber-400"></i>
+                        <span>ลงปฏิทินตารางสอบ &amp; การบ้าน/งาน</span>
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-0.5">ตรวจเช็คสถานะการลง Google Calendar จริง ป้องกันการเพิ่มซ้ำซ้อน และลบออกได้อัตโนมัติ</p>
                 </div>
                 <button onclick="closeCalendarExportModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-all">
                     <i class="fa-solid fa-xmark"></i>
@@ -1260,14 +1073,12 @@
                         <i class="fa-brands fa-google text-blue-400"></i>
                         <span>ลง Google Cal ที่เลือก</span>
                     </button>
-                    <button type="button" onclick="exportSelectedCalendarICS()" class="flex-1 sm:flex-none px-4 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-slate-950 font-bold rounded-xl text-xs sm:text-sm transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
+                    <button type="button" onclick="exportSelectedCalendarICS()" class="flex-1 sm:flex-none px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold rounded-lg text-xs sm:text-sm flex items-center justify-center gap-2">
                         <i class="fa-solid fa-file-arrow-down"></i>
                         <span>ส่งออก .ics ที่เลือก</span>
                     </button>
                 </div>
             </div>
-        </div>
-    </div>
         </div>
     </div>
 
@@ -1301,7 +1112,7 @@
         ];
 
         const NOTE_TYPES = {
-            permanent:    { label: 'โน้ตถาวร',        icon: 'fa-thumbtack',      badgeClass: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40' },
+            permanent:    { label: 'โน้ตถาวร',        icon: 'fa-thumbtack',      badgeClass: 'bg-sky-500/15 text-sky-300 border-sky-500/30' },
             homework:     { label: 'การบ้าน / งาน',    icon: 'fa-book-open',      badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/40' },
             cancel:       { label: 'งดคลาส / หยุดเรียน', icon: 'fa-calendar-xmark', badgeClass: 'bg-rose-500/20 text-rose-300 border-rose-500/40' },
             announcement: { label: 'ประกาศ / อื่นๆ',   icon: 'fa-bullhorn',       badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' }
@@ -2038,7 +1849,7 @@
                             <div class="text-[11px] text-slate-400 mt-0.5">${getDayName(c.day)} ${c.start} - ${c.end} น.</div>
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0 text-[10px]">
-                            ${permCount ? `<span class="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">ถาวร ${permCount}</span>` : ''}
+                            ${permCount ? `<span class="px-2 py-0.5 rounded-md bg-sky-500/15 text-sky-300 border border-sky-500/30">ถาวร ${permCount}</span>` : ''}
                             ${taskCount ? `<span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">งาน ${taskCount}</span>` : ''}
                             <i class="fa-solid fa-chevron-right text-slate-500 ml-1"></i>
                         </div>
@@ -2307,9 +2118,9 @@
                 permContainer.innerHTML = `<div class="text-xs text-slate-500 bg-slate-900/40 rounded-xl p-3 text-center border border-dashed border-slate-800">ยังไม่มีโน้ตถาวรสำหรับวิชานี้</div>`;
             } else {
                 permContainer.innerHTML = permNotes.map(n => `
-                    <div class="bg-indigo-950/25 border border-indigo-500/30 rounded-xl p-3 flex items-start justify-between gap-2">
+                    <div class="bg-[#171E2A] border border-sky-500/30 rounded-lg p-3 flex items-start justify-between gap-2">
                         <div class="flex items-start gap-2 min-w-0">
-                            <i class="fa-solid fa-thumbtack text-indigo-400 mt-0.5 text-xs shrink-0"></i>
+                            <i class="fa-solid fa-thumbtack text-sky-400 mt-0.5 text-xs shrink-0"></i>
                             <p class="text-xs sm:text-sm text-slate-100 break-words">${escapeHTML(n.text)}</p>
                         </div>
                         <div class="flex items-center gap-1 shrink-0">
@@ -2473,8 +2284,8 @@
             selectedDayTab = simObj.getDay();
 
             const clockBadge = document.getElementById('clock-badge');
-            clockBadge.classList.replace('border-slate-700/80', 'border-indigo-500');
-            document.getElementById('clock-indicator').classList.replace('bg-emerald-400', 'bg-indigo-400');
+            clockBadge.classList.replace('border-white/10', 'border-amber-500/70');
+            document.getElementById('clock-indicator').classList.replace('bg-emerald-400', 'bg-amber-400');
 
             updateTick(true);
             autoRoute();
@@ -2488,8 +2299,8 @@
             selectedDayTab = now.getDay();
 
             const clockBadge = document.getElementById('clock-badge');
-            clockBadge.classList.replace('border-indigo-500', 'border-slate-700/80');
-            document.getElementById('clock-indicator').classList.replace('bg-indigo-400', 'bg-emerald-400');
+            clockBadge.classList.replace('border-amber-500/70', 'border-white/10');
+            document.getElementById('clock-indicator').classList.replace('bg-amber-400', 'bg-emerald-400');
 
             updateTick(true);
             autoRoute();
@@ -2507,7 +2318,7 @@
             document.getElementById('live-time').innerText = timeFormatted;
             const liveDateEl = document.getElementById('live-date');
             if (isSimulated) {
-                const simHtml = `<span class="text-indigo-300 font-semibold">[จำลอง] ${getDayName(ctx.day)} ${formatThaiShortDate(ctx.isoDate)}</span>`;
+                const simHtml = `<span class="text-amber-300 font-semibold">[จำลอง] ${getDayName(ctx.day)} ${formatThaiShortDate(ctx.isoDate)}</span>`;
                 const simKey = 'H:' + simHtml;
                 if (liveDateEl && simKey !== lastLiveDateText) {
                     lastLiveDateText = simKey;
@@ -2619,11 +2430,11 @@
                 if (curRenderKey === lastCurrentCardRenderKey) return;
                 lastCurrentCardRenderKey = curRenderKey;
 
-                card.className = "bg-slate-800/80 border border-slate-700/80 rounded-2xl p-5 shadow-lg flex flex-col justify-between transition-colors duration-200";
-                badge.className = "text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-700 text-slate-300";
+                card.className = "bg-[#11161F] border border-white/[0.08] rounded-xl p-5 flex flex-col justify-between transition-colors duration-150";
+                badge.className = "text-[11px] font-medium px-2.5 py-0.5 rounded-md bg-[#171E2A] text-slate-300 border border-white/[0.08]";
                 badge.innerText = "ยังไม่มีข้อมูล";
                 content.innerHTML = `
-                    <div class="py-5 text-center bg-slate-900/40 rounded-xl border border-dashed border-slate-700 space-y-2">
+                    <div class="py-5 text-center space-y-2">
                         <i class="fa-solid fa-calendar-plus text-amber-400 text-2xl"></i>
                         <p class="text-sm font-semibold text-slate-200">ยังไม่มีรายวิชาในตารางเรียน</p>
                         <p class="text-xs text-slate-400">กดปุ่ม <span class="text-amber-400 font-semibold">"+ เพิ่มรายวิชา"</span> เพื่อเริ่มต้นจัดตารางของคุณ</p>
@@ -2652,51 +2463,51 @@
                 lastCurrentCardRenderKey = curRenderKey;
 
                 const cancelledNoticeHTML = (todayCancelledSessions && todayCancelledSessions.length > 0)
-                    ? `<div class="mt-2.5 bg-rose-950/40 border border-rose-500/40 rounded-xl px-3 py-2 text-xs text-rose-200 flex items-center justify-between gap-2">
+                    ? `<div class="mt-2 pt-2.5 border-t border-rose-500/25 text-xs text-rose-200 flex items-center justify-between gap-2">
                         <span class="truncate"><i class="fa-solid fa-calendar-xmark text-rose-400 mr-1.5"></i>งดคลาสวันนี้: <strong>${todayCancelledSessions.map(s => escapeHTML(s.name)).join(', ')}</strong></span>
-                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 shrink-0">${todayCancelledSessions.length} คาบ</span>
+                        <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-rose-500/15 text-rose-300 shrink-0">${todayCancelledSessions.length} คาบ</span>
                        </div>`
                     : '';
 
                 const colObj = getColorObj(currentSession.colorId);
-                card.className = "bg-slate-800/90 border-2 border-emerald-500/60 rounded-2xl p-5 shadow-lg flex flex-col justify-between transition-colors duration-200 pulse-glow";
-                badge.className = "text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1.5";
+                card.className = "bg-[#11161F] border border-emerald-500/35 border-l-2 border-l-emerald-500 rounded-xl p-5 flex flex-col justify-between transition-colors duration-150";
+                badge.className = "text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5";
                 badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> ${L('กำลังเรียน','กำลังสอบ')}`;
 
                 content.innerHTML = `
                     <div class="space-y-3.5">
                         <div>
                             <div class="flex items-center gap-2 flex-wrap">
-                                ${currentSession.code ? `<span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">${escapeHTML(currentSession.code)}</span>` : ''}
-                                ${currentSession.section ? `<span class="font-mono text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-amber-300 border border-slate-700">${escapeHTML(secLabel(currentSession.section))}</span>` : ''}
-                                <span class="text-[11px] font-medium px-2 py-0.5 rounded-full flex items-center gap-1.5" style="background-color: ${hexToRgba(colObj.hex, 0.2)}; color: ${colObj.hex}; border: 1px solid ${hexToRgba(colObj.hex, 0.45)}">
-                                    <span class="w-2 h-2 rounded-full" style="background-color: ${colObj.hex}"></span>
+                                ${currentSession.code ? `<span class="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">${escapeHTML(currentSession.code)}</span>` : ''}
+                                ${currentSession.section ? `<span class="font-mono text-[10px] font-semibold px-2 py-0.5 rounded bg-[#171E2A] text-amber-300 border border-white/[0.08]">${escapeHTML(secLabel(currentSession.section))}</span>` : ''}
+                                <span class="text-[11px] font-medium px-2 py-0.5 rounded flex items-center gap-1.5" style="background-color: ${hexToRgba(colObj.hex, 0.16)}; color: ${colObj.hex}; border: 1px solid ${hexToRgba(colObj.hex, 0.38)}">
+                                    <span class="w-1.5 h-1.5 rounded-full" style="background-color: ${colObj.hex}"></span>
                                     ${escapeHTML(colObj.label)}
                                 </span>
-                                ${currentSession.labBadgeText ? `<span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/40"><i class="fa-solid ${currentSession.examType ? 'fa-pen-to-square' : 'fa-flask'} mr-1"></i>${escapeHTML(currentSession.labBadgeText)}</span>` : ''}
+                                ${currentSession.labBadgeText ? `<span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-400/30"><i class="fa-solid ${currentSession.examType ? 'fa-pen-to-square' : 'fa-flask'} mr-1"></i>${escapeHTML(currentSession.labBadgeText)}</span>` : ''}
                                 <span class="text-xs text-slate-400 font-mono ml-auto"><i class="fa-regular fa-clock mr-1"></i>${currentSession.start} - ${currentSession.end} น.</span>
                             </div>
-                            <h3 class="text-lg sm:text-xl font-bold text-white mt-2 leading-snug">${escapeHTML(currentSession.name)}</h3>
+                            <h3 class="text-lg sm:text-xl font-semibold text-white mt-2 leading-snug">${escapeHTML(currentSession.name)}</h3>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-2 text-xs text-slate-300 bg-slate-900/60 p-2.5 rounded-xl border border-slate-700/60">
+                        <div class="grid grid-cols-2 gap-3 text-xs text-slate-300 pt-2.5 border-t border-white/[0.08]">
                             <div class="flex items-center gap-2 truncate">
                                 <i class="fa-solid fa-location-dot text-rose-400"></i>
                                 <span class="truncate font-semibold text-white">${escapeHTML(currentSession.room)}</span>
                             </div>
                             <div class="flex items-center gap-2 truncate">
-                                <i class="fa-solid fa-user-tie text-sky-400"></i>
+                                <i class="fa-solid fa-user-tie text-slate-400"></i>
                                 <span class="truncate">${escapeHTML(currentSession.teacher || 'ไม่ระบุผู้สอน')}</span>
                             </div>
                         </div>
 
-                        <div class="space-y-1.5">
+                        <div class="space-y-1.5 pt-1">
                             <div class="flex justify-between text-xs">
                                 <span id="cur-progress-pct" class="text-slate-400">${L('ความคืบหน้าคาบเรียน','ความคืบหน้าการสอบ')} (${progressPercent}%)</span>
                                 <span id="cur-remaining-text" class="text-emerald-300 font-semibold font-mono">เหลืออีก ${formatDuration(currentSession.remainingSecs)}</span>
                             </div>
-                            <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-700">
-                                <div id="cur-progress-bar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-[width] duration-300" style="width: ${progressPercent}%"></div>
+                            <div class="w-full h-2 bg-[#090C11] rounded-full overflow-hidden border border-white/[0.08]">
+                                <div id="cur-progress-bar" class="h-full bg-emerald-500 rounded-full transition-[width] duration-300" style="width: ${progressPercent}%"></div>
                             </div>
                         </div>
                         ${cancelledNoticeHTML}
@@ -2729,31 +2540,31 @@
             lastCurrentCardRenderKey = curRenderKey;
 
             const cancelledNoticeHTML = (todayCancelledSessions && todayCancelledSessions.length > 0)
-                ? `<div class="mt-2.5 bg-rose-950/40 border border-rose-500/40 rounded-xl px-3 py-2 text-xs text-rose-200 flex items-center justify-between gap-2">
+                ? `<div class="mt-3 pt-2.5 border-t border-rose-500/25 text-xs text-rose-200 flex items-center justify-between gap-2">
                     <span class="truncate"><i class="fa-solid fa-calendar-xmark text-rose-400 mr-1.5"></i>งดคลาสวันนี้: <strong>${todayCancelledSessions.map(s => escapeHTML(s.name)).join(', ')}</strong></span>
-                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 shrink-0">${todayCancelledSessions.length} คาบ</span>
+                    <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-rose-500/15 text-rose-300 shrink-0">${todayCancelledSessions.length} คาบ</span>
                    </div>`
                 : '';
 
-            card.className = "bg-slate-800/80 border border-slate-700/80 rounded-2xl p-5 shadow-lg flex flex-col justify-between transition-colors duration-200";
+            card.className = "bg-[#11161F] border border-white/[0.08] rounded-xl p-5 flex flex-col justify-between transition-colors duration-150";
 
             if (todaySessions.length === 0) {
                 if (todayCancelledSessions && todayCancelledSessions.length > 0) {
-                    badge.className = "text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40";
+                    badge.className = "text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-rose-500/15 text-rose-300 border border-rose-500/30";
                     badge.innerText = "งดคลาสทั้งหมดวันนี้";
                     content.innerHTML = `
-                        <div class="py-5 px-3 text-center bg-rose-950/20 rounded-xl border border-rose-500/40 space-y-1.5">
-                            <i class="fa-solid fa-calendar-xmark text-rose-400 text-2xl"></i>
+                        <div class="py-5 px-2 text-center space-y-1.5">
+                            <i class="fa-solid fa-calendar-xmark text-rose-400 text-xl"></i>
                             <p class="text-sm font-semibold text-white">คาบเรียนของวันนี้ถูกประกาศงดคลาส</p>
                             <p class="text-xs text-rose-200">${todayCancelledSessions.map(s => `${escapeHTML(s.name)} (${escapeHTML(s.cancelNote.text)})`).join(' • ')}</p>
                         </div>
                     `;
                 } else {
-                    badge.className = "text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-700 text-slate-300";
+                    badge.className = "text-[11px] font-medium px-2.5 py-0.5 rounded-md bg-[#171E2A] text-slate-300 border border-white/[0.08]";
                     badge.innerText = L("วันว่าง / ไม่มีเรียน","ไม่มีสอบวันนี้");
                     content.innerHTML = `
-                        <div class="py-5 text-center bg-slate-900/40 rounded-xl border border-slate-700/50 space-y-1.5">
-                            <i class="fa-solid fa-mug-hot text-sky-400 text-2xl"></i>
+                        <div class="py-5 text-center space-y-1.5">
+                            <i class="fa-solid fa-mug-hot text-slate-400 text-xl"></i>
                             <p class="text-sm font-semibold text-slate-200">${L('ไม่มีตารางเรียนใน','ไม่มีตารางสอบใน')}${getDayName(ctxDay)}</p>
                             <p class="text-xs text-slate-400">พักผ่อนให้เต็มที่ หรือกดเพิ่มวิชาเรียนได้เลย</p>
                         </div>
@@ -2764,22 +2575,22 @@
                 const lastEndSecs = timeToMinutes(todaySessions[todaySessions.length - 1].end) * 60;
 
                 if (nowTotalSecs < firstStartSecs) {
-                    badge.className = "text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30";
+                    badge.className = "text-[11px] font-medium px-2.5 py-0.5 rounded-md bg-[#171E2A] text-amber-300 border border-amber-500/30";
                     badge.innerText = L("เตรียมตัวก่อนเรียน","เตรียมตัวก่อนสอบ");
                     content.innerHTML = `
-                        <div class="py-5 text-center bg-slate-900/40 rounded-xl border border-slate-700/50 space-y-1.5">
-                            <i class="fa-solid fa-sun text-amber-400 text-2xl"></i>
+                        <div class="py-5 text-center space-y-1.5">
+                            <i class="fa-solid fa-sun text-amber-400 text-xl"></i>
                             <p class="text-sm font-semibold text-slate-200">${L('ยังไม่ถึงเวลาเรียนคาบแรก','ยังไม่ถึงเวลาสอบวิชาแรก')}</p>
-                            <p class="text-xs text-slate-400">${L('คาบแรกของวันนี้เริ่มเวลา','วิชาแรกของวันนี้เริ่มสอบเวลา')} <span class="text-amber-300 font-mono font-bold">${todaySessions[0].start} น.</span></p>
+                            <p class="text-xs text-slate-400">${L('คาบแรกของวันนี้เริ่มเวลา','วิชาแรกของวันนี้เริ่มสอบเวลา')} <span class="text-amber-300 font-mono font-semibold">${todaySessions[0].start} น.</span></p>
                         </div>
                         ${cancelledNoticeHTML}
                     `;
                 } else if (nowTotalSecs >= lastEndSecs) {
-                    badge.className = "text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30";
+                    badge.className = "text-[11px] font-medium px-2.5 py-0.5 rounded-md bg-[#171E2A] text-slate-300 border border-white/[0.08]";
                     badge.innerText = L("เลิกเรียนแล้ว","สอบเสร็จแล้ว");
                     content.innerHTML = `
-                        <div class="py-5 text-center bg-slate-900/40 rounded-xl border border-slate-700/50 space-y-1.5">
-                            <i class="fa-solid fa-moon text-indigo-400 text-2xl"></i>
+                        <div class="py-5 text-center space-y-1.5">
+                            <i class="fa-solid fa-moon text-slate-400 text-xl"></i>
                             <p class="text-sm font-semibold text-slate-200">${L('หมดเวลาเรียนสำหรับวันนี้แล้ว','สอบครบทุกวิชาของวันนี้แล้ว')}</p>
                             <p class="text-xs text-slate-400">${L('เรียนครบทั้ง ' + todaySessions.length + ' คาบเรียบร้อย','สอบครบทั้ง ' + todaySessions.length + ' วิชาเรียบร้อย')}</p>
                         </div>
@@ -2787,13 +2598,13 @@
                     `;
                 } else {
                     const isLunch = (nowTotalSecs >= 11.5 * 3600 && nowTotalSecs <= 13.5 * 3600);
-                    badge.className = "text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30";
+                    badge.className = "text-[11px] font-medium px-2.5 py-0.5 rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30";
                     badge.innerText = isLunch ? "ช่วงพักกลางวัน" : "ช่วงพักเปลี่ยนคาบ";
                     content.innerHTML = `
-                        <div class="py-5 text-center bg-slate-900/40 rounded-xl border border-slate-700/50 space-y-1.5">
-                            <i class="fa-solid ${isLunch ? 'fa-utensils text-amber-400' : 'fa-hourglass-half text-sky-400'} text-2xl"></i>
+                        <div class="py-5 text-center space-y-1.5">
+                            <i class="fa-solid ${isLunch ? 'fa-utensils text-amber-400' : 'fa-hourglass-half text-slate-400'} text-xl"></i>
                             <p class="text-sm font-semibold text-slate-200">${isLunch ? 'ขณะนี้เป็นช่วงพักกลางวัน' : 'ช่วงพักระหว่างคาบเรียน'}</p>
-                            <p class="text-xs text-slate-400">${nextSession ? `เตรียมตัวเข้าเรียนวิชาถัดไปเวลา <span class="text-amber-300 font-mono font-bold">${nextSession.start} น.</span>` : ''}</p>
+                            <p class="text-xs text-slate-400">${nextSession ? `เตรียมตัวเข้าเรียนวิชาถัดไปเวลา <span class="text-amber-300 font-mono font-semibold">${nextSession.start} น.</span>` : ''}</p>
                         </div>
                         ${cancelledNoticeHTML}
                     `;
@@ -2823,8 +2634,8 @@
 
             if (!nextSession) {
                 content.innerHTML = `
-                    <div class="py-5 text-center bg-slate-900/40 rounded-xl border border-slate-700/50 space-y-1.5">
-                        <i class="fa-solid fa-circle-check text-emerald-400 text-2xl"></i>
+                    <div class="py-5 text-center space-y-1.5">
+                        <i class="fa-solid fa-circle-check text-emerald-400 text-xl"></i>
                         <p class="text-sm font-semibold text-slate-200">${L('ไม่มีคาบเรียนถัดไปในวันนี้','ไม่มีวิชาสอบถัดไปในวันนี้')}</p>
                         <p class="text-xs text-slate-400">${totalTodayCount > 0 ? 'นี่คือคาบสุดท้ายหรือเลิกเรียนหมดแล้ว' : 'เพิ่มวิชาเรียนหรือเลือกดูตารางวันอื่นด้านล่าง'}</p>
                     </div>
@@ -2837,28 +2648,28 @@
             content.innerHTML = `
                 <div class="space-y-3.5">
                     <div class="flex items-start justify-between gap-2">
-                        <div>
+                        <div class="min-w-0">
                             <div class="flex items-center gap-2 flex-wrap">
-                                ${nextSession.code ? `<span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">${escapeHTML(nextSession.code)}</span>` : ''}
-                                ${nextSession.section ? `<span class="font-mono text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-amber-300 border border-slate-700">${escapeHTML(secLabel(nextSession.section))}</span>` : ''}
-                                <span class="text-[11px] font-medium px-2 py-0.5 rounded-full flex items-center gap-1" style="background-color: ${hexToRgba(colObj.hex, 0.2)}; color: ${colObj.hex}; border: 1px solid ${hexToRgba(colObj.hex, 0.4)}">
+                                ${nextSession.code ? `<span class="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">${escapeHTML(nextSession.code)}</span>` : ''}
+                                ${nextSession.section ? `<span class="font-mono text-[10px] font-semibold px-2 py-0.5 rounded bg-[#171E2A] text-amber-300 border border-white/[0.08]">${escapeHTML(secLabel(nextSession.section))}</span>` : ''}
+                                <span class="text-[11px] font-medium px-2 py-0.5 rounded flex items-center gap-1" style="background-color: ${hexToRgba(colObj.hex, 0.16)}; color: ${colObj.hex}; border: 1px solid ${hexToRgba(colObj.hex, 0.35)}">
                                     <span class="w-1.5 h-1.5 rounded-full" style="background-color: ${colObj.hex}"></span>
                                     ${escapeHTML(colObj.label)}
                                 </span>
-                                ${nextSession.labBadgeText ? `<span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/40"><i class="fa-solid ${nextSession.examType ? 'fa-pen-to-square' : 'fa-flask'} mr-1"></i>${escapeHTML(nextSession.labBadgeText)}</span>` : ''}
+                                ${nextSession.labBadgeText ? `<span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-400/30"><i class="fa-solid ${nextSession.examType ? 'fa-pen-to-square' : 'fa-flask'} mr-1"></i>${escapeHTML(nextSession.labBadgeText)}</span>` : ''}
                                 <span class="text-xs text-slate-300 font-medium truncate max-w-[180px]"><i class="fa-solid fa-location-dot text-rose-400 mr-1"></i>${escapeHTML(nextSession.room)}</span>
                             </div>
-                            <h3 class="text-lg sm:text-xl font-bold text-white mt-2 leading-snug">${escapeHTML(nextSession.name)}</h3>
+                            <h3 class="text-lg sm:text-xl font-semibold text-white mt-2 leading-snug">${escapeHTML(nextSession.name)}</h3>
                         </div>
                         <div class="text-right shrink-0">
                             <div class="text-[11px] text-slate-400">${L('เริ่มเรียนเวลา','เริ่มสอบเวลา')}</div>
-                            <div class="text-lg sm:text-xl font-bold font-mono text-amber-400">${nextSession.start} น.</div>
+                            <div class="text-lg sm:text-xl font-semibold font-mono text-amber-400">${nextSession.start} น.</div>
                         </div>
                     </div>
 
-                    <div class="bg-slate-900/90 p-3 rounded-xl border border-amber-500/30 flex items-center justify-between gap-2">
-                        <div class="flex items-center gap-2 text-xs sm:text-sm text-amber-300 font-semibold">
-                            <i class="fa-solid fa-stopwatch text-amber-400 text-base"></i>
+                    <div class="pt-3 border-t border-white/[0.08] flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2 text-xs sm:text-sm text-amber-300 font-medium">
+                            <i class="fa-solid fa-stopwatch text-amber-400 text-sm"></i>
                             <span>จะเริ่มในอีก <strong id="next-countdown-text" class="text-sm sm:text-base text-white font-mono">${formatDuration(nextSession.secsUntilStart)}</strong></span>
                         </div>
                         <span class="text-[11px] text-slate-400 font-mono hidden sm:inline">ถึง ${nextSession.end} น.</span>
@@ -3034,8 +2845,8 @@
                 const permNotesHTML = sess.permNotes && sess.permNotes.length > 0
                     ? `<div class="mt-2 flex flex-wrap gap-1.5">
                         ${sess.permNotes.map(pn => `
-                            <span class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-lg bg-indigo-950/60 border border-indigo-500/30 text-indigo-200 max-w-full">
-                                <i class="fa-solid fa-thumbtack text-indigo-400 text-[9px] shrink-0"></i>
+                            <span class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md bg-[#171E2A] border border-sky-500/30 text-sky-200 max-w-full">
+                                <i class="fa-solid fa-thumbtack text-sky-400 text-[9px] shrink-0"></i>
                                 <span class="truncate">${escapeHTML(pn.text)}</span>
                             </span>
                         `).join('')}
@@ -3255,7 +3066,7 @@
                         : '';
 
                     const noteTag = (sess.weekTaskCount > 0 || (sess.permNotes && sess.permNotes.length > 0))
-                        ? `<span onclick="event.stopPropagation(); openCourseNotesModal('${sess.courseId}')" title="เปิดดูโน้ตของวิชานี้" class="text-[9px] px-1 rounded bg-indigo-500/40 hover:bg-indigo-500 text-indigo-100 font-bold shrink-0"><i class="fa-solid fa-note-sticky"></i>${sess.weekTaskCount > 0 ? sess.weekTaskCount : ''}</span>`
+                        ? `<span onclick="event.stopPropagation(); openCourseNotesModal('${sess.courseId}')" title="เปิดดูโน้ตของวิชานี้" class="text-[9px] px-1 rounded bg-sky-500/30 hover:bg-sky-500/50 text-sky-100 font-semibold shrink-0"><i class="fa-solid fa-note-sticky"></i>${sess.weekTaskCount > 0 ? sess.weekTaskCount : ''}</span>`
                         : '';
 
                     const leftPct = ((st - gridStartM) / gridTotalM) * 100;
@@ -4500,125 +4311,14 @@
         // --- REAL WATER DROPLET LIGHT PLAY & SQUASH/STRETCH ENGINE ---
         let currentBottomNavIdx = 0; // 0: class, 1: exam, 2: grade
 
-        function animateWaterDroplet(indicatorEl, targetIdx, currentIdx) {
+        function animateWaterDroplet(indicatorEl, targetIdx) {
             if (!indicatorEl) return;
-            const diff = targetIdx - currentIdx;
-            const targetPercent = targetIdx * 100;
-
-            if (diff === 0) {
-                indicatorEl.style.transition = 'transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)';
-                indicatorEl.style.transform = `translateX(${targetPercent}%) scale(1, 1)`;
-                return;
-            }
-
-            const isRight = diff > 0;
-            const distance = Math.abs(diff);
-            // Dynamic stretch based on velocity & travel distance
-            const stretchX = distance > 1 ? 1.25 : 1.16;
-            const squashY = distance > 1 ? 0.78 : 0.85;
-
-            // Flash light gleam across crystal water droplet
-            indicatorEl.style.setProperty('--gleam-pos', isRight ? '150% 0' : '-80% 0');
-            setTimeout(() => {
-                indicatorEl.style.setProperty('--gleam-pos', '-120% 0');
-            }, 550);
-
-            // Phase 1: High velocity fluid launch (stretch in flight)
-            indicatorEl.style.transition = 'transform 0.22s cubic-bezier(0.4, 0, 0.2, 1)';
-            indicatorEl.style.transform = `translateX(${targetPercent}%) scale(${stretchX}, ${squashY})`;
-
-            // Phase 2: Impact squash at destination
-            setTimeout(() => {
-                indicatorEl.style.transition = 'transform 0.15s cubic-bezier(0.2, 0.8, 0.3, 1.3)';
-                indicatorEl.style.transform = `translateX(${targetPercent}%) scale(0.92, 1.1)`;
-
-                // Phase 3: Elastic counter-bounce
-                setTimeout(() => {
-                    indicatorEl.style.transition = 'transform 0.12s ease-out';
-                    indicatorEl.style.transform = `translateX(${targetPercent}%) scale(1.02, 0.98)`;
-
-                    // Phase 4: Settle into resting surface tension
-                    setTimeout(() => {
-                        indicatorEl.style.transition = 'transform 0.1s ease-out';
-                        indicatorEl.style.transform = `translateX(${targetPercent}%) scale(1, 1)`;
-                    }, 110);
-                }, 130);
-            }, 210);
+            indicatorEl.style.transform = `translateX(${targetIdx * 100}%)`;
         }
 
-        function createWaterRipple(e, targetBtn) {
-            if (!targetBtn) return;
-            const rect = targetBtn.getBoundingClientRect();
-            const ripple = document.createElement('span');
-            ripple.className = 'water-ripple-wave';
-            const x = (e && typeof e.clientX === 'number' && e.clientX > 0) ? (e.clientX - rect.left) : (rect.width / 2);
-            const y = (e && typeof e.clientY === 'number' && e.clientY > 0) ? (e.clientY - rect.top) : (rect.height / 2);
-            ripple.style.left = `${x}px`;
-            ripple.style.top = `${y}px`;
-            targetBtn.appendChild(ripple);
-            setTimeout(() => ripple.remove(), 600);
-        }
+        function createWaterRipple() {}
 
-        function initWaterDropletLighting() {
-            const dock = document.getElementById('liquid-bottom-dock');
-            if (!dock) return;
-
-            let dockRect = null;
-            let dockMoveRaf = 0;
-            let pendingX = 0;
-            let pendingY = 0;
-
-            window.addEventListener('resize', () => {
-                dockRect = null;
-            }, { passive: true });
-
-            const scheduleLightUpdate = (clientX, clientY) => {
-                pendingX = clientX;
-                pendingY = clientY;
-                if (dockMoveRaf) return;
-                dockMoveRaf = requestAnimationFrame(() => {
-                    dockMoveRaf = 0;
-                    if (!dockRect) dockRect = dock.getBoundingClientRect();
-                    if (!dockRect.width || !dockRect.height) return;
-                    const rawX = ((pendingX - dockRect.left) / dockRect.width) * 100;
-                    const rawY = ((pendingY - dockRect.top) / dockRect.height) * 100;
-                    const clampedX = Math.max(15, Math.min(85, rawX));
-                    const clampedY = Math.max(10, Math.min(50, rawY));
-                    dock.style.setProperty('--drop-light-x', `${clampedX.toFixed(1)}%`);
-                    dock.style.setProperty('--drop-light-y', `${clampedY.toFixed(1)}%`);
-                });
-            };
-
-            dock.addEventListener('pointermove', (e) => {
-                scheduleLightUpdate(e.clientX, e.clientY);
-            }, { passive: true });
-            dock.addEventListener('touchmove', (e) => {
-                if (e.touches && e.touches[0]) {
-                    scheduleLightUpdate(e.touches[0].clientX, e.touches[0].clientY);
-                }
-            }, { passive: true });
-            dock.addEventListener('pointerleave', () => {
-                if (dockMoveRaf) {
-                    cancelAnimationFrame(dockMoveRaf);
-                    dockMoveRaf = 0;
-                }
-                dockRect = null;
-                dock.style.setProperty('--drop-light-x', '42%');
-                dock.style.setProperty('--drop-light-y', '20%');
-            });
-
-            // Tap ripple on bottom dock buttons (Class / Exam / Grade)
-            document.querySelectorAll('#liquid-bottom-dock button').forEach(btn => {
-                btn.addEventListener('pointerdown', (e) => {
-                    createWaterRipple(e, btn);
-                });
-            });
-        }
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initWaterDropletLighting);
-        } else {
-            initWaterDropletLighting();
-        }
+        function initWaterDropletLighting() {}
 
         let lastBottomNavKey = '';
         function renderBottomNav() {
@@ -4636,9 +4336,9 @@
                 const btn = document.getElementById(id);
                 if (!btn) return;
                 if (isActive) {
-                    btn.className = `flex-1 py-2.5 rounded-full font-bold text-xs sm:text-sm relative z-10 transition-colors duration-200 flex items-center justify-center gap-1.5 ${activeColor} scale-[1.03] drop-shadow-sm overflow-hidden`;
+                    btn.className = `flex-1 py-2.5 rounded-full font-semibold text-xs sm:text-sm relative z-10 flex items-center justify-center gap-1.5 ${activeColor} overflow-hidden`;
                 } else {
-                    btn.className = 'flex-1 py-2.5 rounded-full font-medium text-xs sm:text-sm relative z-10 transition-colors duration-200 flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 scale-100 overflow-hidden';
+                    btn.className = 'flex-1 py-2.5 rounded-full font-medium text-xs sm:text-sm relative z-10 flex items-center justify-center gap-1.5 text-slate-400 hover:text-slate-200 overflow-hidden';
                 }
             };
             setBtn('nav-class', pageMode === 'class', 'text-amber-400');
@@ -5254,7 +4954,7 @@
                     widgetSyncToken: ensureWidgetSyncToken(),
                     clientUpdatedAt: nowIso,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    appVersion: "1.3.3"
+                    appVersion: "1.4.0"
                 };
 
                 const docRef = firebaseDb.collection(FIREBASE_COLLECTION_USERS)
@@ -7452,13 +7152,11 @@
                         <i class="fa-solid fa-upload"></i> เลือกรูปภาพจากเครื่อง
                         <input type="file" accept="image/*" onchange="handleCustomAppIconUpload(event)" class="hidden">
                     </label>
-                    <button type="button" onclick="resetCustomAppIcon()" class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-medium">
+                    <button type="button" onclick="resetCustomAppIcon()" class="px-3.5 py-2.5 rounded-lg bg-[#171E2A] hover:bg-[#1E2736] border border-white/[0.08] text-slate-300 text-xs font-medium">
                         ใช้ไอคอนเริ่มต้น
                     </button>
                 </div>
             </div>
-        </div>
-    </div>
         </div>
     </div>
 
@@ -8714,17 +8412,13 @@ function renderAccessoryInline(widget, ui) {
     <div id="ios-widget-modal" class="fixed inset-0 z-[65] hidden items-center justify-center bg-slate-950/85 backdrop-blur-sm p-3 sm:p-4 overflow-y-auto">
         <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden my-auto flex flex-col max-h-[92vh]">
             <!-- Header -->
-            <div class="px-5 py-4 bg-slate-800/90 border-b border-slate-700 flex items-center justify-between shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 text-xl shadow-inner">
-                        <i class="fa-brands fa-apple"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-base sm:text-lg text-white flex items-center gap-2">
-                            วิดเจ็ตหน้าจอโฮม iOS (iPhone & iPad)
-                        </h3>
-                        <p class="text-xs text-slate-400 mt-0.5">แสดงตารางเรียนและงานสำคัญบนหน้าจอโฮม iPhone / iPad ผ่านแอป Scriptable</p>
-                    </div>
+            <div class="px-5 py-4 bg-[#0E131B] border-b border-white/[0.08] flex items-center justify-between shrink-0">
+                <div>
+                    <h3 class="font-semibold text-base sm:text-lg text-white flex items-center gap-2">
+                        <i class="fa-brands fa-apple text-amber-400"></i>
+                        <span>วิดเจ็ตหน้าจอโฮม iOS (iPhone &amp; iPad)</span>
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-0.5">แสดงตารางเรียนและงานสำคัญบนหน้าจอโฮม iPhone / iPad ผ่านแอป Scriptable</p>
                 </div>
                 <button onclick="closeIosWidgetModal()" class="text-slate-400 hover:text-white w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-700 transition-all">
                     <i class="fa-solid fa-xmark"></i>
@@ -8746,14 +8440,14 @@ function renderAccessoryInline(widget, ui) {
                 <!-- Scriptable Widget (iOS) -->
                 <div class="bg-slate-800/70 border border-slate-700 rounded-xl p-4 space-y-3.5">
                     <div class="flex items-center justify-between flex-wrap gap-2">
-                        <div class="flex items-center gap-2.5">
-                            <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center justify-center font-bold text-xs"><i class="fa-solid fa-code"></i></span>
-                            <div>
-                                <h4 class="font-bold text-white text-sm">วิดเจ็ต iOS ผ่านแอป Scriptable</h4>
-                                <p class="text-[11px] text-slate-400">รองรับหลายขนาด (Small 2×2 / Medium 4×2 / Large 4×4 / Lock Screen) พร้อมโหมดสัปดาห์สอบ &amp; เรียงลำดับงานสำคัญ</p>
-                            </div>
+                        <div>
+                            <h4 class="font-semibold text-white text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-code text-emerald-400"></i>
+                                <span>วิดเจ็ต iOS ผ่านแอป Scriptable</span>
+                            </h4>
+                            <p class="text-[11px] text-slate-400 mt-0.5">รองรับหลายขนาด (Small 2×2 / Medium 4×2 / Large 4×4 / Lock Screen) พร้อมโหมดสัปดาห์สอบ &amp; เรียงลำดับงานสำคัญ</p>
                         </div>
-                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">iPhone &amp; iPad</span>
+                        <span class="text-[10px] font-mono font-medium px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">iPhone &amp; iPad</span>
                     </div>
 
                     <!-- Steps Checklist -->
@@ -8778,7 +8472,7 @@ function renderAccessoryInline(widget, ui) {
 
                     <!-- Action Buttons -->
                     <div class="flex flex-wrap items-center gap-2 pt-1">
-                        <button type="button" onclick="openInScriptable('new')" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs transition-all shadow-lg flex items-center gap-2 active:scale-95">
+                        <button type="button" onclick="openInScriptable('new')" class="px-4 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-xs flex items-center gap-2">
                             <i class="fa-solid fa-copy"></i>
                             <span>คัดลอกโค้ด + เปิดสร้างสคริปต์ใหม่</span>
                         </button>
@@ -8828,17 +8522,15 @@ function renderAccessoryInline(widget, ui) {
         <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <!-- Header -->
             <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-850">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500/20 to-sky-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 text-lg shadow-inner">
-                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h3 class="font-semibold text-base sm:text-lg text-white flex items-center gap-2">
+                            <i class="fa-solid fa-cloud-arrow-up text-amber-400"></i>
+                            <span>ระบบซิงก์ข้อมูลคลาวด์ (Cloud Sync)</span>
+                        </h3>
+                        <span class="text-[10px] font-mono font-medium px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Spark Plan Free</span>
                     </div>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <h3 class="font-bold text-base sm:text-lg text-white">ระบบซิงก์ข้อมูลคลาวด์ (Cloud Sync)</h3>
-                            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">ฟรี 100% Spark Plan</span>
-                        </div>
-                        <p class="text-xs text-slate-400 mt-0.5">ซิงก์ตารางเรียน หมวดสี ช่วงสอบ และโน้ตข้ามอุปกรณ์อัตโนมัติ</p>
-                    </div>
+                    <p class="text-xs text-slate-400 mt-0.5">ซิงก์ตารางเรียน หมวดสี ช่วงสอบ และโน้ตข้ามอุปกรณ์อัตโนมัติ</p>
                 </div>
                 <button type="button" onclick="closeCloudSyncModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-all">
                     <i class="fa-solid fa-xmark"></i>
@@ -8874,12 +8566,10 @@ function renderAccessoryInline(widget, ui) {
                 <span class="text-[11px] text-slate-400 flex items-center gap-1.5">
                     <i class="fa-solid fa-shield-halved text-emerald-400"></i> ปลอดภัย แยกข้อมูลรายบุคคลตามบัญชี Google
                 </span>
-                <button type="button" onclick="closeCloudSyncModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition-all">
+                <button type="button" onclick="closeCloudSyncModal()" class="px-4 py-2 bg-[#171E2A] hover:bg-[#1E2736] border border-white/[0.08] text-slate-200 rounded-lg text-xs font-medium">
                     ปิด
                 </button>
             </div>
-        </div>
-    </div>
         </div>
     </div>
 
