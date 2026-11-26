@@ -1,17 +1,3 @@
-// Variables used to start the script:
-// Widget Settings:
-// - Script: SmartSchedule
-// - Parameter (optional): URL to your schedule JSON or leave empty to use synced/embedded data.
-
-/**
- * Smart Schedule iOS Widget (Scriptable)
- * รองรับหลายขนาดอัตโนมัติ (Small 2×2 / Medium 4×2 / Large 4×4 / Lock Screen)
- * รูปแบบและตรรกะตรงกับ Android Widget:
- * - Exam Mode (สัปดาห์สอบโทนส้ม) + Progress Bar + นับถอยหลังเข้า/เลิกเรียน
- * - เรียงลำดับงานตามความเร่งด่วน (เลยกำหนด -> วันนี้ -> พรุ่งนี้ -> วันถัดไป) + ความสำคัญ
- * - แสดงตารางวันนี้ (ในขนาด Large) และไฮไลต์งานด่วนสีแดงชมพู
- */
-
 // --- CONFIGURATION ---
 const APP_URL = "https://flyingtoasts.github.io/my-uni-schedule/"; // URL ของเว็บแอปเพื่อเปิดเมื่อแตะ Widget
 const SYNC_URL = ""; // URL ซิงก์อัตโนมัติจาก Firebase Cloud Sync (เว็บแอปจะเติมให้อัตโนมัติเมื่อเข้าสู่ระบบ)
@@ -339,12 +325,26 @@ function normalizePayload(raw, now) {
               room: ex.room || "",
               kind: "exam"
             });
-            tasks.push({
-              title: `สอบ ${c.code || c.name} (${t === "midterm" ? "กลางภาค" : "ปลายภาค"})`,
-              date: ex.date,
-              type: "exam"
-            });
           }
+        });
+      }
+    });
+  }
+
+  // กรณีไม่มีข้อมูลคาบเรียนล่วงหน้าแล้ว (เช่น ออฟไลน์เกิน 14 วัน) ให้สร้างจากคาบประจำสัปดาห์สำรอง
+  let todayIso = toIsoDate(now);
+  let hasUpcomingOrTodayDated = datedSessions.some(s => s && s.date && s.date >= todayIso);
+  if (!hasUpcomingOrTodayDated && raw && Array.isArray(raw.fallbackRecurringSessions)) {
+    raw.fallbackRecurringSessions.forEach(rs => {
+      if (rs && rs.day !== undefined && rs.start && rs.end) {
+        recurringSessions.push({
+          day: Number(rs.day),
+          start: rs.start,
+          end: rs.end,
+          code: rs.code || "",
+          name: rs.name || "",
+          room: rs.room || "",
+          kind: rs.kind || "class"
         });
       }
     });
