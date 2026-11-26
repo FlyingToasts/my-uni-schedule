@@ -42,13 +42,18 @@
         }
     </script>
     <style>
-        /* Design System: Obsidian Academic Instrument (see DESIGN.md) */
+        /* Design System: Obsidian Liquid Glass (see DESIGN.md) */
         :root {
-            --bg-canvas: #090C11;
+            --bg-canvas: #070A10;
             --bg-header: #0E131B;
             --bg-surface: #11161F;
             --bg-elevated: #171E2A;
             --bg-hover: #1E2736;
+            --glass-bg: rgba(16, 21, 30, 0.72);
+            --glass-bg-strong: rgba(13, 18, 26, 0.84);
+            --glass-rim-top: rgba(255, 255, 255, 0.20);
+            --glass-rim: rgba(255, 255, 255, 0.10);
+            --glass-rim-strong: rgba(255, 255, 255, 0.18);
             --border-subtle: rgba(255, 255, 255, 0.08);
             --border-strong: rgba(255, 255, 255, 0.14);
             --text-primary: #F1F5F9;
@@ -63,7 +68,11 @@
         body {
             font-family: 'IBM Plex Sans Thai', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: var(--bg-canvas);
-            background-image: radial-gradient(ellipse 85% 38% at 50% -12%, rgba(245, 158, 11, 0.085) 0%, transparent 70%);
+            /* Layered static studio-light wells behind translucent Liquid Glass (no blur orbs, no fixed attachment) */
+            background-image:
+                radial-gradient(ellipse 75% 42% at 50% -10%, rgba(245, 158, 11, 0.11) 0%, transparent 68%),
+                radial-gradient(circle at 10% 34%, rgba(56, 189, 248, 0.075) 0%, transparent 45%),
+                radial-gradient(circle at 88% 72%, rgba(16, 185, 129, 0.06) 0%, transparent 48%);
             color: var(--text-primary);
             padding-bottom: 5.5rem;
             position: relative;
@@ -76,19 +85,37 @@
             font-variant-numeric: tabular-nums;
         }
 
-        /* Machined Obsidian Glass top-edge sheen overriding legacy slate opacity utilities */
+        /* Smoked Liquid Glass Panels with Fresnel top-edge thickness refraction */
+        .lg-panel,
         .bg-slate-800\/80, .bg-slate-800\/70, .bg-slate-800\/90, .bg-slate-800\/60, .bg-slate-850 {
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.028) 0%, rgba(255, 255, 255, 0) 38%), var(--bg-surface) !important;
-            border-color: var(--border-subtle) !important;
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+            background:
+                linear-gradient(160deg, rgba(255, 255, 255, 0.075) 0%, rgba(255, 255, 255, 0.018) 38%, rgba(255, 255, 255, 0.005) 100%),
+                var(--glass-bg) !important;
+            border-color: var(--glass-rim) !important;
+            box-shadow:
+                inset 0 1px 0 var(--glass-rim-top),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+                0 12px 30px -14px rgba(0, 0, 0, 0.68) !important;
         }
 
+        @media (hover: hover) and (pointer: fine) {
+            .lg-panel {
+                -webkit-backdrop-filter: blur(10px) saturate(135%);
+                backdrop-filter: blur(10px) saturate(135%);
+            }
+        }
+
+        /* Translucent Liquid Glass Header & Controls */
         header {
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0%, transparent 100%), var(--bg-header) !important;
-            -webkit-backdrop-filter: none !important;
-            backdrop-filter: none !important;
-            border-bottom: 1px solid var(--border-subtle) !important;
-            box-shadow: 0 4px 16px -6px rgba(0, 0, 0, 0.5) !important;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.055) 0%, rgba(255, 255, 255, 0.01) 100%),
+                var(--glass-bg-strong) !important;
+            -webkit-backdrop-filter: blur(14px) saturate(150%);
+            backdrop-filter: blur(14px) saturate(150%);
+            isolation: isolate;
+            transform: translateZ(0);
+            border-bottom: 1px solid var(--glass-rim) !important;
+            box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.4), 0 8px 24px -10px rgba(0, 0, 0, 0.62) !important;
         }
 
         #simulator-panel {
@@ -96,19 +123,70 @@
             backdrop-filter: none !important;
         }
 
-        /* Live Card subtle corner washes & breathing compositor dot */
+        /* Smoked Liquid Glass Controls & Specular Primary CTA */
+        button[class*="bg-[#171E2A]"],
+        label[class*="bg-[#171E2A]"] {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.065) 0%, rgba(255, 255, 255, 0.015) 100%), rgba(23, 30, 42, 0.72) !important;
+            border-color: var(--glass-rim) !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 -1px 0 rgba(0, 0, 0, 0.35) !important;
+        }
+        button[class*="bg-[#171E2A]"]:hover,
+        label[class*="bg-[#171E2A]"]:hover {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.105) 0%, rgba(255, 255, 255, 0.03) 100%), rgba(30, 39, 54, 0.85) !important;
+            border-color: var(--glass-rim-strong) !important;
+        }
+        button[class*="bg-amber-500"] {
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42), 0 6px 18px -6px rgba(245, 158, 11, 0.45) !important;
+        }
+
+        /* Live Card Fresnel Refraction & Pointer Hover Sheen */
         #current-class-card,
         #next-class-card {
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.028) 0%, transparent 38%), var(--bg-surface) !important;
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07) !important;
+            position: relative;
+            overflow: hidden;
+            --card-mx: 50%;
+            --card-my: 0%;
         }
 
         #current-class-card.border-l-emerald-500 {
-            background: radial-gradient(circle at 0% 0%, rgba(16, 185, 129, 0.12) 0%, transparent 55%), linear-gradient(180deg, rgba(255, 255, 255, 0.028) 0%, transparent 38%), var(--bg-surface) !important;
+            background:
+                radial-gradient(circle at 0% 0%, rgba(16, 185, 129, 0.14) 0%, transparent 56%),
+                linear-gradient(160deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.018) 38%, rgba(255, 255, 255, 0.005) 100%),
+                var(--glass-bg) !important;
+            box-shadow:
+                inset 0 1px 0 rgba(52, 211, 153, 0.34),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+                0 14px 32px -14px rgba(16, 185, 129, 0.25) !important;
         }
 
         #next-class-card {
-            background: radial-gradient(circle at 100% 0%, rgba(245, 158, 11, 0.085) 0%, transparent 55%), linear-gradient(180deg, rgba(255, 255, 255, 0.028) 0%, transparent 38%), var(--bg-surface) !important;
+            background:
+                radial-gradient(circle at 100% 0%, rgba(245, 158, 11, 0.11) 0%, transparent 56%),
+                linear-gradient(160deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.018) 38%, rgba(255, 255, 255, 0.005) 100%),
+                var(--glass-bg) !important;
+            box-shadow:
+                inset 0 1px 0 rgba(251, 191, 36, 0.26),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+                0 12px 30px -14px rgba(0, 0, 0, 0.7) !important;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            #current-class-card::after,
+            #next-class-card::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                border-radius: inherit;
+                pointer-events: none;
+                z-index: 1;
+                opacity: 0;
+                background: radial-gradient(280px circle at var(--card-mx, 50%) var(--card-my, 0%), rgba(255, 255, 255, 0.065), transparent 65%);
+                transition: opacity 220ms ease;
+            }
+            #current-class-card:hover::after,
+            #next-class-card:hover::after {
+                opacity: 1;
+            }
         }
 
         @keyframes liveDotBreath {
@@ -119,11 +197,20 @@
             animation: liveDotBreath 2.6s ease-in-out infinite;
         }
 
-        /* Monochrome Crystal Lens Capsule Bottom Dock (no rainbow ring, no blur flicker) */
+        /* Liquid Glass Floating Capsule Dock & Convex Crystal Lens */
         .precision-dock {
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%), rgba(17, 22, 31, 0.96) !important;
-            border: 1px solid var(--border-strong) !important;
-            box-shadow: 0 14px 32px -8px rgba(0, 0, 0, 0.78), inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.018) 45%, rgba(255, 255, 255, 0.005) 100%),
+                rgba(15, 20, 29, 0.68) !important;
+            -webkit-backdrop-filter: blur(16px) saturate(160%);
+            backdrop-filter: blur(16px) saturate(160%);
+            isolation: isolate;
+            transform: translateZ(0);
+            border: 1px solid rgba(255, 255, 255, 0.16) !important;
+            box-shadow:
+                0 16px 36px -8px rgba(0, 0, 0, 0.78),
+                inset 0 1px 0 rgba(255, 255, 255, 0.24),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.5) !important;
             --lens-x: 42%;
         }
 
@@ -134,12 +221,16 @@
             left: 0;
             pointer-events: none;
             border-radius: 9999px;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.025) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.22);
+            background: linear-gradient(180deg,
+                rgba(255, 255, 255, 0.18) 0%,
+                rgba(255, 255, 255, 0.05) 45%,
+                rgba(255, 255, 255, 0.02) 75%,
+                rgba(255, 255, 255, 0.09) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.28);
             box-shadow:
-                0 6px 16px -4px rgba(0, 0, 0, 0.55),
-                inset 0 1px 1px rgba(255, 255, 255, 0.34),
-                inset 0 -1px 1px rgba(0, 0, 0, 0.45);
+                0 6px 18px -4px rgba(0, 0, 0, 0.60),
+                inset 0 1.5px 1px rgba(255, 255, 255, 0.48),
+                inset 0 -1.5px 2px rgba(0, 0, 0, 0.42);
             z-index: 1;
             overflow: hidden;
             transform-origin: center center;
@@ -150,24 +241,37 @@
         .lens-specular {
             position: absolute;
             top: 2px;
-            left: 14%;
-            right: 14%;
-            height: 20%;
-            background: radial-gradient(ellipse at var(--lens-x, 42%) 15%, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0.14) 38%, transparent 72%);
+            left: 12%;
+            right: 12%;
+            height: 22%;
+            background: radial-gradient(ellipse at var(--lens-x, 42%) 15%, rgba(255, 255, 255, 0.80) 0%, rgba(255, 255, 255, 0.18) 38%, transparent 72%);
             border-radius: 9999px 9999px 60% 60% / 9999px 9999px 40% 40%;
             pointer-events: none;
-            opacity: 0.85;
+            opacity: 0.90;
+        }
+
+        .lens-caustic {
+            position: absolute;
+            bottom: 1.5px;
+            left: 22%;
+            right: 22%;
+            height: 14%;
+            background: radial-gradient(ellipse at center bottom, rgba(255, 255, 255, 0.24) 0%, transparent 65%);
+            border-radius: 9999px;
+            pointer-events: none;
+            transform: translateX(calc((50% - var(--lens-x, 50%)) * 0.22));
+            transition: transform 120ms ease-out;
         }
 
         .lens-gleam {
             position: absolute;
             inset: 0;
             border-radius: 9999px;
-            background: linear-gradient(110deg, transparent 32%, rgba(255, 255, 255, 0.08) 45%, rgba(255, 255, 255, 0.28) 50%, rgba(255, 255, 255, 0.08) 55%, transparent 68%);
+            background: linear-gradient(110deg, transparent 32%, rgba(255, 255, 255, 0.10) 45%, rgba(255, 255, 255, 0.34) 50%, rgba(255, 255, 255, 0.10) 55%, transparent 68%);
             background-size: 240% 100%;
             background-position: var(--gleam-pos, -120% 0);
             pointer-events: none;
-            opacity: 0.45;
+            opacity: 0.50;
             transition: background-position 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
@@ -349,7 +453,7 @@
         <!-- Live Status Cards Grid (2 Columns) -->
         <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Left Card: Current Class -->
-            <div id="current-class-card" class="bg-[#11161F] border border-white/[0.08] rounded-xl p-5 flex flex-col justify-between transition-colors duration-150">
+            <div id="current-class-card" class="lg-panel bg-[#11161F] border border-white/[0.08] rounded-xl p-5 flex flex-col justify-between transition-colors duration-150">
                 <div class="flex items-center justify-between border-b border-white/[0.08] pb-3 mb-3.5">
                     <span class="font-semibold text-emerald-400 text-sm sm:text-base flex items-center gap-2">
                         <i class="fa-solid fa-chalkboard-user text-sm"></i> <span id="current-card-title">กำลังเรียนอยู่ในขณะนี้</span>
@@ -364,7 +468,7 @@
             </div>
 
             <!-- Right Card: Next Class -->
-            <div id="next-class-card" class="bg-[#11161F] border border-white/[0.08] rounded-xl p-5 flex flex-col justify-between transition-colors duration-150">
+            <div id="next-class-card" class="lg-panel bg-[#11161F] border border-white/[0.08] rounded-xl p-5 flex flex-col justify-between transition-colors duration-150">
                 <div class="flex items-center justify-between border-b border-white/[0.08] pb-3 mb-3.5">
                     <span class="font-semibold text-amber-400 text-sm sm:text-base flex items-center gap-2">
                         <i class="fa-solid fa-forward-step text-sm"></i> <span id="next-card-title">คาบเรียนถัดไป</span>
@@ -380,7 +484,7 @@
         </section>
 
         <!-- Weekly Task & Announcement Summary Section -->
-        <section id="weekly-summary-section" class="bg-[#11161F] border border-white/[0.08] rounded-xl p-4 sm:p-5 space-y-4">
+        <section id="weekly-summary-section" class="lg-panel bg-[#11161F] border border-white/[0.08] rounded-xl p-4 sm:p-5 space-y-4">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-white/[0.08] pb-3.5">
                 <div class="space-y-1">
                     <div class="flex items-center gap-2 flex-wrap">
@@ -419,7 +523,7 @@
         </section>
 
         <!-- Action Bar & Schedule Tools (Single Primary Amber CTA + Quiet Secondary Surface) -->
-        <section class="bg-[#11161F] rounded-xl p-4 sm:p-5 border border-white/[0.08] flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+        <section class="lg-panel bg-[#11161F] rounded-xl p-4 sm:p-5 border border-white/[0.08] flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
             <div>
                 <h2 class="text-sm sm:text-base font-semibold text-white flex items-center gap-2">
                     <i class="fa-solid fa-sliders text-slate-400"></i> จัดการตารางเรียนและหมวดสีวิชา
@@ -470,7 +574,7 @@
         </section>
 
         <!-- Timetable Section -->
-        <section id="page-class" class="bg-[#11161F] rounded-xl border border-white/[0.08] overflow-hidden">
+        <section id="page-class" class="lg-panel bg-[#11161F] rounded-xl border border-white/[0.08] overflow-hidden">
             <!-- Mode Switcher: Daily Timeline vs Weekly Matrix -->
             <div class="bg-[#0E131B] p-1.5 flex gap-1.5 border-b border-white/[0.08]">
                 <button id="tab-daily" onclick="switchViewMode('daily')" class="flex-1 py-2.5 px-4 rounded-lg font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 bg-[#1E2736] text-amber-400 border border-white/10">
@@ -531,7 +635,7 @@
         </section>
 
         <!-- Exam Schedule Page -->
-        <section id="page-exam" class="hidden bg-[#11161F] rounded-xl border border-white/[0.08] overflow-hidden">
+        <section id="page-exam" class="hidden lg-panel bg-[#11161F] rounded-xl border border-white/[0.08] overflow-hidden">
             <div class="bg-[#0E131B] p-1.5 flex gap-1.5 border-b border-white/[0.08]">
                 <button id="exam-tab-midterm" onclick="selectExamType('midterm')"><i class="fa-solid fa-pen-to-square"></i> สอบกลางภาค (Midterm)</button>
                 <button id="exam-tab-final" onclick="selectExamType('final')"><i class="fa-solid fa-file-signature"></i> สอบปลายภาค (Final)</button>
@@ -543,17 +647,18 @@
         </section>
 
         <!-- Grade Page -->
-        <section id="page-grade" class="hidden bg-[#11161F] rounded-xl border border-white/[0.08] overflow-hidden">
+        <section id="page-grade" class="hidden lg-panel bg-[#11161F] rounded-xl border border-white/[0.08] overflow-hidden">
             <div id="grade-page-body" class="p-4 sm:p-5 space-y-4"></div>
         </section>
 
     </main>
 
-    <!-- Bottom Navigation: Quiet Obsidian Segmented Capsule Dock -->
+    <!-- Bottom Navigation: Liquid Glass Crystal Capsule Dock -->
     <nav class="fixed bottom-3 sm:bottom-5 inset-x-0 z-40 px-3 sm:px-4 pointer-events-none pb-[env(safe-area-inset-bottom)]">
         <div id="liquid-bottom-dock" class="max-w-md mx-auto pointer-events-auto precision-dock p-1 rounded-full relative flex items-center overflow-hidden">
-            <!-- Sliding Active Segment Indicator -->
+            <!-- Sliding Active Crystal Lens Indicator -->
             <div id="liquid-nav-indicator" class="dock-indicator" style="width: calc(100% / 3); transform: translateX(0%);">
+                <span class="lens-caustic"></span>
                 <span class="lens-specular"></span>
                 <span class="lens-gleam"></span>
             </div>
@@ -2512,7 +2617,7 @@
                 if (curRenderKey === lastCurrentCardRenderKey) return;
                 lastCurrentCardRenderKey = curRenderKey;
 
-                card.className = "bg-[#11161F] border border-white/[0.08] rounded-xl p-5 flex flex-col justify-between transition-colors duration-150";
+                card.className = "lg-panel bg-[#11161F] border border-white/[0.08] rounded-xl p-5 flex flex-col justify-between transition-colors duration-150";
                 badge.className = "text-[11px] font-medium px-2.5 py-0.5 rounded-md bg-[#171E2A] text-slate-300 border border-white/[0.08]";
                 badge.innerText = "ยังไม่มีข้อมูล";
                 content.innerHTML = `
@@ -2552,7 +2657,7 @@
                     : '';
 
                 const colObj = getColorObj(currentSession.colorId);
-                card.className = "bg-[#11161F] border border-emerald-500/35 border-l-2 border-l-emerald-500 rounded-xl p-5 flex flex-col justify-between transition-colors duration-150";
+                card.className = "lg-panel bg-[#11161F] border border-emerald-500/35 border-l-2 border-l-emerald-500 rounded-xl p-5 flex flex-col justify-between transition-colors duration-150";
                 badge.className = "text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5";
                 badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 live-dot-breath"></span> ${L('กำลังเรียน','กำลังสอบ')}`;
 
@@ -2628,7 +2733,7 @@
                    </div>`
                 : '';
 
-            card.className = "bg-[#11161F] border border-white/[0.08] rounded-xl p-5 flex flex-col justify-between transition-colors duration-150";
+            card.className = "lg-panel bg-[#11161F] border border-white/[0.08] rounded-xl p-5 flex flex-col justify-between transition-colors duration-150";
 
             if (todaySessions.length === 0) {
                 if (todayCancelledSessions && todayCancelledSessions.length > 0) {
@@ -4496,6 +4601,47 @@
                     createWaterRipple(e, btn);
                 });
             });
+
+            initLiquidGlassCardSheen();
+        }
+
+        function initLiquidGlassCardSheen() {
+            if (!window.matchMedia || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+            ['current-class-card', 'next-class-card'].forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                let rect = null;
+                let raf = 0;
+                let px = 0;
+                let py = 0;
+
+                el.addEventListener('pointerenter', () => {
+                    rect = el.getBoundingClientRect();
+                }, { passive: true });
+
+                el.addEventListener('pointermove', (e) => {
+                    px = e.clientX;
+                    py = e.clientY;
+                    if (raf) return;
+                    raf = requestAnimationFrame(() => {
+                        raf = 0;
+                        if (!rect) rect = el.getBoundingClientRect();
+                        if (!rect.width || !rect.height) return;
+                        const xPct = Math.max(0, Math.min(100, ((px - rect.left) / rect.width) * 100));
+                        const yPct = Math.max(0, Math.min(100, ((py - rect.top) / rect.height) * 100));
+                        el.style.setProperty('--card-mx', `${xPct.toFixed(1)}%`);
+                        el.style.setProperty('--card-my', `${yPct.toFixed(1)}%`);
+                    });
+                }, { passive: true });
+
+                el.addEventListener('pointerleave', () => {
+                    if (raf) {
+                        cancelAnimationFrame(raf);
+                        raf = 0;
+                    }
+                    rect = null;
+                }, { passive: true });
+            });
         }
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initWaterDropletLighting);
@@ -5137,7 +5283,7 @@
                     widgetSyncToken: ensureWidgetSyncToken(),
                     clientUpdatedAt: nowIso,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    appVersion: "1.4.1"
+                    appVersion: "1.4.2"
                 };
 
                 const docRef = firebaseDb.collection(FIREBASE_COLLECTION_USERS)
