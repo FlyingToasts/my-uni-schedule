@@ -1,3 +1,17 @@
+// Variables used to start the script:
+// Widget Settings:
+// - Script: SmartSchedule
+// - Parameter (optional): URL to your schedule JSON or leave empty to use synced/embedded data.
+
+/**
+ * Smart Schedule iOS Widget (Scriptable)
+ * รองรับหลายขนาดอัตโนมัติ (Small 2×2 / Medium 4×2 / Large 4×4 / Lock Screen)
+ * รูปแบบและตรรกะตรงกับ Android Widget:
+ * - Exam Mode (สัปดาห์สอบโทนส้ม) + Progress Bar + นับถอยหลังเข้า/เลิกเรียน
+ * - เรียงลำดับงานตามความเร่งด่วน (เลยกำหนด -> วันนี้ -> พรุ่งนี้ -> วันถัดไป) + ความสำคัญ
+ * - แสดงตารางวันนี้ (ในขนาด Large) และไฮไลต์งานด่วนสีแดงชมพู
+ */
+
 // --- CONFIGURATION ---
 const APP_URL = "https://flyingtoasts.github.io/my-uni-schedule/"; // URL ของเว็บแอปเพื่อเปิดเมื่อแตะ Widget
 const SYNC_URL = ""; // URL ซิงก์อัตโนมัติจาก Firebase Cloud Sync (เว็บแอปจะเติมให้อัตโนมัติเมื่อเข้าสู่ระบบ)
