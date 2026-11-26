@@ -63,6 +63,7 @@
         body {
             font-family: 'IBM Plex Sans Thai', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: var(--bg-canvas);
+            background-image: radial-gradient(ellipse 85% 38% at 50% -12%, rgba(245, 158, 11, 0.085) 0%, transparent 70%);
             color: var(--text-primary);
             padding-bottom: 5.5rem;
             position: relative;
@@ -75,19 +76,19 @@
             font-variant-numeric: tabular-nums;
         }
 
-        /* Crisp tonal surface tokens overriding legacy slate opacity utilities */
+        /* Machined Obsidian Glass top-edge sheen overriding legacy slate opacity utilities */
         .bg-slate-800\/80, .bg-slate-800\/70, .bg-slate-800\/90, .bg-slate-800\/60, .bg-slate-850 {
-            background-color: var(--bg-surface) !important;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.028) 0%, rgba(255, 255, 255, 0) 38%), var(--bg-surface) !important;
             border-color: var(--border-subtle) !important;
-            box-shadow: none !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
         }
 
         header {
-            background-color: var(--bg-header) !important;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0%, transparent 100%), var(--bg-header) !important;
             -webkit-backdrop-filter: none !important;
             backdrop-filter: none !important;
             border-bottom: 1px solid var(--border-subtle) !important;
-            box-shadow: none !important;
+            box-shadow: 0 4px 16px -6px rgba(0, 0, 0, 0.5) !important;
         }
 
         #simulator-panel {
@@ -95,11 +96,35 @@
             backdrop-filter: none !important;
         }
 
-        /* Calm Segmented Capsule Bottom Dock */
+        /* Live Card subtle corner washes & breathing compositor dot */
+        #current-class-card,
+        #next-class-card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.028) 0%, transparent 38%), var(--bg-surface) !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07) !important;
+        }
+
+        #current-class-card.border-l-emerald-500 {
+            background: radial-gradient(circle at 0% 0%, rgba(16, 185, 129, 0.12) 0%, transparent 55%), linear-gradient(180deg, rgba(255, 255, 255, 0.028) 0%, transparent 38%), var(--bg-surface) !important;
+        }
+
+        #next-class-card {
+            background: radial-gradient(circle at 100% 0%, rgba(245, 158, 11, 0.085) 0%, transparent 55%), linear-gradient(180deg, rgba(255, 255, 255, 0.028) 0%, transparent 38%), var(--bg-surface) !important;
+        }
+
+        @keyframes liveDotBreath {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.42; }
+        }
+        .live-dot-breath {
+            animation: liveDotBreath 2.6s ease-in-out infinite;
+        }
+
+        /* Monochrome Crystal Lens Capsule Bottom Dock (no rainbow ring, no blur flicker) */
         .precision-dock {
-            background-color: var(--bg-surface) !important;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%), rgba(17, 22, 31, 0.96) !important;
             border: 1px solid var(--border-strong) !important;
-            box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.72) !important;
+            box-shadow: 0 14px 32px -8px rgba(0, 0, 0, 0.78), inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+            --lens-x: 42%;
         }
 
         .dock-indicator {
@@ -109,21 +134,66 @@
             left: 0;
             pointer-events: none;
             border-radius: 9999px;
-            background-color: var(--bg-hover);
-            border: 1px solid rgba(255, 255, 255, 0.10);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.025) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            box-shadow:
+                0 6px 16px -4px rgba(0, 0, 0, 0.55),
+                inset 0 1px 1px rgba(255, 255, 255, 0.34),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.45);
             z-index: 1;
+            overflow: hidden;
+            transform-origin: center center;
             will-change: transform;
-            transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+            transition: transform 280ms cubic-bezier(0.34, 1.4, 0.64, 1);
         }
 
+        .lens-specular {
+            position: absolute;
+            top: 2px;
+            left: 14%;
+            right: 14%;
+            height: 20%;
+            background: radial-gradient(ellipse at var(--lens-x, 42%) 15%, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0.14) 38%, transparent 72%);
+            border-radius: 9999px 9999px 60% 60% / 9999px 9999px 40% 40%;
+            pointer-events: none;
+            opacity: 0.85;
+        }
+
+        .lens-gleam {
+            position: absolute;
+            inset: 0;
+            border-radius: 9999px;
+            background: linear-gradient(110deg, transparent 32%, rgba(255, 255, 255, 0.08) 45%, rgba(255, 255, 255, 0.28) 50%, rgba(255, 255, 255, 0.08) 55%, transparent 68%);
+            background-size: 240% 100%;
+            background-position: var(--gleam-pos, -120% 0);
+            pointer-events: none;
+            opacity: 0.45;
+            transition: background-position 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .tap-ripple {
+            position: absolute;
+            border-radius: 9999px;
+            width: 24px;
+            height: 24px;
+            transform: translate(-50%, -50%) scale(0.2);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.18) 0%, transparent 70%);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            pointer-events: none;
+            animation: tapRippleAnim 420ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            z-index: 5;
+        }
+        @keyframes tapRippleAnim {
+            0% { transform: translate(-50%, -50%) scale(0.2); opacity: 0.75; }
+            100% { transform: translate(-50%, -50%) scale(4); opacity: 0; }
+        }
+
+        /* Tactile button press & compositor transitions */
         button, a[class*="rounded-xl"], a[class*="rounded-lg"] {
-            transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, opacity 150ms ease !important;
+            transition: transform 140ms cubic-bezier(0.2, 0.8, 0.2, 1), background-color 150ms ease, border-color 150ms ease, color 150ms ease, opacity 150ms ease !important;
         }
-
-        #current-class-card,
-        #next-class-card {
-            background-color: var(--bg-surface) !important;
-            box-shadow: none !important;
+        button:active, a[class*="rounded-xl"]:active, a[class*="rounded-lg"]:active {
+            transform: scale(0.975);
         }
 
         .pulse-glow {
@@ -131,12 +201,21 @@
             box-shadow: none !important;
         }
 
+        @keyframes modalPanelIn {
+            from { opacity: 0; transform: translateY(6px) scale(0.985); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        div[id$="-modal"]:not(.hidden) > div {
+            animation: modalPanelIn 160ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
         div[id$="-modal"] > div.bg-slate-900,
         div[id$="-modal"] > div.bg-slate-800,
         div[id$="-modal"] > div[class*="bg-\[#11161F\]"] {
-            background-color: var(--bg-surface) !important;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 25%), var(--bg-surface) !important;
             border-color: var(--border-strong) !important;
-            box-shadow: 0 20px 44px -12px rgba(0, 0, 0, 0.72) !important;
+            box-shadow: 0 20px 44px -12px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
         }
 
         /* Custom Scrollbar */
@@ -234,7 +313,7 @@
                         <div id="live-time" class="font-mono text-base sm:text-lg font-semibold text-amber-400 leading-none">00:00:00</div>
                         <div id="live-date" class="text-[11px] text-slate-400 leading-tight mt-1">กำลังโหลด...</div>
                     </div>
-                    <div id="clock-indicator" class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></div>
+                    <div id="clock-indicator" class="w-2 h-2 rounded-full bg-emerald-400 live-dot-breath shrink-0"></div>
                 </div>
             </div>
         </div>
@@ -474,7 +553,10 @@
     <nav class="fixed bottom-3 sm:bottom-5 inset-x-0 z-40 px-3 sm:px-4 pointer-events-none pb-[env(safe-area-inset-bottom)]">
         <div id="liquid-bottom-dock" class="max-w-md mx-auto pointer-events-auto precision-dock p-1 rounded-full relative flex items-center overflow-hidden">
             <!-- Sliding Active Segment Indicator -->
-            <div id="liquid-nav-indicator" class="dock-indicator" style="width: calc(100% / 3); transform: translateX(0%);"></div>
+            <div id="liquid-nav-indicator" class="dock-indicator" style="width: calc(100% / 3); transform: translateX(0%);">
+                <span class="lens-specular"></span>
+                <span class="lens-gleam"></span>
+            </div>
 
             <button id="nav-class" onclick="setPageMode('class')" class="flex-1 py-2.5 rounded-full font-semibold text-xs sm:text-sm relative z-10 flex items-center justify-center gap-1.5 text-amber-400 overflow-hidden">
                 <i class="fa-solid fa-table-cells-large"></i> <span>ตารางเรียน</span>
@@ -534,7 +616,7 @@
                     <!-- Note Type Selector -->
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
                         <button type="button" onclick="selectNoteType('permanent')" id="ntype-btn-permanent" class="p-2.5 rounded-xl border text-left transition-all flex flex-col gap-1">
-                            <span class="text-xs font-bold flex items-center gap-1.5"><i class="fa-solid fa-thumbtack text-indigo-400"></i> โน้ตถาวร</span>
+                            <span class="text-xs font-bold flex items-center gap-1.5"><i class="fa-solid fa-thumbtack text-sky-400"></i> โน้ตถาวร</span>
                             <span class="text-[10px] text-slate-400 leading-tight">ติดวิชาตลอด (ลิงก์/รหัส/เกณฑ์)</span>
                         </button>
                         <button type="button" onclick="selectNoteType('homework')" id="ntype-btn-homework" class="p-2.5 rounded-xl border text-left transition-all flex flex-col gap-1">
@@ -576,7 +658,7 @@
 
                 <!-- Section 1: Permanent Notes -->
                 <div class="space-y-2">
-                    <div class="text-xs font-bold text-indigo-300 flex items-center justify-between">
+                    <div class="text-xs font-bold text-sky-300 flex items-center justify-between">
                         <span><i class="fa-solid fa-thumbtack mr-1.5"></i> โน้ตถาวรประจำวิชา (<span id="perm-notes-count">0</span>)</span>
                         <span class="text-[11px] font-normal text-slate-400">แสดงติดกับรายวิชานี้ตลอด</span>
                     </div>
@@ -915,7 +997,7 @@
         <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
             <div class="px-5 py-4 bg-slate-800/90 border-b border-slate-700 flex items-center justify-between">
                 <h3 class="font-bold text-base sm:text-lg text-white flex items-center gap-2">
-                    <i class="fa-solid fa-palette text-indigo-400"></i> จัดการสีและชื่อหมวดวิชา
+                    <i class="fa-solid fa-palette text-amber-400"></i> จัดการสีและชื่อหมวดวิชา
                 </h3>
                 <button onclick="closeColorManagerModal()" class="text-slate-400 hover:text-white w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-700 transition-all">
                     <i class="fa-solid fa-xmark"></i>
@@ -2472,7 +2554,7 @@
                 const colObj = getColorObj(currentSession.colorId);
                 card.className = "bg-[#11161F] border border-emerald-500/35 border-l-2 border-l-emerald-500 rounded-xl p-5 flex flex-col justify-between transition-colors duration-150";
                 badge.className = "text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5";
-                badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> ${L('กำลังเรียน','กำลังสอบ')}`;
+                badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 live-dot-breath"></span> ${L('กำลังเรียน','กำลังสอบ')}`;
 
                 content.innerHTML = `
                     <div class="space-y-3.5">
@@ -2782,7 +2864,7 @@
                                 <i class="fa-solid fa-plus mr-1"></i> เพิ่มรายวิชาแรกของคุณ
                             </button>
                             <button onclick="openColorManagerModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs sm:text-sm font-medium transition-all">
-                                <i class="fa-solid fa-palette text-indigo-400 mr-1"></i> ตั้งค่าสีหมวดวิชา
+                                <i class="fa-solid fa-palette text-amber-400 mr-1"></i> ตั้งค่าสีหมวดวิชา
                             </button>
                         </div>
                     </div>
@@ -4311,14 +4393,115 @@
         // --- REAL WATER DROPLET LIGHT PLAY & SQUASH/STRETCH ENGINE ---
         let currentBottomNavIdx = 0; // 0: class, 1: exam, 2: grade
 
-        function animateWaterDroplet(indicatorEl, targetIdx) {
+        let dockAnimTimer = null;
+        let dockGleamTimer = null;
+
+        function animateWaterDroplet(indicatorEl, targetIdx, currentIdx) {
             if (!indicatorEl) return;
-            indicatorEl.style.transform = `translateX(${targetIdx * 100}%)`;
+            if (dockAnimTimer) {
+                clearTimeout(dockAnimTimer);
+                dockAnimTimer = null;
+            }
+            if (dockGleamTimer) {
+                clearTimeout(dockGleamTimer);
+                dockGleamTimer = null;
+            }
+
+            const diff = targetIdx - currentIdx;
+            const targetPercent = targetIdx * 100;
+
+            if (diff === 0) {
+                indicatorEl.style.transition = 'transform 260ms cubic-bezier(0.34, 1.4, 0.64, 1)';
+                indicatorEl.style.transform = `translateX(${targetPercent}%) scale(1, 1)`;
+                return;
+            }
+
+            const isRight = diff > 0;
+            const stretchX = Math.abs(diff) > 1 ? 1.15 : 1.09;
+            const squashY = Math.abs(diff) > 1 ? 0.88 : 0.92;
+
+            indicatorEl.style.setProperty('--gleam-pos', isRight ? '150% 0' : '-80% 0');
+            dockGleamTimer = setTimeout(() => {
+                dockGleamTimer = null;
+                indicatorEl.style.setProperty('--gleam-pos', '-120% 0');
+            }, 440);
+
+            indicatorEl.style.transition = 'transform 190ms cubic-bezier(0.4, 0, 0.2, 1)';
+            indicatorEl.style.transform = `translateX(${targetPercent}%) scale(${stretchX}, ${squashY})`;
+
+            dockAnimTimer = setTimeout(() => {
+                dockAnimTimer = null;
+                indicatorEl.style.transition = 'transform 210ms cubic-bezier(0.34, 1.56, 0.64, 1)';
+                indicatorEl.style.transform = `translateX(${targetPercent}%) scale(1, 1)`;
+            }, 180);
         }
 
-        function createWaterRipple() {}
+        function createWaterRipple(e, targetBtn) {
+            if (!targetBtn) return;
+            const rect = targetBtn.getBoundingClientRect();
+            const ripple = document.createElement('span');
+            ripple.className = 'tap-ripple';
+            const x = (e && typeof e.clientX === 'number' && e.clientX > 0) ? (e.clientX - rect.left) : (rect.width / 2);
+            const y = (e && typeof e.clientY === 'number' && e.clientY > 0) ? (e.clientY - rect.top) : (rect.height / 2);
+            ripple.style.left = `${x}px`;
+            ripple.style.top = `${y}px`;
+            targetBtn.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 440);
+        }
 
-        function initWaterDropletLighting() {}
+        function initWaterDropletLighting() {
+            const dock = document.getElementById('liquid-bottom-dock');
+            if (!dock) return;
+
+            let dockRect = null;
+            let dockMoveRaf = 0;
+            let pendingX = 0;
+
+            window.addEventListener('resize', () => {
+                dockRect = null;
+            }, { passive: true });
+
+            const scheduleLightUpdate = (clientX) => {
+                pendingX = clientX;
+                if (dockMoveRaf) return;
+                dockMoveRaf = requestAnimationFrame(() => {
+                    dockMoveRaf = 0;
+                    if (!dockRect) dockRect = dock.getBoundingClientRect();
+                    if (!dockRect.width) return;
+                    const rawX = ((pendingX - dockRect.left) / dockRect.width) * 100;
+                    const clampedX = Math.max(15, Math.min(85, rawX));
+                    dock.style.setProperty('--lens-x', `${clampedX.toFixed(1)}%`);
+                });
+            };
+
+            dock.addEventListener('pointermove', (e) => {
+                scheduleLightUpdate(e.clientX);
+            }, { passive: true });
+            dock.addEventListener('touchmove', (e) => {
+                if (e.touches && e.touches[0]) {
+                    scheduleLightUpdate(e.touches[0].clientX);
+                }
+            }, { passive: true });
+            dock.addEventListener('pointerleave', () => {
+                if (dockMoveRaf) {
+                    cancelAnimationFrame(dockMoveRaf);
+                    dockMoveRaf = 0;
+                }
+                dockRect = null;
+                dock.style.setProperty('--lens-x', '42%');
+            });
+
+            document.querySelectorAll('#liquid-bottom-dock button').forEach(btn => {
+                btn.addEventListener('pointerdown', (e) => {
+                    createWaterRipple(e, btn);
+                });
+            });
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initWaterDropletLighting);
+        } else {
+            initWaterDropletLighting();
+        }
 
         let lastBottomNavKey = '';
         function renderBottomNav() {
@@ -4954,7 +5137,7 @@
                     widgetSyncToken: ensureWidgetSyncToken(),
                     clientUpdatedAt: nowIso,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    appVersion: "1.4.0"
+                    appVersion: "1.4.1"
                 };
 
                 const docRef = firebaseDb.collection(FIREBASE_COLLECTION_USERS)
@@ -5382,7 +5565,7 @@
                                     <span>ดึงจาก Cloud</span>
                                 </button>
                                 <button type="button" onclick="smartMergeScheduleWithCloud()" class="px-3 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-medium transition-all flex items-center justify-center gap-1.5 active:scale-95">
-                                    <i class="fa-solid fa-code-merge text-indigo-400"></i>
+                                    <i class="fa-solid fa-code-merge text-amber-400"></i>
                                     <span>ผสานข้อมูล</span>
                                 </button>
                                 <button type="button" onclick="signOutFirebase()" class="px-3 py-2.5 rounded-xl bg-slate-900 hover:bg-rose-950/60 border border-slate-700 hover:border-rose-500/40 text-rose-300 text-xs font-medium transition-all flex items-center justify-center gap-1.5 active:scale-95">
